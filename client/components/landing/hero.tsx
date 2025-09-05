@@ -8,18 +8,18 @@ export default function Hero() {
             Coming Soon
           </span>
         </div>
-        
+
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6">
           Your Reddit CRM
           <br />
           <span className="text-primary">Redefined</span>
         </h1>
-        
+
         <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed">
-          Manage Reddit DMs, discover leads, and build relationships with the most powerful 
-          CRM platform designed specifically for Reddit marketing.
+          Manage Reddit DMs, discover leads, and build relationships with the
+          most powerful CRM platform designed specifically for Reddit marketing.
         </p>
-        
+
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
           <button className="w-full sm:w-auto bg-primary text-primary-foreground px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition-opacity shadow-lg">
             Join the Waitlist
@@ -28,7 +28,7 @@ export default function Hero() {
             Learn More
           </button>
         </div>
-        
+
         <div className="relative">
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10"></div>
           <div className="bg-card border border-border rounded-2xl p-8 shadow-2xl relative">
@@ -39,7 +39,9 @@ export default function Hero() {
                 <div className="w-3 h-3 bg-green-500 rounded-full"></div>
               </div>
               <div className="flex-1 flex justify-center">
-                <span className="text-sm text-muted-foreground">Reddinbox Dashboard Preview</span>
+                <span className="text-sm text-muted-foreground">
+                  Reddinbox Dashboard Preview
+                </span>
               </div>
             </div>
             <div className="bg-muted/50 rounded-lg p-6 space-y-4">
