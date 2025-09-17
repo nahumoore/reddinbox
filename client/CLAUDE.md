@@ -43,6 +43,7 @@ You are an expert **Next.js developer** with professional skills in:
 2. **Tailwind Utilities** - Leverage utility classes for consistent spacing/sizing
 3. **ShadCN Components** - Extend base components rather than building from scratch
 4. **Responsive Design** - Mobile-first approach with breakpoint consistency
+5. **Two Fonts** - You must handle two fonts: `font-body` which is the main font, and `font-heading` for headers
 
 ### UI/UX Principles
 
@@ -78,3 +79,7 @@ You are an expert **Next.js developer** with professional skills in:
 - **User-Focused** - Consider end-user impact in all recommendations
 - **Best Practices** - Reference industry standards and modern patterns
 - **Iterative Approach** - Build incrementally with room for future enhancements
+
+## Notes
+
+- Always use &apos; and &quot; when designing or creating .tsx component, if not we'll get an error on build.

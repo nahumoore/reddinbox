@@ -1,15 +1,12 @@
+import { Toaster } from "@/components/ui/sonner";
 import type { Metadata } from "next";
-import { Inter, Raleway } from "next/font/google";
+import { Lexend_Deca } from "next/font/google";
 import "./globals.css";
 
-const raleway = Raleway({
-  variable: "--font-raleway",
+const mainFont = Lexend_Deca({
+  variable: "--font-main",
   subsets: ["latin"],
-});
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
+  weight: ["400"],
 });
 
 export const metadata: Metadata = {
@@ -25,8 +22,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${raleway.variable} ${inter.variable} antialiased`}>
+      <body className={`${mainFont.variable} font-main antialiased`}>
         {children}
+        <Toaster richColors />
       </body>
     </html>
   );

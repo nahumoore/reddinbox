@@ -1,7 +1,9 @@
-import Features from "../components/landing/features";
-import Hero from "../components/landing/hero";
-import Navbar from "../components/landing/navbar";
-import Footer from "../components/landing/footer";
+import Features from "@/components/landing/Features";
+import FinalCTA from "@/components/landing/FinalCTA";
+import Footer from "@/components/landing/Footer";
+import Hero from "@/components/landing/Hero";
+import HowItWorks from "@/components/landing/HowItWorks";
+import Navbar from "@/components/landing/Navbar";
 
 export default function Home() {
   return (
@@ -9,7 +11,9 @@ export default function Home() {
       <Navbar />
       <main>
         <Hero />
+        <HowItWorks />
         <Features />
+        <FinalCTA />
       </main>
       <Footer />
     </div>

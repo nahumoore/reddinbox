@@ -1,0 +1,274 @@
+"use client";
+
+import { useOnboardingForm } from "@/stores/onboarding-form";
+import {
+  IconArrowLeft,
+  IconArrowRight,
+  IconPackage,
+  IconPlus,
+  IconX,
+} from "@tabler/icons-react";
+import { useState } from "react";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Textarea } from "../ui/textarea";
+
+export default function WebsiteInformation() {
+  const { websiteAnalysis, setWebsiteAnalysis, setStep } = useOnboardingForm();
+
+  // Local state for form fields
+  const [formData, setFormData] = useState({
+    websiteName: websiteAnalysis?.websiteName || "",
+    companyDescription: websiteAnalysis?.companyDescription || "",
+    keywordsToMonitor: websiteAnalysis?.keywordsToMonitor || [],
+    idealCustomerProfile: websiteAnalysis?.idealCustomerProfile || "",
+  });
+
+  const [newKeyword, setNewKeyword] = useState("");
+
+  const [errors, setErrors] = useState<{
+    websiteName?: string;
+    companyDescription?: string;
+    keywordsToMonitor?: string;
+    idealCustomerProfile?: string;
+  }>({});
+
+  const validateForm = () => {
+    const newErrors: typeof errors = {};
+
+    if (!formData.websiteName.trim()) {
+      newErrors.websiteName = "Website name is required";
+    }
+
+    if (!formData.companyDescription.trim()) {
+      newErrors.companyDescription = "Company description is required";
+    }
+
+    if (formData.keywordsToMonitor.length === 0) {
+      newErrors.keywordsToMonitor = "At least one keyword is required";
+    }
+
+    if (!formData.idealCustomerProfile.trim()) {
+      newErrors.idealCustomerProfile = "Ideal customer profile is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleFieldChange = (
+    field: keyof typeof formData,
+    value: string | string[]
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
+  };
+
+  const addKeyword = () => {
+    const keyword = newKeyword.trim();
+    if (keyword && !formData.keywordsToMonitor.includes(keyword)) {
+      handleFieldChange("keywordsToMonitor", [
+        ...formData.keywordsToMonitor,
+        keyword,
+      ]);
+      setNewKeyword("");
+    }
+  };
+
+  const removeKeyword = (keywordToRemove: string) => {
+    const updatedKeywords = formData.keywordsToMonitor.filter(
+      (keyword) => keyword !== keywordToRemove
+    );
+    handleFieldChange("keywordsToMonitor", updatedKeywords);
+  };
+
+  const handleKeywordInputKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addKeyword();
+    }
+  };
+
+  const handleContinue = () => {
+    if (!validateForm()) return;
+
+    // Update the onboarding store with the edited data
+    setWebsiteAnalysis({
+      websiteName: formData.websiteName,
+      companyDescription: formData.companyDescription,
+      keywordsToMonitor: formData.keywordsToMonitor,
+      idealCustomerProfile: formData.idealCustomerProfile,
+      competitors: websiteAnalysis?.competitors || [], // Keep existing competitors
+    });
+
+    setStep(3);
+  };
+
+  const handleGoBack = () => {
+    setStep(1);
+  };
+
+  return (
+    <div className="space-y-8">
+      {/* Header Section */}
+      <div className="space-y-4">
+        <div className="flex items-center space-x-3">
+          <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
+            <IconPackage className="size-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-foreground font-heading">
+              Review Your Product Information
+            </h1>
+            <p className="text-muted-foreground">
+              We&apos;ve analyzed your website. Please review and adjust the
+              information below.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Form Fields */}
+      <div className="space-y-6">
+        {/* Website Name */}
+        <div className="space-y-2">
+          <Label htmlFor="websiteName">Website/Company Name *</Label>
+          <Input
+            id="websiteName"
+            type="text"
+            placeholder="Your company name"
+            value={formData.websiteName}
+            onChange={(e) => handleFieldChange("websiteName", e.target.value)}
+            className={errors.websiteName ? "border-destructive" : ""}
+          />
+          {errors.websiteName && (
+            <p className="text-sm text-destructive">{errors.websiteName}</p>
+          )}
+        </div>
+
+        {/* Company Description */}
+        <div className="space-y-2">
+          <Label htmlFor="companyDescription">Company Description *</Label>
+          <Textarea
+            id="companyDescription"
+            placeholder="What does your company do? What products or services do you offer?"
+            value={formData.companyDescription}
+            onChange={(e) =>
+              handleFieldChange("companyDescription", e.target.value)
+            }
+            className={`min-h-24 ${
+              errors.companyDescription ? "border-destructive" : ""
+            }`}
+          />
+          {errors.companyDescription && (
+            <p className="text-sm text-destructive">
+              {errors.companyDescription}
+            </p>
+          )}
+        </div>
+
+        {/* Keywords to Monitor */}
+        <div className="space-y-4">
+          <Label htmlFor="keywordInput">Keywords to Monitor on Reddit *</Label>
+
+          {/* Add New Keyword Input */}
+          <div className="flex gap-2">
+            <Input
+              id="keywordInput"
+              type="text"
+              placeholder="Add a keyword and press Enter"
+              value={newKeyword}
+              onChange={(e) => setNewKeyword(e.target.value)}
+              onKeyPress={handleKeywordInputKeyPress}
+              className={`flex-1 ${
+                errors.keywordsToMonitor ? "border-destructive" : ""
+              }`}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={addKeyword}
+              disabled={!newKeyword.trim()}
+              className="px-3"
+            >
+              <IconPlus className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Existing Keywords Display */}
+          {formData.keywordsToMonitor.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {formData.keywordsToMonitor.map((keyword, index) => (
+                <Badge
+                  key={index}
+                  variant="secondary"
+                  className="flex items-center gap-2 px-3 py-1 text-sm"
+                >
+                  {keyword}
+                  <button
+                    type="button"
+                    onClick={() => removeKeyword(keyword)}
+                    className="ml-1 rounded-full p-1 hover:bg-destructive/20 transition-colors"
+                  >
+                    <IconX className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          )}
+
+          <p className="text-sm text-muted-foreground">
+            Add keywords that are relevant to your product. These will be used
+            to find relevant Reddit discussions.
+          </p>
+
+          {errors.keywordsToMonitor && (
+            <p className="text-sm text-destructive">
+              {errors.keywordsToMonitor}
+            </p>
+          )}
+        </div>
+
+        {/* Ideal Customer Profile */}
+        <div className="space-y-2">
+          <Label htmlFor="idealCustomerProfile">Ideal Customer Profile *</Label>
+          <Textarea
+            id="idealCustomerProfile"
+            placeholder="Describe your ideal customer: demographics, pain points, behavior, etc."
+            value={formData.idealCustomerProfile}
+            onChange={(e) =>
+              handleFieldChange("idealCustomerProfile", e.target.value)
+            }
+            className={`min-h-32 ${
+              errors.idealCustomerProfile ? "border-destructive" : ""
+            }`}
+          />
+          {errors.idealCustomerProfile && (
+            <p className="text-sm text-destructive">
+              {errors.idealCustomerProfile}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Navigation Buttons */}
+      <div className="flex justify-between py-4">
+        <Button variant="outline" onClick={handleGoBack} className="px-6">
+          <IconArrowLeft className="size-4 mr-2" />
+          Previous
+        </Button>
+
+        <Button onClick={handleContinue} className="px-8" size="lg">
+          Continue
+          <IconArrowRight className="size-4 ml-2" />
+        </Button>
+      </div>
+    </div>
+  );
+}
