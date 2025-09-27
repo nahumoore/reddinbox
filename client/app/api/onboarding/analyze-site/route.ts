@@ -1,4 +1,4 @@
-import { SubredditData } from "@/stores/onboarding-form";
+import { SubredditData } from "@/types/reddit";
 import { analyzeWebsiteContent } from "@/utils/openai-analyzer";
 import { scrapeWebsite } from "@/utils/website-scraper";
 import { NextRequest, NextResponse } from "next/server";
@@ -45,9 +45,8 @@ export async function POST(
     return NextResponse.json({
       websiteName: analysis.websiteName,
       keywordsToMonitor: analysis.keywords,
-      idealCustomerProfile: analysis.idealCustomerProfile,
-      competitors: analysis.competitors,
       companyDescription: analysis.companyDescription,
+      targetAudience: analysis.targetAudience,
     });
   } catch (error) {
     console.error("Website analysis route error:", error);

@@ -47,3 +47,16 @@ export interface RedditUserProfile {
   has_verified_email: boolean;
   public_description: string;
 }
+
+export interface SubredditData {
+  id: string;
+  display_name_prefixed: string;
+  title: string;
+  primary_color: string;
+  subscribers: number;
+  public_description: string;
+  community_icon: string;
+  banner_background_image: string;
+  description: string;
+  lang: string;
+}

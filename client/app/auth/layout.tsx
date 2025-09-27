@@ -7,7 +7,10 @@ export default async function AuthLayout({
   children: React.ReactNode;
 }) {
   // REMOVE THIS AFTER TESTING
-  redirect("/");
+  if (process.env.NODE_ENV !== "development") {
+    redirect("/");
+  }
+
   const supabase = await supabaseServer();
   const {
     data: { user },

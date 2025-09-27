@@ -1,223 +1,236 @@
 "use client";
-import { AnimatePresence, motion } from "framer-motion";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card } from "@/components/ui/card";
+import RedditCommentAward from "@/public/landing/reddit-comment-award.png";
+import SubredditImageIllustration from "@/public/landing/subreddit-icon-illustration.webp";
 import {
-  ArrowRight,
-  ChevronRight,
-  MessageSquare,
-  TrendingUp,
-  Users,
-} from "lucide-react";
-import { useEffect, useState } from "react";
+  IconArrowDown,
+  IconArrowUp,
+  IconBookmark,
+  IconDots,
+  IconInbox,
+  IconMessage,
+  IconShare,
+  IconTrendingUp,
+} from "@tabler/icons-react";
+import Image from "next/image";
+import { IconCurvedArrow } from "../icons/IconCurvedArrow";
+import { Highlighter } from "../ui/highlighter";
+import { Separator } from "../ui/separator";
+import { SparklesText } from "../ui/sparkles-text";
 
 export default function HeroIllustration() {
-  const [activeStep, setActiveStep] = useState(0);
-
-  const steps = [
-    {
-      icon: MessageSquare,
-      title: "Monitor Reddit",
-      description:
-        "Track posts and comments for users that potentially are interested in your product",
-      badge: "AI-Powered",
-      gradient: "from-primary to-accent",
-      delay: 0,
-      metrics: "10K+ posts tracked daily",
-    },
-    {
-      icon: Users,
-      title: "Engage with Leads",
-      description:
-        "Start warming up users by receiving notifications of their activity, answering their posts and comments",
-      badge: "CRM Integration",
-      gradient: "from-emerald-500 to-teal-500",
-      delay: 0.2,
-      metrics: "95% response rate",
-    },
-    {
-      icon: TrendingUp,
-      title: "Send Messages",
-      description:
-        "Once the user knows you, it's warmed up and see you as a potential solution, send them a message",
-      badge: "Sales Ready",
-      gradient: "from-purple-500 to-pink-500",
-      delay: 0.4,
-      metrics: "3x conversion boost",
-    },
-  ];
-
-  // Auto-cycle through steps for visual appeal
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveStep((prev) => (prev + 1) % steps.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [steps.length]);
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, ease: "easeOut" }}
-      className="w-full max-w-sm mx-auto md:max-w-6xl relative"
-    >
-      {/* Floating Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          animate={{
-            rotate: 360,
-            scale: [1, 1.1, 1],
-          }}
-          transition={{
-            rotate: { duration: 20, repeat: Infinity, ease: "linear" },
-            scale: { duration: 4, repeat: Infinity, ease: "easeInOut" },
-          }}
-          className="absolute -top-10 -right-10 w-20 h-20 bg-gradient-to-br from-primary/10 to-accent/10 rounded-full blur-xl"
-        />
-      </div>
-
-      {/* Process Cards */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8 mb-12 relative">
-        {steps.map((step, index) => (
-          <div key={index} className="relative">
-            <motion.div
-              initial={{ opacity: 0, y: 40, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{
-                delay: step.delay,
-                duration: 0.6,
-                ease: "easeOut",
-              }}
-              className={`relative bg-card/80 backdrop-blur-sm border transition-all duration-500 group h-full ${
-                activeStep === index
-                  ? "border-primary/50 shadow-xl shadow-primary/10 scale-105"
-                  : "border-border"
-              } rounded-2xl p-6 overflow-hidden`}
-            >
-              {/* Animated Background Gradient */}
-              <div
-                className={`absolute inset-0 bg-gradient-to-br ${step.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="flex flex-col lg:flex-row justify-center gap-6 lg:gap-12">
+        {/* COMMENT REDDIT CARD */}
+        <Card className="bg-card border border-border hover:shadow-lg transition-all duration-300 max-w-2xl w-full lg:w-auto">
+          {/* Main Post */}
+          <div className="px-4 sm:px-6 space-y-3">
+            {/* Post Header */}
+            <div className="flex items-center space-x-2 text-xs sm:text-sm text-muted-foreground">
+              <Image
+                src={SubredditImageIllustration}
+                alt="Subreddit Image Illustration"
+                width={30}
+                height={30}
+                className="rounded-full"
               />
+              <div className="flex flex-col">
+                <div className="flex items-center space-x-2">
+                  <span className="font-medium">r/Entrepreneur</span>
+                  <span>•</span>
+                  <span>4h ago</span>
+                </div>
+                <span className="text-xs text-foreground">
+                  u/startupfounder23
+                </span>
+              </div>
+            </div>
 
-              {/* Active Step Glow */}
-              <AnimatePresence>
-                {activeStep === index && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 rounded-2xl"
-                  />
-                )}
-              </AnimatePresence>
+            {/* Post Title */}
+            <h3 className="text-base sm:text-lg font-semibold text-foreground leading-tight">
+              How can I get my first 1000 customers without paid ads?
+            </h3>
 
-              {/* Icon with enhanced animations */}
-              <motion.div
-                className={`w-14 h-14 rounded-xl bg-gradient-to-br ${step.gradient} p-3 mb-4 relative overflow-hidden mx-auto`}
-                animate={activeStep === index ? { scale: [1, 1.05, 1] } : {}}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
-                <step.icon className="w-full h-full text-white relative z-10" />
-                <motion.div
-                  className="absolute inset-0 bg-white/20"
-                  animate={{ x: [-100, 100] }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: index * 0.5,
-                  }}
-                />
-              </motion.div>
+            {/* Post Content */}
+            <p className="text-foreground text-sm leading-relaxed">
+              I&apos;ve been building a SaaS for productivity teams for 7
+              months. Great product, solid retention, but I&apos;m stuck at 200
+              users. Every &quot;growth hack&quot; feels spammy. How did you
+              authentically reach your first 1000 customers?
+            </p>
 
-              {/* Content with improved typography */}
-              <h3 className="font-heading font-bold text-xl mb-3 text-foreground">
-                {step.title}
-              </h3>
-              <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                {step.description}
+            {/* Post Actions */}
+            <div className="flex items-center flex-wrap gap-3 sm:gap-4 pt-2">
+              <div className="flex items-center space-x-1 group">
+                <IconArrowUp className="w-5 h-5 text-muted-foreground" />
+                <span className="text-sm font-medium text-muted-foreground">
+                  17
+                </span>
+                <IconArrowDown className="w-5 h-5 text-muted-foreground" />
+              </div>
+              <div className="flex items-center space-x-1 text-muted-foreground">
+                <IconMessage className="w-5 h-5" />
+                <span className="text-sm font-medium">37</span>
+              </div>
+              <div className="flex items-center space-x-1 text-muted-foreground">
+                <IconShare className="w-5 h-5" />
+                <span className="text-sm font-medium hidden sm:inline">
+                  Share
+                </span>
+              </div>
+              <div className="flex items-center space-x-1 text-muted-foreground">
+                <IconBookmark className="w-5 h-5" />
+              </div>
+              <div className="flex items-center space-x-1 text-muted-foreground">
+                <IconDots className="w-5 h-5" />
+              </div>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Comment Section */}
+          <div className="px-4 sm:px-6">
+            <div className="flex gap-3 bg-yellow-300/30 border border-yellow-300/50 rounded-lg p-2 relative">
+              {/* Comment Content */}
+              <div className="flex-1 space-y-2">
+                {/* Comment Header */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Avatar className="w-7 h-7 sm:w-8 sm:h-8">
+                    <AvatarImage src="/founder.webp" />
+                    <AvatarFallback>A</AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm font-medium">Strong_Teacher78</span>
+                  <span className="text-xs text-muted-foreground">1h ago</span>
+                </div>
+
+                {/* Comment Text */}
+                <p className="text-sm text-foreground leading-relaxed ml-[40px]">
+                  tbh I hit my first 1k by doubling down on 3 repeatable plays:
+                  niche communities, targeted 1:1 outreach, and turning customer
+                  wins into content and referrals! I've been working on this
+                  exact problem building{" "}
+                  <Highlighter color="#ff5700" action="underline">
+                    Reddinbox
+                  </Highlighter>
+                </p>
+                <p className="text-sm text-foreground leading-relaxed ml-[40px]">
+                  Start by listing 50 ideal accounts, find the 5–10
+                  subreddits/slack channels they hang in, and spend 2 weeks
+                  adding value (no pitching) then invite the warmest 5–10 for a
+                  short demo. Convert with a small incentive (extended trial or
+                  playbook), publish 3 quick case studies + 10 micro-posts from
+                  those wins, and ask every happy user for one intro, most of
+                  our +800 organic signups came from referrals and community
+                  mentions :)
+                </p>
+
+                {/* Comment Actions */}
+                <div className="flex items-center gap-4 pt-1 ml-[40px]">
+                  <div className="flex items-center space-x-1 group">
+                    <IconArrowUp className="size-4 text-muted-foreground" />
+                    <span className="text-sm font-medium text-muted-foreground">
+                      67
+                    </span>
+                    <IconArrowDown className="size-4 text-muted-foreground" />
+                  </div>
+                  <button className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
+                    Reply
+                  </button>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">2</span>
+                    <Image
+                      src={RedditCommentAward}
+                      alt="Reddit Comment Award"
+                      width={15}
+                      height={15}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* ARROW ICON - Hidden on mobile */}
+              <IconCurvedArrow className="hidden lg:block size-24 text-primary/80 absolute bottom-14 -right-30 -rotate-[60deg]" />
+            </div>
+          </div>
+        </Card>
+
+        {/* PROFILE OVERVIEW CARD */}
+        <div className="flex items-center justify-center lg:justify-start">
+          <Card className="bg-card border border-border hover:shadow-lg transition-all duration-300 overflow-hidden lg:-rotate-1 w-full max-w-md lg:max-w-none">
+            <div className="px-6 space-y-4">
+              {/* Profile Header */}
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <Avatar className="w-12 h-12">
+                    <AvatarImage src="/founder.webp" />
+                    <AvatarFallback>AF</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h3 className="font-semibold text-foreground">
+                      Strong_Teacher78
+                    </h3>
+                    <p className="text-sm text-muted-foreground">Nico More</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 relative">
+                  <IconInbox className="w-5 h-5 text-muted-foreground" />
+                  <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                    7
+                  </div>
+                </div>
+              </div>
+
+              {/* Description */}
+              <p className="text-sm text-foreground leading-relaxed">
+                The best marketing is the one that doesn't look like marketing
+                ✨
               </p>
 
-              {/* Metrics Badge */}
-              {/* <motion.div
-                className="inline-flex items-center gap-1 text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-full"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: step.delay + 0.3 }}
-              >
-                <Zap className="w-3 h-3" />
-                {step.metrics}
-              </motion.div> */}
-
-              {/* Enhanced Arrow Indicator */}
-              {index < steps.length - 1 && (
-                <div className="hidden lg:block absolute -right-10 top-1/2 transform -translate-y-1/2">
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{
-                      delay: step.delay + 0.6,
-                      duration: 0.5,
-                    }}
-                    className="text-primary/60"
-                  >
-                    <motion.div
-                      animate={{ x: [0, 5, 0] }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                      }}
-                    >
-                      <ArrowRight className="w-8 h-8" />
-                    </motion.div>
-                  </motion.div>
-                </div>
-              )}
-            </motion.div>
-          </div>
-        ))}
-      </div>
-
-      {/* Enhanced Flow Visualization for Mobile */}
-      <div className="lg:hidden flex justify-center items-center mb-10">
-        <div className="flex items-center space-x-2">
-          {steps.map((_, index) => (
-            <motion.div key={index} className="flex items-center">
-              <motion.div
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  activeStep === index ? "bg-primary scale-125" : "bg-muted"
-                }`}
-              />
-              {index < steps.length - 1 && (
-                <motion.div
-                  animate={{ x: [0, 3, 0] }}
-                  transition={{
-                    duration: 1.5,
-                    repeat: Infinity,
-                    delay: index * 0.2,
-                  }}
-                  className="text-primary/60 mx-3"
+              {/* Product Link */}
+              <div className="flex justify-between">
+                <SparklesText
+                  className="flex items-center"
+                  sparklesCount={5}
+                  colors={{ first: "#ff5700", second: "#ff5700" }}
                 >
-                  <ChevronRight className="w-4 h-4" />
-                </motion.div>
-              )}
-            </motion.div>
-          ))}
+                  <div className="bg-primary/10 border border-primary/20 rounded-lg p-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium text-primary text-sm">
+                          Reddinbox
+                        </h4>
+                        <p className="text-xs text-primary">
+                          https://reddinbox.com
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </SparklesText>
+
+                {/* Stats */}
+                <div className="flex flex-col">
+                  <span className="text-sm text-muted-foreground">
+                    Profile views
+                  </span>
+                  <div className="flex items-center justify-end gap-1">
+                    <span className="text-sm font-medium text-foreground">
+                      5.7k
+                    </span>
+                    <div className="flex items-center gap-1 text-green-600">
+                      <IconTrendingUp className="w-3 h-3" />
+                      <span className="text-xs font-medium">+2.3</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Card>
         </div>
       </div>
-
-      {/* Enhanced Bottom Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.4, duration: 0.6 }}
-        className="text-center mt-8 px-4 md:mt-12 md:px-0"
-      >
-        <p className="text-muted-foreground text-base max-w-2xl mx-auto font-medium leading-relaxed">
-          Let&apos;s be honest, no one likes cold DMs. We&apos;ll track your
-          leads so you can engage with them before starting a conversation.
-        </p>
-      </motion.div>
-    </motion.div>
+    </div>
   );
 }

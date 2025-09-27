@@ -3,13 +3,27 @@
 import { MagicCard } from "@/components/magicui/magic-card";
 import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
+import { Highlighter } from "@/components/ui/highlighter";
 import { useUserInfo } from "@/stores/user-info";
-import { IconArrowRight, IconRocket } from "@tabler/icons-react";
+import { IconArrowRight, IconLoader2, IconRocket } from "@tabler/icons-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function OnboardingCompleted() {
   const { userInfo } = useUserInfo();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleContinueToDashboard = () => {
+  const handleContinueToDashboard = async () => {
+    setIsLoading(true);
+    const response = await fetchOnboardingCompleted();
+
+    if (response.error) {
+      toast.error(response.error);
+      setIsLoading(false);
+
+      return;
+    }
+
     window.location.href = "/dashboard";
   };
 
@@ -38,7 +52,13 @@ export default function OnboardingCompleted() {
 
               <div className="space-y-3 max-w-lg mx-auto">
                 <p className="text-lg text-muted-foreground">
-                  You can start managing your Reddit outreach like a pro
+                  You&apos;re ready to start managing your{" "}
+                  <Highlighter action="underline" color="#ff5700">
+                    <span className="text-primary font-semibold">
+                      Reddit marketing
+                    </span>
+                  </Highlighter>{" "}
+                  like a pro!
                 </p>
               </div>
             </div>
@@ -48,9 +68,14 @@ export default function OnboardingCompleted() {
                 size="lg"
                 className="w-full sm:w-auto px-10 py-4 text-lg font-semibold shadow-lg"
                 onClick={handleContinueToDashboard}
+                disabled={isLoading}
               >
                 Continue to Dashboard
-                <IconArrowRight className="size-5 ml-2" />
+                {isLoading ? (
+                  <IconLoader2 className="size-5 animate-spin ml-2" />
+                ) : (
+                  <IconArrowRight className="size-5 ml-2" />
+                )}
               </Button>
             </div>
           </CardContent>
@@ -59,3 +84,18 @@ export default function OnboardingCompleted() {
     </main>
   );
 }
+
+const fetchOnboardingCompleted = async () => {
+  try {
+    const response = await fetch("/api/onboarding/completed", {
+      method: "POST",
+    });
+    return response.json();
+  } catch (error) {
+    console.error("Onboarding completed error:", error);
+    return {
+      error:
+        error instanceof Error ? error.message : "An unknown error occurred",
+    };
+  }
+};

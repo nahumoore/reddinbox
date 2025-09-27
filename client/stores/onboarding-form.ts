@@ -1,23 +1,10 @@
+import { SubredditData } from "@/types/reddit";
 import { create } from "zustand";
-
 export interface WebsiteAnalysis {
   websiteName: string;
   companyDescription: string;
+  targetAudience: string;
   keywordsToMonitor: string[];
-  idealCustomerProfile: string;
-  competitors: string[];
-}
-
-export interface SubredditData {
-  display_name: string;
-  display_name_prefixed: string;
-  title: string;
-  header_title: string;
-  primary_color: string;
-  subscribers: number;
-  public_description: string;
-  community_icon: string;
-  url: string;
 }
 
 interface OnboardingFormState {
@@ -30,7 +17,7 @@ interface OnboardingFormState {
   websiteAnalysis: WebsiteAnalysis | null;
 
   // Step 3: Competitors
-  competitors: string[];
+  targetSubreddits: SubredditData[];
 
   // Actions
   setStep: (step: number) => void;
@@ -42,7 +29,7 @@ interface OnboardingFormState {
   setWebsiteAnalysis: (analysis: WebsiteAnalysis) => void;
 
   // Step 3 Actions
-  setCompetitors: (competitors: string[]) => void;
+  setTargetSubreddits: (subreddits: SubredditData[]) => void;
 
   // Reset
   resetForm: () => void;
@@ -68,7 +55,7 @@ export const useOnboardingForm = create<OnboardingFormState>((set, get) => ({
   setWebsiteUrl: (websiteUrl) => set({ websiteUrl }),
   setWebsiteAnalysis: (websiteAnalysis) => set({ websiteAnalysis }),
 
-  setCompetitors: (competitors) => set({ competitors }),
+  setTargetSubreddits: (targetSubreddits) => set({ targetSubreddits }),
 
   resetForm: () => set(initialState),
 }));

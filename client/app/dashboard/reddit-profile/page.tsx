@@ -12,9 +12,11 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRedditAccounts } from "@/stores/reddit-accounts";
+import { generateRedditAuthUrl } from "@/utils/reddit/generate-auth-url";
 import {
   IconAlertTriangle,
   IconApi,
+  IconBrandReddit,
   IconCake,
   IconCoins,
   IconCrown,
@@ -70,7 +72,7 @@ function ProfileHeader({
 
   return (
     <Card className="mb-6">
-      <CardContent>
+      <CardContent className="flex justify-between items-center">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <Avatar className="size-20">
             <AvatarImage
@@ -85,11 +87,6 @@ function ProfileHeader({
           <div className="flex-1 space-y-2">
             <div className="flex flex-col sm:flex-row sm:items-center gap-2">
               <h1 className="text-2xl font-bold">u/{name}</h1>
-              <div className="flex gap-2 flex-wrap">
-                <Badge variant={isActive ? "default" : "secondary"}>
-                  {isActive ? "Active" : "Inactive"}
-                </Badge>
-              </div>
             </div>
 
             {createdDate && (
@@ -107,6 +104,16 @@ function ProfileHeader({
             )}
           </div>
         </div>
+        <Button
+          variant="outline"
+          onClick={() => {
+            const authUrl = generateRedditAuthUrl();
+            window.location.href = authUrl;
+          }}
+        >
+          Authenticate
+          <IconBrandReddit />
+        </Button>
       </CardContent>
     </Card>
   );

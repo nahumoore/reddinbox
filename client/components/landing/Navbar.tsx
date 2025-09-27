@@ -1,8 +1,10 @@
 "use client";
 
+import { IconArrowRight } from "@tabler/icons-react";
 import Link from "next/link";
 import { useState } from "react";
 import { BrandReddinbox } from "../icons/BrandReddinbox";
+import { buttonVariants } from "../ui/button";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -23,10 +25,10 @@ export default function Navbar() {
             </Link>
             <div className="flex items-end gap-4">
               <Link
-                href="#features"
+                href="#benefits"
                 className="text-muted-foreground hover:text-foreground transition-colors"
               >
-                Features
+                Benefits
               </Link>
               <Link
                 href="#how-it-works"
@@ -34,16 +36,29 @@ export default function Navbar() {
               >
                 How it works
               </Link>
+              <Link
+                href="#pricing"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Pricing
+              </Link>
             </div>
           </div>
 
           <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-8">
+            <div className="flex items-baseline space-x-2">
               <Link
-                href="/whitelist"
-                className="bg-primary text-primary-foreground p-2 rounded-lg font-semibold hover:opacity-90 shadow-lg hover:scale-105 hover:shadow-lg transition-all hover:shadow-primary/20 cursor-pointer"
+                href="/auth/login"
+                className={buttonVariants({ variant: "outline" })}
               >
-                Get Notified
+                Login
+              </Link>
+              <Link
+                href="/auth/register"
+                className="bg-primary text-primary-foreground p-2 rounded-lg font-semibold hover:opacity-90 shadow-lg hover:scale-105 hover:shadow-lg transition-all hover:shadow-primary/20 cursor-pointer flex items-center gap-2"
+              >
+                Start Free Trial
+                <IconArrowRight className="size-4" />
               </Link>
             </div>
           </div>

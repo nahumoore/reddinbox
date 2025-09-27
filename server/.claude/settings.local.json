@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/nicol/Documents/Projects/reddinbox/client/lib/supabase/**)",
+      "Read(//c/Users/nicol/Documents/Projects/reddinbox/client/**)",
+      "Bash(npx tsc:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

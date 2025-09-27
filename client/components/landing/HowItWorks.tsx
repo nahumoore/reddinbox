@@ -1,183 +1,141 @@
 "use client";
+
+import { cn } from "@/lib/utils";
 import {
-  IconCheck,
-  IconFlame,
-  IconMessageX,
-  IconTrendingDown,
-  IconX,
+  IconMessages,
+  IconTrendingUp,
+  IconUserCheck,
 } from "@tabler/icons-react";
+import { Badge } from "../ui/badge";
+import { Highlighter } from "../ui/highlighter";
+import {
+  Step1Illustration,
+  Step2Illustration,
+  Step3Illustration,
+} from "./HowItWorksIllustrationts";
+
+const steps = [
+  {
+    step: 1,
+    icon: IconUserCheck,
+    title: "Analyze Your Business",
+    description:
+      "We analyze your product and target audience to discover and track the perfect conversations for your niche.",
+    benefit: "Build instant credibility",
+    illustration: Step1Illustration,
+  },
+  {
+    step: 2,
+    icon: IconMessages,
+    title: "Generate Authentic Responses",
+    description:
+      "Create authentic, helpful responses with the main purpose of helping users and build your reputation while mentioning your product naturally.",
+    benefit: "Never sound like a spam bot",
+    illustration: Step2Illustration,
+  },
+  {
+    step: 3,
+    icon: IconTrendingUp,
+    title: "Track Authority Growth",
+    description:
+      "Track each conversation and follow ups to build a relationship and convert them into a lead.",
+    benefit: "See your reputation compound",
+    illustration: Step3Illustration,
+  },
+];
 
 export default function HowItWorks() {
   return (
     <section
-      className="bg-slate-50 py-16 px-4 sm:px-6 lg:px-8"
+      className="py-24 bg-gradient-to-br from-background to-secondary/20"
       id="how-it-works"
     >
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-16">
-          <div className="flex items-center justify-center mb-4">
-            <IconMessageX className="h-12 w-12 text-red-500 mr-3" />
-            <h2 className="text-4xl font-bold text-gray-900 font-heading">
-              The Cold DM Death Trap
-            </h2>
+        <div className="text-center mb-20">
+          <div className="flex justify-center mb-6">
+            <Badge className="bg-primary/10 text-primary border-primary/20 uppercase text-sm">
+              How It Works
+            </Badge>
           </div>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto font-body">
-            Why 97% of Reddit DMs Get Ignored (And How to Be in the 3%)
+
+          <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-6 font-heading max-w-4xl mx-auto">
+            Build <span className="text-primary">Recognition</span> That{" "}
+            <Highlighter action="underline" color="#ff5700">
+              Converts Into Revenue
+            </Highlighter>
+          </h2>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            Transform industry expertise into systematic lead generation through
+            trusted relationships. The <b>anti-spam approach</b> that gets better over time.
           </p>
         </div>
 
-        {/* Main Content - 2 Column Layout for Desktop */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-          {/* Left Column - The Problem */}
-          <div className="flex flex-col">
-            {/* Title */}
-            <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center font-heading">
-              <IconTrendingDown className="h-8 w-8 text-red-500 mr-3" />
-              What Everyone Does
-            </h3>
+        {/* Steps with Split Layout */}
+        <div className="space-y-24">
+          {steps.map((step, index) => (
+            <div key={step.step} className="relative">
+              <div
+                className={`grid lg:grid-cols-2 gap-12 lg:gap-16 items-center ${
+                  index % 2 === 1 ? "lg:grid-flow-col-dense" : ""
+                }`}
+              >
+                {/* Content Side */}
+                <div
+                  className={`space-y-6 ${
+                    index % 2 === 1 ? "lg:col-start-2" : ""
+                  }`}
+                >
+                  {/* Step Header */}
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="size-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-lg font-bold">
+                      {step.step}
+                    </div>
+                    <div className="size-12 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
+                      <step.icon className="size-6 text-primary" />
+                    </div>
+                  </div>
 
-            {/* Quote Block */}
-            <div className="mb-6 p-4 border-l-4 border-red-500 bg-gray-50">
-              <p className="text-gray-700 italic text-lg font-body">
-                Hey, I saw your post about needing a developer. Check out my
-                agency...
-              </p>
-            </div>
+                  {/* Title and Description */}
+                  <div>
+                    <h3 className="text-2xl lg:text-4xl font-bold text-foreground mb-4 font-heading leading-tight">
+                      {step.title}
+                    </h3>
+                    <p className="text-lg text-muted-foreground leading-relaxed mb-6">
+                      {step.description}
+                    </p>
+                  </div>
 
-            {/* Description */}
-            <p className="text-lg text-gray-700 mb-6 font-body">
-              <strong>Sound familiar?</strong> That&apos;s what every
-              founder&apos;s Reddit inbox looks like.
-              <span className="font-semibold text-red-600">
-                {" "}
-                500+ identical cold pitches
-              </span>{" "}
-              fighting for 30 seconds of attention.
-            </p>
+                  {/* Benefits */}
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <span className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-semibold">
+                        {step.benefit}
+                      </span>
+                    </div>
+                  </div>
+                </div>
 
-            {/* List */}
-            <div className="flex-1 space-y-3">
-              <h4 className="font-semibold text-gray-900 text-lg mb-4 font-heading">
-                Here&apos;s what happens to cold DMs:
-              </h4>
-              <div className="flex items-center">
-                <IconX className="h-5 w-5 text-red-500 mr-3 flex-shrink-0" />
-                <span className="text-gray-700 font-body">
-                  <strong>87% never get opened</strong> (Reddit shows sender
-                  preview)
-                </span>
-              </div>
-              <div className="flex items-center">
-                <IconX className="h-5 w-5 text-red-500 mr-3 flex-shrink-0" />
-                <span className="text-gray-700 font-body">
-                  <strong>11% get opened, immediately deleted</strong>
-                </span>
-              </div>
-              <div className="flex items-center">
-                <IconX className="h-5 w-5 text-red-500 mr-3 flex-shrink-0" />
-                <span className="text-gray-700 font-body">
-                  <strong>2% get a polite not interested</strong>
-                </span>
-              </div>
-              <div className="flex items-center">
-                <IconX className="h-5 w-5 text-red-500 mr-3 flex-shrink-0" />
-                <span className="text-gray-700 font-body">
-                  <strong>0% turn into customers</strong>
-                </span>
-              </div>
-            </div>
-
-            {/* Result */}
-            <div className="mt-8 text-center py-8">
-              <div className="text-6xl font-bold text-red-500 mb-2 font-heading">
-                3%
-              </div>
-              <div className="text-gray-700 font-medium font-body">
-                Success Rate for cold Reddit DMs
+                {/* Visual/Image Side */}
+                <div className={`${index % 2 === 1 ? "lg:col-start-1" : ""}`}>
+                  <div className="relative">
+                    {/* Placeholder for Image/Visual */}
+                    <div
+                      className={cn(
+                        "aspect-[4/3] from-primary/5 to-secondary/10 rounded-2xl flex items-center justify-center relative overflow-hidden",
+                        index % 2 === 1
+                          ? "bg-gradient-to-br"
+                          : "bg-gradient-to-tl"
+                      )}
+                    >
+                      {step.illustration && <step.illustration />}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-
-          {/* Right Column - The Solution */}
-          <div className="flex flex-col">
-            {/* Title */}
-            <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center font-heading">
-              <IconFlame className="h-8 w-8 text-primary mr-3 fill-primary" />
-              The Warm Engagement Advantage
-            </h3>
-
-            {/* Quote Block */}
-            <div className="mb-6 p-4 border-l-4 border-green-500 bg-green-50">
-              <p className="text-gray-700 italic text-lg font-body">
-                Oh hey, you&apos;re the person who gave that helpful advice on
-                my SaaS metrics post last week!
-              </p>
-            </div>
-
-            {/* Description */}
-            <p className="text-lg text-gray-700 mb-6 font-body">
-              <strong>What if instead, they recognized your name?</strong>
-            </p>
-
-            <p className="text-lg text-gray-700 mb-6 font-body">
-              When you warm up leads through genuine engagement:
-            </p>
-
-            {/* List */}
-            <div className="flex-1 space-y-3">
-              <div className="flex items-center">
-                <IconCheck className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                <span className="text-gray-700 font-body">
-                  <strong>73% response rate</strong> vs 3% for cold outreach
-                </span>
-              </div>
-              <div className="flex items-center">
-                <IconCheck className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                <span className="text-gray-700 font-body">
-                  <strong>5x higher conversion</strong> to actual conversations
-                </span>
-              </div>
-              <div className="flex items-center">
-                <IconCheck className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                <span className="text-gray-700 font-body">
-                  <strong>Zero spam reports</strong> (they actually want to hear
-                  from you)
-                </span>
-              </div>
-              <div className="flex items-center">
-                <IconCheck className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                <span className="text-gray-700 font-body">
-                  <strong>Builds real relationships</strong>, not just
-                  transactions
-                </span>
-              </div>
-            </div>
-
-            {/* Result */}
-            <div className="mt-8 text-center py-8">
-              <div className="text-6xl font-bold text-green-500 mb-2 font-heading">
-                73%
-              </div>
-              <div className="text-gray-700 font-medium font-body">
-                Response Rate with warm engagement
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
-
-        {/* Combined CTA Section - Enhanced Display */}
-        <p className="text-2xl text-gray-800 font-body leading-relaxed max-w-4xl mx-auto mt-12 text-center">
-          <strong className="text-red-600 bg-red-50 px-2 py-1 rounded-lg">
-            Reddit users HATE being sold to.
-          </strong>
-          <br />
-          But they{" "}
-          <strong className="text-green-600 bg-green-50 px-2 py-1 rounded-lg">
-            love people who contribute
-          </strong>{" "}
-          to their communities.
-        </p>
       </div>
     </section>
   );

@@ -1,45 +1,21 @@
 "use client";
 
 import { useOnboardingForm, WebsiteAnalysis } from "@/stores/onboarding-form";
+import { SubredditData } from "@/types/reddit";
+import { generateRedditAuthUrl } from "@/utils/reddit/generate-auth-url";
 import {
   IconBrandReddit,
   IconExternalLink,
-  IconEye,
   IconLoader2,
-  IconMessage,
-  IconShield,
 } from "@tabler/icons-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-
-const permissions = [
-  {
-    icon: IconEye,
-    title: "Read access to your profile",
-    description:
-      "We need to access your Reddit username and basic profile information",
-    required: true,
-  },
-  {
-    icon: IconMessage,
-    title: "Private message access",
-    description:
-      "Access your Reddit DMs to import them into Reddinbox for management",
-    required: true,
-  },
-  {
-    icon: IconBrandReddit,
-    title: "Submit content on your behalf",
-    description:
-      "Send direct messages and interact with Reddit communities as you",
-    required: true,
-  },
-];
+import { Card, CardContent } from "../ui/card";
 
 export default function RedditAuthStep() {
-  const { websiteAnalysis, websiteUrl, userName } = useOnboardingForm();
+  const { websiteAnalysis, websiteUrl, userName, targetSubreddits } =
+    useOnboardingForm();
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectionError, setConnectionError] = useState("");
 
@@ -52,7 +28,8 @@ export default function RedditAuthStep() {
       const response = await fetchCompleteOnboarding(
         websiteAnalysis!,
         websiteUrl,
-        userName
+        userName,
+        targetSubreddits
       );
 
       if (response.error) {
@@ -73,54 +50,31 @@ export default function RedditAuthStep() {
   return (
     <div className="space-y-6">
       <div className="space-y-4">
-        <div className="flex items-center space-x-3">
-          <div className="w-12 h-12 bg-gradient-to-br from-[#FF4500] to-[#FF6B35] rounded-full flex items-center justify-center">
-            <IconBrandReddit className="size-6 text-white" />
+        <div className="flex items-center space-x-4">
+          <div className="relative size-16 bg-gradient-to-br from-[#FF4500] to-[#FF6B35] rounded-2xl flex items-center justify-center shadow-lg">
+            <IconBrandReddit className="size-8 text-white" />
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground font-heading">
+          <div className="space-y-1">
+            <h1 className="text-3xl font-bold text-foreground font-heading">
               Connect Your Reddit Account
             </h1>
-            <p className="text-muted-foreground">
-              Connect your Reddit account to start managing your DMs and
-              engaging with communities
+            <p className="text-lg text-muted-foreground">
+              Connect your Reddit account in which you&apos;d like to build
+              authority for your product
             </p>
           </div>
         </div>
       </div>
 
       <div className="space-y-6">
-        <Card className="border-primary/20">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-lg">
-              <IconShield className="size-5 text-green-500" />
-              <span>Required Permissions</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Reddinbox needs these permissions to provide you with the best
-              experience:
-            </p>
-
-            {permissions.map((permission, index) => (
-              <div
-                key={index}
-                className="flex items-start space-x-3 p-3 rounded-lg bg-muted/30"
-              >
-                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                  <permission.icon className="size-4 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-medium text-sm">{permission.title}</h4>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {permission.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+        <div className="text-center space-y-2">
+          <h2 className="text-xl font-semibold text-foreground font-heading">
+            Final Step
+          </h2>
+          <p className="text-muted-foreground">
+            Connect your Reddit account to complete your setup
+          </p>
+        </div>
 
         {connectionError && (
           <Card className="bg-red-50/50 border-red-200">
@@ -156,32 +110,18 @@ export default function RedditAuthStep() {
   );
 }
 
-const generateRedditAuthUrl = () => {
-  const randomState = Math.random().toString(36).substring(2, 15);
-
-  const baseUrl = "https://www.reddit.com/api/v1/authorize";
-  const params = new URLSearchParams({
-    client_id: process.env.NEXT_PUBLIC_REDDIT_CLIENT_ID!,
-    response_type: "code",
-    state: randomState,
-    redirect_uri: `${process.env.NEXT_PUBLIC_CLIENT_URL}/api/auth/reddit/callback`,
-    duration: "permanent",
-    scope: "identity privatemessages read history",
-  });
-
-  return `${baseUrl}?${params.toString()}`;
-};
-
 const fetchCompleteOnboarding = async (
   websiteAnalysis: WebsiteAnalysis,
   websiteUrl: string,
-  userName: string
+  userName: string,
+  targetSubreddits: SubredditData[]
 ) => {
   try {
-    const response = await fetch("/api/onboarding/complete", {
+    const response = await fetch("/api/onboarding/reddit-oauth", {
       method: "POST",
       body: JSON.stringify({
         websiteAnalysis,
+        targetSubreddits,
         websiteUrl,
         userName,
       }),

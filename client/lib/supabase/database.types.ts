@@ -34,6 +34,7 @@ export type Database = {
           name: string
           num_friends: number | null
           oauth_scopes: string[] | null
+          public_description: string | null
           reddit_id: string
           refresh_token: string | null
           snoovatar_img: string | null
@@ -63,6 +64,7 @@ export type Database = {
           name: string
           num_friends?: number | null
           oauth_scopes?: string[] | null
+          public_description?: string | null
           reddit_id: string
           refresh_token?: string | null
           snoovatar_img?: string | null
@@ -92,6 +94,7 @@ export type Database = {
           name?: string
           num_friends?: number | null
           oauth_scopes?: string[] | null
+          public_description?: string | null
           reddit_id?: string
           refresh_token?: string | null
           snoovatar_img?: string | null
@@ -114,74 +117,177 @@ export type Database = {
       }
       reddit_content_discovered: {
         Row: {
-          ai_explanation: string | null
           author: string
-          comments_last_fetched_at: string | null
           content: string
           content_type: Database["public"]["Enums"]["content_type"] | null
           created_at: string | null
           downs: number | null
+          embedded_content: string | null
           id: string
-          is_processed: boolean | null
-          lead_score: number | null
-          matched_keywords: string[]
-          parent_post_id: string | null
           reddit_created_at: string
           reddit_id: string
           reddit_url: string | null
-          reviewed_by_user: boolean | null
-          subreddit: string
+          subreddit_id: string | null
           title: string | null
           ups: number | null
-          website_id: string | null
         }
         Insert: {
-          ai_explanation?: string | null
           author: string
-          comments_last_fetched_at?: string | null
           content: string
           content_type?: Database["public"]["Enums"]["content_type"] | null
           created_at?: string | null
           downs?: number | null
+          embedded_content?: string | null
           id?: string
-          is_processed?: boolean | null
-          lead_score?: number | null
-          matched_keywords: string[]
-          parent_post_id?: string | null
           reddit_created_at: string
           reddit_id: string
           reddit_url?: string | null
-          reviewed_by_user?: boolean | null
-          subreddit: string
+          subreddit_id?: string | null
           title?: string | null
           ups?: number | null
-          website_id?: string | null
         }
         Update: {
-          ai_explanation?: string | null
           author?: string
-          comments_last_fetched_at?: string | null
           content?: string
           content_type?: Database["public"]["Enums"]["content_type"] | null
           created_at?: string | null
           downs?: number | null
+          embedded_content?: string | null
           id?: string
-          is_processed?: boolean | null
-          lead_score?: number | null
-          matched_keywords?: string[]
-          parent_post_id?: string | null
           reddit_created_at?: string
           reddit_id?: string
           reddit_url?: string | null
-          reviewed_by_user?: boolean | null
-          subreddit?: string
+          subreddit_id?: string | null
           title?: string | null
           ups?: number | null
-          website_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "reddit_content_discovered_website_id_fkey"
+            foreignKeyName: "reddit_content_discovered_subreddit_id_fkey"
+            columns: ["subreddit_id"]
+            isOneToOne: false
+            referencedRelation: "reddit_subreddits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reddit_subreddits: {
+        Row: {
+          audience_ai_prompt: string | null
+          banner_background_image: string | null
+          community_icon: string | null
+          created_at: string | null
+          created_utc: number | null
+          description: string | null
+          display_name_prefixed: string
+          id: string
+          is_active: boolean | null
+          lang: string | null
+          primary_color: string | null
+          public_description: string | null
+          subreddit_type: string | null
+          subscribers: number | null
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          audience_ai_prompt?: string | null
+          banner_background_image?: string | null
+          community_icon?: string | null
+          created_at?: string | null
+          created_utc?: number | null
+          description?: string | null
+          display_name_prefixed: string
+          id: string
+          is_active?: boolean | null
+          lang?: string | null
+          primary_color?: string | null
+          public_description?: string | null
+          subreddit_type?: string | null
+          subscribers?: number | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          audience_ai_prompt?: string | null
+          banner_background_image?: string | null
+          community_icon?: string | null
+          created_at?: string | null
+          created_utc?: number | null
+          description?: string | null
+          display_name_prefixed?: string
+          id?: string
+          is_active?: boolean | null
+          lang?: string | null
+          primary_color?: string | null
+          public_description?: string | null
+          subreddit_type?: string | null
+          subscribers?: number | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      reddit_user_interactions: {
+        Row: {
+          created_at: string | null
+          id: string
+          interacted_with_reddit_username: string
+          interaction_type: Database["public"]["Enums"]["interaction_type"]
+          original_reddit_post_id: string
+          our_interaction_content: string
+          our_interaction_reddit_id: string | null
+          reddit_content_discovered_id: string | null
+          status: Database["public"]["Enums"]["reddit_interaction_status"]
+          updated_at: string | null
+          user_id: string
+          website_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          interacted_with_reddit_username: string
+          interaction_type: Database["public"]["Enums"]["interaction_type"]
+          original_reddit_post_id: string
+          our_interaction_content: string
+          our_interaction_reddit_id?: string | null
+          reddit_content_discovered_id?: string | null
+          status?: Database["public"]["Enums"]["reddit_interaction_status"]
+          updated_at?: string | null
+          user_id: string
+          website_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          interacted_with_reddit_username?: string
+          interaction_type?: Database["public"]["Enums"]["interaction_type"]
+          original_reddit_post_id?: string
+          our_interaction_content?: string
+          our_interaction_reddit_id?: string | null
+          reddit_content_discovered_id?: string | null
+          status?: Database["public"]["Enums"]["reddit_interaction_status"]
+          updated_at?: string | null
+          user_id?: string
+          website_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reddit_user_interactions_reddit_content_discovered_id_fkey"
+            columns: ["reddit_content_discovered_id"]
+            isOneToOne: false
+            referencedRelation: "reddit_content_discovered"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reddit_user_interactions_user_id_fkey1"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_info"
+            referencedColumns: ["auth_user_id"]
+          },
+          {
+            foreignKeyName: "reddit_user_interactions_website_id_fkey"
             columns: ["website_id"]
             isOneToOne: false
             referencedRelation: "websites"
@@ -189,81 +295,61 @@ export type Database = {
           },
         ]
       }
-      reddit_leads: {
+      scheduled_content: {
         Row: {
-          ai_explanation: string | null
-          contacted_at: string | null
-          content: string
-          content_type: Database["public"]["Enums"]["content_type"]
           created_at: string | null
-          downs: number | null
+          error_message: string | null
+          failed_times: number | null
           id: string
-          lead_score: number
-          parent_post_id: string | null
-          reddit_author: string
-          reddit_created_at: string
-          reddit_url: string | null
-          status: Database["public"]["Enums"]["lead_status"]
-          subreddit: string
-          updated_at: string | null
-          ups: number | null
+          is_posted: boolean | null
+          reddit_account_id: string
+          scheduled_at: string
+          source_user_interaction: string
           user_id: string
-          website_id: string
         }
         Insert: {
-          ai_explanation?: string | null
-          contacted_at?: string | null
-          content: string
-          content_type: Database["public"]["Enums"]["content_type"]
           created_at?: string | null
-          downs?: number | null
+          error_message?: string | null
+          failed_times?: number | null
           id?: string
-          lead_score: number
-          parent_post_id?: string | null
-          reddit_author: string
-          reddit_created_at: string
-          reddit_url?: string | null
-          status?: Database["public"]["Enums"]["lead_status"]
-          subreddit: string
-          updated_at?: string | null
-          ups?: number | null
+          is_posted?: boolean | null
+          reddit_account_id: string
+          scheduled_at: string
+          source_user_interaction: string
           user_id: string
-          website_id: string
         }
         Update: {
-          ai_explanation?: string | null
-          contacted_at?: string | null
-          content?: string
-          content_type?: Database["public"]["Enums"]["content_type"]
           created_at?: string | null
-          downs?: number | null
+          error_message?: string | null
+          failed_times?: number | null
           id?: string
-          lead_score?: number
-          parent_post_id?: string | null
-          reddit_author?: string
-          reddit_created_at?: string
-          reddit_url?: string | null
-          status?: Database["public"]["Enums"]["lead_status"]
-          subreddit?: string
-          updated_at?: string | null
-          ups?: number | null
+          is_posted?: boolean | null
+          reddit_account_id?: string
+          scheduled_at?: string
+          source_user_interaction?: string
           user_id?: string
-          website_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "reddit_leads_user_id_fkey"
+            foreignKeyName: "scheduled_content_reddit_account_id_fkey"
+            columns: ["reddit_account_id"]
+            isOneToOne: false
+            referencedRelation: "reddit_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scheduled_content_source_user_interaction_fkey"
+            columns: ["source_user_interaction"]
+            isOneToOne: false
+            referencedRelation: "reddit_user_interactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scheduled_content_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "user_info"
             referencedColumns: ["auth_user_id"]
-          },
-          {
-            foreignKeyName: "reddit_leads_website_id_fkey"
-            columns: ["website_id"]
-            isOneToOne: false
-            referencedRelation: "websites"
-            referencedColumns: ["id"]
           },
         ]
       }
@@ -276,6 +362,7 @@ export type Database = {
           last_connected: string
           name: string | null
           onboarding_completed: boolean
+          subscription_active: boolean | null
           updated_at: string
         }
         Insert: {
@@ -286,6 +373,7 @@ export type Database = {
           last_connected?: string
           name?: string | null
           onboarding_completed?: boolean
+          subscription_active?: boolean | null
           updated_at?: string
         }
         Update: {
@@ -296,49 +384,53 @@ export type Database = {
           last_connected?: string
           name?: string | null
           onboarding_completed?: boolean
+          subscription_active?: boolean | null
           updated_at?: string
         }
         Relationships: []
       }
       websites: {
         Row: {
-          competitors: string[] | null
           created_at: string
           description: string | null
           id: string
-          ideal_customer_profile: string | null
           is_active: boolean
           keywords: string[] | null
           name: string
+          subreddit_reddit_ids: string[] | null
+          target_audience: string | null
           updated_at: string
           url: string
           user_id: string
+          vector_ai_searcher: string
         }
         Insert: {
-          competitors?: string[] | null
           created_at?: string
           description?: string | null
           id?: string
-          ideal_customer_profile?: string | null
           is_active?: boolean
           keywords?: string[] | null
           name: string
+          subreddit_reddit_ids?: string[] | null
+          target_audience?: string | null
           updated_at?: string
           url: string
           user_id: string
+          vector_ai_searcher: string
         }
         Update: {
-          competitors?: string[] | null
           created_at?: string
           description?: string | null
           id?: string
-          ideal_customer_profile?: string | null
           is_active?: boolean
           keywords?: string[] | null
           name?: string
+          subreddit_reddit_ids?: string[] | null
+          target_audience?: string | null
           updated_at?: string
           url?: string
           user_id?: string
+          vector_ai_searcher?: string
         }
         Relationships: [
           {
@@ -376,18 +468,103 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      binary_quantize: {
+        Args: { "": string } | { "": unknown }
+        Returns: unknown
+      }
+      halfvec_avg: {
+        Args: { "": number[] }
+        Returns: unknown
+      }
+      halfvec_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      halfvec_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      halfvec_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
+      hnsw_bit_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnsw_halfvec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnsw_sparsevec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnswhandler: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflat_bit_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflat_halfvec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflathandler: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      l2_norm: {
+        Args: { "": unknown } | { "": unknown }
+        Returns: number
+      }
+      l2_normalize: {
+        Args: { "": string } | { "": unknown } | { "": unknown }
+        Returns: unknown
+      }
+      sparsevec_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      sparsevec_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      sparsevec_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
+      vector_avg: {
+        Args: { "": number[] }
+        Returns: string
+      }
+      vector_dims: {
+        Args: { "": string } | { "": unknown }
+        Returns: number
+      }
+      vector_norm: {
+        Args: { "": string }
+        Returns: number
+      }
+      vector_out: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      vector_send: {
+        Args: { "": string }
+        Returns: string
+      }
+      vector_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
     }
     Enums: {
       content_type: "post" | "comment"
-      lead_status:
-        | "new"
-        | "contacted"
-        | "converted"
-        | "not_interested"
-        | "saved"
-        | "discarded"
-      reddit_content_collection_reason: "keyword_match" | "high_engagement"
+      interaction_type: "comment_reply" | "post_reply" | "dm"
+      reddit_interaction_status: "new" | "ignored" | "submitted" | "scheduled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -516,15 +693,8 @@ export const Constants = {
   public: {
     Enums: {
       content_type: ["post", "comment"],
-      lead_status: [
-        "new",
-        "contacted",
-        "converted",
-        "not_interested",
-        "saved",
-        "discarded",
-      ],
-      reddit_content_collection_reason: ["keyword_match", "high_engagement"],
+      interaction_type: ["comment_reply", "post_reply", "dm"],
+      reddit_interaction_status: ["new", "ignored", "submitted", "scheduled"],
     },
   },
 } as const

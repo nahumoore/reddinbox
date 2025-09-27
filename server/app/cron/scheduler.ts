@@ -1,18 +1,15 @@
 import cron from "node-cron";
 import { supabaseAdmin } from "../lib/supabase/client";
-import { commentsCollection } from "./leads-discovery/lead-scoring";
-import { postsCollection } from "./leads-discovery/posts-collection";
+import { discoverRedditContentJob } from "./authority-feedback/discover-reddit-content";
 
 // CRON JOBS REGISTRY
 const cronJobs = {
-  postsCollection, // Collect posts from Reddit with keyword matching
-  commentsCollection, // Collect comments from stored posts with keyword matching
+  discoverRedditContentJob, // Collect content from Reddit and answer comments
 } as const;
 
 // CRON SCHEDULES
 const cronSchedules = {
-  postsCollection: "*/45 * * * *", // Every 45 minutes
-  commentsCollection: "0 0 */1 * * *", // Every hour
+  discoverRedditContentJob: "0 0 */1 * * *", // Every hour
 } as const;
 
 /**
@@ -46,24 +43,6 @@ async function executeCronJob(jobName: CronJobName) {
  */
 function startCronJobs() {
   console.log("🕒 Starting cron scheduler...");
-
-  // Execute cron jobs immediately in development mode
-  if (process.env.NODE_ENV === "dev") {
-    console.log(
-      "🧪 Development mode detected - executing all cron jobs immediately for testing..."
-    );
-    const cronJobsToExecute = ["postsCollection"];
-
-    cronJobsToExecute.forEach(async (jobName) => {
-      try {
-        await executeCronJob(jobName as CronJobName);
-      } catch (error) {
-        console.error(`❌ Immediate execution of "${jobName}" failed:`, error);
-      }
-    });
-
-    return;
-  }
 
   Object.entries(cronSchedules).forEach(([jobName, schedule]) => {
     cron.schedule(

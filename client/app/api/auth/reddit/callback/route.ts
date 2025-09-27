@@ -35,7 +35,6 @@ export async function GET(request: NextRequest) {
     const result = await exchangeCodeForTokens(code);
 
     if (!result.success) {
-      console.log(result);
       console.error(`Reddit OAuth error [${result.code}]:`, result.error);
       await rollbackDatabase(supabase, user.id);
       return NextResponse.redirect(
@@ -104,6 +103,7 @@ export async function GET(request: NextRequest) {
           coins: userData.coins || null,
           num_friends: userData.num_friends || null,
           subreddit: userData.subreddit || null,
+          public_description: userData.public_description || null,
         });
 
       if (insertError) {
@@ -144,18 +144,6 @@ const rollbackDatabase = async (
 
     if (websitesError) {
       console.error("Failed to rollback websites:", websitesError);
-    }
-
-    // CLEAN UP USER INFO ONBOARDING
-    const { error: userInfoError } = await supabase
-      .from("user_info")
-      .update({
-        onboarding_completed: false,
-      })
-      .eq("auth_user_id", authUserId);
-
-    if (userInfoError) {
-      console.error("Failed to rollback user info:", userInfoError);
     }
   } catch (error) {
     console.error("Error during rollback:", error);

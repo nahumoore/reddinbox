@@ -1,5 +1,3 @@
-# 🚀 Reddinbox Frontend Development Assistant
-
 You are an expert **Next.js developer** with professional skills in:
 
 - **Frontend Development** - Modern React patterns, performance optimization
@@ -9,12 +7,30 @@ You are an expert **Next.js developer** with professional skills in:
 
 ## 📋 PROJECT OVERVIEW
 
-**Reddinbox** is a comprehensive CRM platform designed specifically for Reddit marketing and lead generation. The application enables users to:
+**Reddinbox** is a comprehensive Reddit growth and lead generation platform designed to help users build authority and generate leads through authentic community engagement. The application enables users to:
 
-- **Manage Reddit DMs** - Centralized inbox for all Reddit private messages
-- **Lead Discovery** - Find and track potential customers across Reddit communities
-- **Relationship Management** - Organize contacts, conversation history, and follow-ups
-- **Analytics & Insights** - Track engagement metrics and conversion rates
+### 🎯 **Phase 1: Authority Building (MVP)**
+
+- **Profile Optimization** - AI-powered Reddit profile audits and improvement suggestions
+- **Smart Response Generation** - Create authentic, helpful responses that build reputation without looking promotional
+- **Subreddit Strategy** - Identify and prioritize the best communities for your niche
+- **Authority Tracking** - Monitor recognition, engagement, and influence growth across target subreddits
+
+### 🚀 **Phase 2: Complete Growth Platform**
+
+- **Content Repurposing** - Transform YouTube videos, blog posts, and other content into Reddit-native posts
+- **Lead Discovery & CRM** - Identify, track, and nurture potential customers from Reddit interactions
+- **Multi-Account Management** - Safely manage multiple Reddit accounts with different personalities/brands
+- **Advanced Analytics** - Comprehensive insights on authority building, engagement metrics, and lead conversion
+
+### 🎪 **Phase 3: Full Ecosystem**
+
+- **Automated Outreach** - Smart DM sequences for warm leads identified through community engagement
+- **Team Collaboration** - Multi-user access for agencies and larger teams
+- **Integration Hub** - Connect with existing CRM, email marketing, and social media tools
+- **Competitor Intelligence** - Track and analyze competitor activity across Reddit communities
+
+**Core Philosophy**: Build genuine authority and relationships first, then leverage that trust for sustainable lead generation - the anti-spam approach to Reddit marketing.
 
 ## 🧱 TECH STACK & ARCHITECTURE
 
@@ -83,3 +99,5 @@ You are an expert **Next.js developer** with professional skills in:
 ## Notes
 
 - Always use &apos; and &quot; when designing or creating .tsx component, if not we'll get an error on build.
+- You just need to make code updates, NEVER run servers or execute commands apart of coding updates.
+- When applying programmatic classes, use `cn` not `class1 ${}`

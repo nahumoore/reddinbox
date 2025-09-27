@@ -17,6 +17,7 @@ export default async function OnboardingLayout({
     redirect("/auth/login");
   }
 
+  // CHECK USER INFO
   const supabase = supabaseAdmin;
   const { data: userInfo } = await supabase
     .from("user_info")

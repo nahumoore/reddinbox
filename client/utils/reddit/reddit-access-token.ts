@@ -1,3 +1,5 @@
+import { supabaseAdmin } from "@/lib/supabase/admin";
+import { supabaseServer } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 
 interface RedditTokenResponse {
@@ -26,6 +28,7 @@ interface RedditUserData {
   coins: number;
   num_friends: number;
   subreddit: string;
+  public_description: string;
 }
 
 export interface TokenResult {
@@ -68,16 +71,57 @@ export async function getValidRedditToken(): Promise<TokenResult> {
   try {
     const cookieStore = await cookies();
 
-    const accessToken = cookieStore.get(COOKIE_NAMES.ACCESS_TOKEN)?.value;
-    const refreshToken = cookieStore.get(COOKIE_NAMES.REFRESH_TOKEN)?.value;
-    const expiresAt = cookieStore.get(COOKIE_NAMES.EXPIRES_AT)?.value;
+    let accessToken = cookieStore.get(COOKIE_NAMES.ACCESS_TOKEN)?.value;
+    let refreshToken = cookieStore.get(COOKIE_NAMES.REFRESH_TOKEN)?.value;
+    let expiresAt = cookieStore.get(COOKIE_NAMES.EXPIRES_AT)?.value;
 
+    // If no tokens in cookies, check Supabase for active Reddit account
     if (!accessToken || !refreshToken || !expiresAt) {
-      return {
-        success: false,
-        error: "No Reddit tokens found. User needs to authenticate.",
-        code: "NO_TOKENS",
-      };
+      const supabaseAuth = await supabaseServer();
+      const {
+        data: { user },
+      } = await supabaseAuth.auth.getUser();
+
+      if (!user) {
+        return {
+          success: false,
+          error: "User not authenticated.",
+          code: "USER_NOT_AUTHENTICATED",
+        };
+      }
+
+      // Query for active Reddit account
+      const supabase = supabaseAdmin;
+      const { data: redditAccount, error } = await supabase
+        .from("reddit_accounts")
+        .select("access_token, refresh_token, token_expires_at")
+        .eq("user_id", user.id)
+        .eq("is_active", true)
+        .single();
+
+      if (error || !redditAccount) {
+        return {
+          success: false,
+          error: "No active Reddit account found. User needs to authenticate.",
+          code: "NO_TOKENS",
+        };
+      }
+
+      // Use tokens from database
+      accessToken = redditAccount.access_token!;
+      refreshToken = redditAccount.refresh_token!;
+      expiresAt = redditAccount.token_expires_at
+        ? new Date(redditAccount.token_expires_at).getTime().toString()
+        : undefined;
+
+      if (!accessToken || !refreshToken || !expiresAt) {
+        return {
+          success: false,
+          error:
+            "Incomplete Reddit tokens in database. User needs to re-authenticate.",
+          code: "INCOMPLETE_TOKENS",
+        };
+      }
     }
 
     const expirationTime = parseInt(expiresAt);

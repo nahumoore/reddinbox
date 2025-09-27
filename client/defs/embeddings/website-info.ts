@@ -1,0 +1,7 @@
+export const WEBSITE_INFO_EMBEDDING = `
+Product: {PRODUCT_NAME} - {PRODUCT_DESCRIPTION}
+
+Target: {TARGET_AUDIENCE}
+
+Keywords: {KEYWORDS}
+`;

@@ -9,7 +9,7 @@
     "start": "node dist/main.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "cron:start": "node dist/cron/scheduler.js",
-    "cron:dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register app/cron/scheduler.ts"
+    "cron:dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register app/cron/scheduler-test.ts"
   },
   "keywords": [],
   "author": "",

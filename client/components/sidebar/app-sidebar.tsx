@@ -1,11 +1,9 @@
 "use client";
 
-import { GalleryVerticalEnd } from "lucide-react";
 import * as React from "react";
 
 import { LinkProps, NavMain } from "@/components/sidebar/nav-main";
 import { NavUser } from "@/components/sidebar/nav-user";
-import { TeamSwitcher } from "@/components/sidebar/team-switcher";
 import {
   Sidebar,
   SidebarContent,
@@ -13,35 +11,29 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { IconInbox, IconUser, IconUsers } from "@tabler/icons-react";
+import {
+  IconHeartHandshake,
+  IconUser,
+  IconUsersGroup,
+} from "@tabler/icons-react";
+import { BrandReddinbox } from "../icons/BrandReddinbox";
 import { NavFooter } from "./nav-footer";
+import { WebsiteSwitcher } from "./website-switcher";
 
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-  ],
   navMain: [
     {
-      section: "Outreach",
+      section: "Platform",
       items: [
         {
-          title: "Lead Discovery",
-          icon: IconUsers,
-          url: "/dashboard/lead-discovery",
+          title: "Authority Feed",
+          icon: IconUsersGroup,
+          url: "/dashboard/authority-feed",
         },
         {
-          title: "Inbox",
-          icon: IconInbox,
-          url: "/dashboard/inbox",
+          title: "Relationship Pipeline",
+          icon: IconHeartHandshake,
+          url: "/dashboard/relationship-pipeline",
         },
       ],
     },
@@ -59,14 +51,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <div className="px-2 mb-2">
+          <div className="flex items-center gap-2">
+            <BrandReddinbox className="size-6 text-primary" />
+            <span className="font-medium text-xl text-primary mt-1">
+              Reddinbox
+            </span>
+          </div>
+        </div>
+        <WebsiteSwitcher />
       </SidebarHeader>
       <SidebarContent>
         <NavMain links={data.navMain as LinkProps[]} />
       </SidebarContent>
       <SidebarFooter>
         <NavFooter links={data.navFooter} />
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

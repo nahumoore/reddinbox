@@ -2,7 +2,6 @@
 
 import { useOnboardingForm } from "@/stores/onboarding-form";
 import {
-  IconArrowLeft,
   IconArrowRight,
   IconPackage,
   IconPlus,
@@ -23,7 +22,7 @@ export default function WebsiteInformation() {
     websiteName: websiteAnalysis?.websiteName || "",
     companyDescription: websiteAnalysis?.companyDescription || "",
     keywordsToMonitor: websiteAnalysis?.keywordsToMonitor || [],
-    idealCustomerProfile: websiteAnalysis?.idealCustomerProfile || "",
+    targetAudience: websiteAnalysis?.targetAudience || "",
   });
 
   const [newKeyword, setNewKeyword] = useState("");
@@ -32,7 +31,7 @@ export default function WebsiteInformation() {
     websiteName?: string;
     companyDescription?: string;
     keywordsToMonitor?: string;
-    idealCustomerProfile?: string;
+    targetAudience?: string;
   }>({});
 
   const validateForm = () => {
@@ -50,8 +49,8 @@ export default function WebsiteInformation() {
       newErrors.keywordsToMonitor = "At least one keyword is required";
     }
 
-    if (!formData.idealCustomerProfile.trim()) {
-      newErrors.idealCustomerProfile = "Ideal customer profile is required";
+    if (!formData.targetAudience.trim()) {
+      newErrors.targetAudience = "Target audience is required";
     }
 
     setErrors(newErrors);
@@ -71,7 +70,11 @@ export default function WebsiteInformation() {
 
   const addKeyword = () => {
     const keyword = newKeyword.trim();
-    if (keyword && !formData.keywordsToMonitor.includes(keyword)) {
+    if (
+      keyword &&
+      !formData.keywordsToMonitor.includes(keyword) &&
+      formData.keywordsToMonitor.length < 5
+    ) {
       handleFieldChange("keywordsToMonitor", [
         ...formData.keywordsToMonitor,
         keyword,
@@ -102,30 +105,25 @@ export default function WebsiteInformation() {
       websiteName: formData.websiteName,
       companyDescription: formData.companyDescription,
       keywordsToMonitor: formData.keywordsToMonitor,
-      idealCustomerProfile: formData.idealCustomerProfile,
-      competitors: websiteAnalysis?.competitors || [], // Keep existing competitors
+      targetAudience: formData.targetAudience,
     });
 
     setStep(3);
-  };
-
-  const handleGoBack = () => {
-    setStep(1);
   };
 
   return (
     <div className="space-y-8">
       {/* Header Section */}
       <div className="space-y-4">
-        <div className="flex items-center space-x-3">
-          <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
-            <IconPackage className="size-6 text-white" />
+        <div className="flex items-center space-x-4">
+          <div className="relative size-16 bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center shadow-lg">
+            <IconPackage className="size-8 text-white" />
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground font-heading">
+          <div className="space-y-1">
+            <h1 className="text-3xl font-bold text-foreground font-heading">
               Review Your Product Information
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-lg text-muted-foreground">
               We&apos;ve analyzed your website. Please review and adjust the
               information below.
             </p>
@@ -172,9 +170,28 @@ export default function WebsiteInformation() {
           )}
         </div>
 
+        {/* Target Audience */}
+        <div className="space-y-2">
+          <Label htmlFor="targetAudience">Target Audience *</Label>
+          <Textarea
+            id="targetAudience"
+            placeholder="Describe your ideal customers or target audience"
+            value={formData.targetAudience}
+            onChange={(e) =>
+              handleFieldChange("targetAudience", e.target.value)
+            }
+            className={`min-h-24 ${
+              errors.targetAudience ? "border-destructive" : ""
+            }`}
+          />
+          {errors.targetAudience && (
+            <p className="text-sm text-destructive">{errors.targetAudience}</p>
+          )}
+        </div>
+
         {/* Keywords to Monitor */}
         <div className="space-y-4">
-          <Label htmlFor="keywordInput">Keywords to Monitor on Reddit *</Label>
+          <Label htmlFor="keywordInput">Relevant Keywords *</Label>
 
           {/* Add New Keyword Input */}
           <div className="flex gap-2">
@@ -194,7 +211,9 @@ export default function WebsiteInformation() {
               variant="outline"
               size="sm"
               onClick={addKeyword}
-              disabled={!newKeyword.trim()}
+              disabled={
+                !newKeyword.trim() || formData.keywordsToMonitor.length >= 5
+              }
               className="px-3"
             >
               <IconPlus className="h-4 w-4" />
@@ -223,47 +242,16 @@ export default function WebsiteInformation() {
             </div>
           )}
 
-          <p className="text-sm text-muted-foreground">
-            Add keywords that are relevant to your product. These will be used
-            to find relevant Reddit discussions.
-          </p>
-
           {errors.keywordsToMonitor && (
             <p className="text-sm text-destructive">
               {errors.keywordsToMonitor}
             </p>
           )}
         </div>
-
-        {/* Ideal Customer Profile */}
-        <div className="space-y-2">
-          <Label htmlFor="idealCustomerProfile">Ideal Customer Profile *</Label>
-          <Textarea
-            id="idealCustomerProfile"
-            placeholder="Describe your ideal customer: demographics, pain points, behavior, etc."
-            value={formData.idealCustomerProfile}
-            onChange={(e) =>
-              handleFieldChange("idealCustomerProfile", e.target.value)
-            }
-            className={`min-h-32 ${
-              errors.idealCustomerProfile ? "border-destructive" : ""
-            }`}
-          />
-          {errors.idealCustomerProfile && (
-            <p className="text-sm text-destructive">
-              {errors.idealCustomerProfile}
-            </p>
-          )}
-        </div>
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex justify-between py-4">
-        <Button variant="outline" onClick={handleGoBack} className="px-6">
-          <IconArrowLeft className="size-4 mr-2" />
-          Previous
-        </Button>
-
+      <div className="flex justify-end py-4">
         <Button onClick={handleContinue} className="px-8" size="lg">
           Continue
           <IconArrowRight className="size-4 ml-2" />

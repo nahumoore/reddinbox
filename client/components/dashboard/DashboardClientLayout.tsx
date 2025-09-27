@@ -1,12 +1,14 @@
 "use client";
 
 import { useRedditAccounts } from "@/stores/reddit-accounts";
-import { useRedditLeads } from "@/stores/reddit-leads";
+import { useRedditSubreddits } from "@/stores/reddit-subreddits";
+import { useRedditUserInteractions } from "@/stores/reddit-user-interactions";
 import { useUserInfo } from "@/stores/user-info";
 import { useUserWebsites } from "@/stores/user-wesbites";
 import {
   RedditAccount,
-  RedditLead,
+  RedditSubreddit,
+  RedditUserInteraction,
   UserInfo,
   Website,
 } from "@/types/db-schema";
@@ -18,14 +20,16 @@ export default function DashboardClientLayout({
   children,
   userInfo,
   redditAccounts,
-  redditLeads,
+  redditUserInteractions,
   websites,
+  subreddits,
 }: {
   children: React.ReactNode;
   userInfo: UserInfo;
   redditAccounts: RedditAccount[];
-  redditLeads: RedditLead[];
+  redditUserInteractions: RedditUserInteraction[];
   websites: Website[];
+  subreddits: RedditSubreddit[];
 }) {
   // STORES
   const { setUserInfo, setIsLoadingUserInfo } = useUserInfo();
@@ -36,7 +40,9 @@ export default function DashboardClientLayout({
   } = useRedditAccounts();
   const { setUserWebsites, setUserActiveWebsite, setIsLoadingUserWebsites } =
     useUserWebsites();
-  const { setRedditLeads, setIsLoadingRedditLeads } = useRedditLeads();
+  const { setRedditUserInteractions, setIsLoadingRedditUserInteractions } =
+    useRedditUserInteractions();
+  const { setSubreddits, setIsLoadingSubreddits } = useRedditSubreddits();
 
   // LOAD DATA
   useEffect(() => {
@@ -51,15 +57,19 @@ export default function DashboardClientLayout({
     );
     setIsLoadingRedditAccounts(false);
 
-    // REDDIT LEADS
-    setRedditLeads(redditLeads);
-    setIsLoadingRedditLeads(false);
+    // REDDIT USER INTERACTIONS
+    setRedditUserInteractions(redditUserInteractions);
+    setIsLoadingRedditUserInteractions(false);
 
     // WEBSITES
     setUserWebsites(websites);
     setUserActiveWebsite(websites.find((website) => website.is_active)!);
     setIsLoadingUserWebsites(false);
-  }, [userInfo, redditAccounts, websites, redditLeads]);
+
+    // SUBREDDITS
+    setSubreddits(subreddits);
+    setIsLoadingSubreddits(false);
+  }, [userInfo, redditAccounts, websites, redditUserInteractions]);
 
   return (
     <SidebarProvider>

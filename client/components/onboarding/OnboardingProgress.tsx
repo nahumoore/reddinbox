@@ -5,7 +5,7 @@ import {
   IconBrandReddit,
   IconCheck,
   IconPackage,
-  IconVs,
+  IconUsersGroup,
   IconWorld,
 } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -20,14 +20,14 @@ const steps = [
   {
     id: 2,
     title: "Product Information",
-    description: "What is your product and who is your ideal customer?",
+    description: "Tell us about your product",
     icon: IconPackage,
   },
   {
     id: 3,
-    title: "Competitors",
-    description: "Who are your competitors?",
-    icon: IconVs,
+    title: "Select Subreddits",
+    description: "Select the subreddits you want to monitor",
+    icon: IconUsersGroup,
   },
   {
     id: 4,
@@ -41,33 +41,34 @@ export default function OnboardingProgress() {
   const { step } = useOnboardingForm();
 
   return (
-    <div className="bg-primary text-primary-foreground p-6 space-y-6 min-h-full">
-      <div className="space-y-2">
+    <div className="bg-primary text-primary-foreground p-6 h-full flex flex-col">
+      <div className="space-y-2 mb-6">
         <h2 className="text-xl font-heading font-bold">Setup Progress</h2>
         <p className="text-primary-foreground/80 text-sm">
           Complete your onboarding
         </p>
       </div>
 
-      <div className="space-y-4">
-        {steps.map((stepItem) => {
+      <div className="flex flex-col justify-between flex-1">
+        {steps.map((stepItem, index) => {
           const isCompleted = step > stepItem.id;
           const isCurrent = step === stepItem.id;
+          const isLast = index === steps.length - 1;
 
           return (
-            <motion.div
-              key={stepItem.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: stepItem.id * 0.1, duration: 0.3 }}
-              className={`flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 ${
-                isCurrent
-                  ? "bg-primary-foreground/20 backdrop-blur-sm"
-                  : isCompleted
-                  ? "bg-primary-foreground/10"
-                  : "opacity-60"
-              }`}
-            >
+            <div key={stepItem.id} className="flex flex-col">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: stepItem.id * 0.1, duration: 0.3 }}
+                className={`flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 ${
+                  isCurrent
+                    ? "bg-primary-foreground/20 backdrop-blur-sm"
+                    : isCompleted
+                    ? "bg-primary-foreground/10"
+                    : "opacity-60"
+                }`}
+              >
               <motion.div
                 className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 ${
                   isCompleted
@@ -151,7 +152,25 @@ export default function OnboardingProgress() {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </motion.div>
+              </motion.div>
+
+              {/* Progress line */}
+              {!isLast && (
+                <div className="flex justify-center py-3">
+                  <motion.div
+                    initial={{ scaleY: 0 }}
+                    animate={{ scaleY: 1 }}
+                    transition={{ delay: stepItem.id * 0.1 + 0.2, duration: 0.3 }}
+                    className={`w-px h-6 transition-colors duration-300 ${
+                      isCompleted
+                        ? "bg-primary-foreground/40"
+                        : "bg-primary-foreground/20"
+                    }`}
+                    style={{ originY: 0 }}
+                  />
+                </div>
+              )}
+            </div>
           );
         })}
       </div>

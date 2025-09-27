@@ -1,12 +1,11 @@
-import { WEBSITE_ANALYSIS_PROMPT } from "@/defs/analysis-prompts";
+import { WEBSITE_ANALYSIS_PROMPT } from "@/defs/system-instructions/analysis-prompts";
 import OpenAI from "openai";
 
 interface AnalysisResult {
   websiteName: string;
   companyDescription: string;
   keywords: string[];
-  idealCustomerProfile: string;
-  competitors: string[];
+  targetAudience: string;
   error?: string;
 }
 
@@ -61,8 +60,7 @@ export async function analyzeWebsiteContent(
       websiteName: analysisData.websiteName,
       companyDescription: analysisData.companyDescription,
       keywords: analysisData.keywords,
-      idealCustomerProfile: analysisData.idealCustomerProfile,
-      competitors: analysisData.competitors,
+      targetAudience: analysisData.targetAudience,
     };
   } catch (error) {
     console.error("OpenAI analysis error:", error);
@@ -70,8 +68,7 @@ export async function analyzeWebsiteContent(
       websiteName: "",
       companyDescription: "",
       keywords: [],
-      idealCustomerProfile: "",
-      competitors: [],
+      targetAudience: "",
       error:
         error instanceof Error
           ? error.message
