@@ -69,7 +69,7 @@ export default function BlogPage() {
   return (
     <>
       <Navbar />
-      <BlogClientPage allPosts={allPosts.slice(0, 3)} />;
+      <BlogClientPage allPosts={allPosts} />;
       <Footer />
     </>
   );

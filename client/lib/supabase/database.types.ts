@@ -119,6 +119,9 @@ export type Database = {
         Row: {
           author: string
           content: string
+          content_category:
+            | Database["public"]["Enums"]["reddit_post_category"]
+            | null
           content_type: Database["public"]["Enums"]["content_type"] | null
           created_at: string | null
           downs: number | null
@@ -134,6 +137,9 @@ export type Database = {
         Insert: {
           author: string
           content: string
+          content_category?:
+            | Database["public"]["Enums"]["reddit_post_category"]
+            | null
           content_type?: Database["public"]["Enums"]["content_type"] | null
           created_at?: string | null
           downs?: number | null
@@ -149,6 +155,9 @@ export type Database = {
         Update: {
           author?: string
           content?: string
+          content_category?:
+            | Database["public"]["Enums"]["reddit_post_category"]
+            | null
           content_type?: Database["public"]["Enums"]["content_type"] | null
           created_at?: string | null
           downs?: number | null
@@ -235,7 +244,7 @@ export type Database = {
           interacted_with_reddit_username: string
           interaction_type: Database["public"]["Enums"]["interaction_type"]
           original_reddit_post_id: string
-          our_interaction_content: string
+          our_interaction_content: string | null
           our_interaction_reddit_id: string | null
           reddit_content_discovered_id: string | null
           status: Database["public"]["Enums"]["reddit_interaction_status"]
@@ -249,7 +258,7 @@ export type Database = {
           interacted_with_reddit_username: string
           interaction_type: Database["public"]["Enums"]["interaction_type"]
           original_reddit_post_id: string
-          our_interaction_content: string
+          our_interaction_content?: string | null
           our_interaction_reddit_id?: string | null
           reddit_content_discovered_id?: string | null
           status?: Database["public"]["Enums"]["reddit_interaction_status"]
@@ -263,7 +272,7 @@ export type Database = {
           interacted_with_reddit_username?: string
           interaction_type?: Database["public"]["Enums"]["interaction_type"]
           original_reddit_post_id?: string
-          our_interaction_content?: string
+          our_interaction_content?: string | null
           our_interaction_reddit_id?: string | null
           reddit_content_discovered_id?: string | null
           status?: Database["public"]["Enums"]["reddit_interaction_status"]
@@ -295,64 +304,6 @@ export type Database = {
           },
         ]
       }
-      scheduled_content: {
-        Row: {
-          created_at: string | null
-          error_message: string | null
-          failed_times: number | null
-          id: string
-          is_posted: boolean | null
-          reddit_account_id: string
-          scheduled_at: string
-          source_user_interaction: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          error_message?: string | null
-          failed_times?: number | null
-          id?: string
-          is_posted?: boolean | null
-          reddit_account_id: string
-          scheduled_at: string
-          source_user_interaction: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          error_message?: string | null
-          failed_times?: number | null
-          id?: string
-          is_posted?: boolean | null
-          reddit_account_id?: string
-          scheduled_at?: string
-          source_user_interaction?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "scheduled_content_reddit_account_id_fkey"
-            columns: ["reddit_account_id"]
-            isOneToOne: false
-            referencedRelation: "reddit_accounts"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "scheduled_content_source_user_interaction_fkey"
-            columns: ["source_user_interaction"]
-            isOneToOne: false
-            referencedRelation: "reddit_user_interactions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "scheduled_content_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_info"
-            referencedColumns: ["auth_user_id"]
-          },
-        ]
-      }
       user_info: {
         Row: {
           auth_user_id: string
@@ -362,7 +313,10 @@ export type Database = {
           last_connected: string
           name: string | null
           onboarding_completed: boolean
-          subscription_active: boolean | null
+          stripe_customer_id: string | null
+          subscription_period_end_at: string
+          subscription_period_started_at: string
+          subscription_status: Database["public"]["Enums"]["subscription_statuses"]
           updated_at: string
         }
         Insert: {
@@ -373,7 +327,10 @@ export type Database = {
           last_connected?: string
           name?: string | null
           onboarding_completed?: boolean
-          subscription_active?: boolean | null
+          stripe_customer_id?: string | null
+          subscription_period_end_at?: string
+          subscription_period_started_at?: string
+          subscription_status?: Database["public"]["Enums"]["subscription_statuses"]
           updated_at?: string
         }
         Update: {
@@ -384,15 +341,20 @@ export type Database = {
           last_connected?: string
           name?: string | null
           onboarding_completed?: boolean
-          subscription_active?: boolean | null
+          stripe_customer_id?: string | null
+          subscription_period_end_at?: string
+          subscription_period_started_at?: string
+          subscription_status?: Database["public"]["Enums"]["subscription_statuses"]
           updated_at?: string
         }
         Relationships: []
       }
       websites: {
         Row: {
+          authority_feed_options: Json | null
           created_at: string
           description: string | null
+          expertise: string[] | null
           id: string
           is_active: boolean
           keywords: string[] | null
@@ -405,8 +367,10 @@ export type Database = {
           vector_ai_searcher: string
         }
         Insert: {
+          authority_feed_options?: Json | null
           created_at?: string
           description?: string | null
+          expertise?: string[] | null
           id?: string
           is_active?: boolean
           keywords?: string[] | null
@@ -419,8 +383,10 @@ export type Database = {
           vector_ai_searcher: string
         }
         Update: {
+          authority_feed_options?: Json | null
           created_at?: string
           description?: string | null
+          expertise?: string[] | null
           id?: string
           is_active?: boolean
           keywords?: string[] | null
@@ -471,6 +437,29 @@ export type Database = {
       binary_quantize: {
         Args: { "": string } | { "": unknown }
         Returns: unknown
+      }
+      find_relevant_reddit_content: {
+        Args:
+          | {
+              p_acceptance_score?: number
+              p_limit?: number
+              p_website_id: string
+            }
+          | { p_acceptance_score?: number; p_website_id: string }
+        Returns: {
+          author: string
+          content: string
+          content_type: string
+          downs: number
+          id: string
+          reddit_created_at: string
+          reddit_id: string
+          reddit_url: string
+          similarity_score: number
+          subreddit_id: string
+          title: string
+          ups: number
+        }[]
       }
       halfvec_avg: {
         Args: { "": number[] }
@@ -565,6 +554,20 @@ export type Database = {
       content_type: "post" | "comment"
       interaction_type: "comment_reply" | "post_reply" | "dm"
       reddit_interaction_status: "new" | "ignored" | "submitted" | "scheduled"
+      reddit_post_category:
+        | "help_request"
+        | "advice_seeking"
+        | "problem_complaint"
+        | "comparison_request"
+        | "open_discussion"
+        | "success_story"
+        | "experience_share"
+        | "news_update"
+        | "tool_announcement"
+        | "self_promotion"
+        | "resource_compilation"
+        | "other"
+      subscription_statuses: "free-trial" | "active" | "stopped"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -695,6 +698,21 @@ export const Constants = {
       content_type: ["post", "comment"],
       interaction_type: ["comment_reply", "post_reply", "dm"],
       reddit_interaction_status: ["new", "ignored", "submitted", "scheduled"],
+      reddit_post_category: [
+        "help_request",
+        "advice_seeking",
+        "problem_complaint",
+        "comparison_request",
+        "open_discussion",
+        "success_story",
+        "experience_share",
+        "news_update",
+        "tool_announcement",
+        "self_promotion",
+        "resource_compilation",
+        "other",
+      ],
+      subscription_statuses: ["free-trial", "active", "stopped"],
     },
   },
 } as const

@@ -10,7 +10,7 @@ import { CardContent } from "../ui/card";
 import { Input } from "../ui/input";
 
 export default function WelcomeStep() {
-  const { setStep, setUserName, userName } = useOnboardingForm();
+  const { setStep, setUserName } = useOnboardingForm();
   const { userInfo } = useUserInfo();
 
   const [localName, setLocalName] = useState(

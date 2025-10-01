@@ -1,6 +1,9 @@
-import { notFound } from "next/navigation";
-import { Metadata } from "next";
+import BlogStylings from "@/components/blog/BlogStylings";
 import { getPostBySlug, getPostSlugs } from "@/utils/mdx";
+import { Metadata } from "next";
+import { MDXRemote } from "next-mdx-remote/rsc";
+import { notFound } from "next/navigation";
+import remarkGfm from "remark-gfm";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -27,13 +30,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `${post.meta.title} | Reddinbox Blog`,
     description: post.meta.description,
     keywords: post.meta.tags,
-    authors: [{ name: post.meta.author }],
+    authors: [{ name: "Nicolas" }],
     openGraph: {
       title: post.meta.title,
       description: post.meta.description,
       type: "article",
       publishedTime: post.meta.date,
-      authors: [post.meta.author],
+      authors: ["Nicolas"],
       images: post.meta.image ? [post.meta.image] : [],
       siteName: "Reddinbox",
     },
@@ -64,8 +67,7 @@ export default async function BlogPost({ params }: Props) {
           {post.meta.description}
         </p>
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <span>By {post.meta.author}</span>
-          <span>"</span>
+          <span>By Nicolas</span>
           <time dateTime={post.meta.date}>
             {new Date(post.meta.date).toLocaleDateString("en-US", {
               year: "numeric",
@@ -73,18 +75,27 @@ export default async function BlogPost({ params }: Props) {
               day: "numeric",
             })}
           </time>
-          {post.meta.readTime && (
-            <>
-              <span>"</span>
-              <span>{post.meta.readTime}</span>
-            </>
-          )}
+          {post.meta.readTime && <span>{post.meta.readTime}</span>}
         </div>
       </header>
 
       <div className="prose prose-lg max-w-none font-body">
-        {post.content}
+        <MDXContent source={post.content} />
       </div>
     </article>
   );
 }
+
+const MDXContent = ({ source }: { source: string }) => {
+  const components = BlogStylings();
+  const options = {
+    mdxOptions: {
+      remarkPlugins: [remarkGfm],
+      rehypePlugins: [],
+    },
+  };
+
+  return (
+    <MDXRemote source={source} components={components} options={options} />
+  );
+};

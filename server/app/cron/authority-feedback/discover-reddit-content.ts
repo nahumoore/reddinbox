@@ -3,6 +3,10 @@ import {
   filterSpamPosts,
   SpamFilterInput,
 } from "@/methods/discover-reddit-posts/filter-reddit-spam";
+import {
+  classifyRedditPosts,
+  ClassificationInput,
+} from "@/methods/discover-reddit-posts/classify-reddit-post";
 import { generateEmbeddingsForPosts } from "@/methods/discover-reddit-posts/reddit-post-embedding";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { createRedditUserInteractionsJob } from "./create-reddit-user-interactions";
@@ -20,6 +24,7 @@ interface ProcessedPost {
   subreddit_id: string;
   subreddit_name: string;
   is_self: boolean;
+  content_category?: string;
   embedded_content?: number[] | null;
 }
 
@@ -211,6 +216,51 @@ export const discoverRedditContentJob = async ({
         if (aiSpamCount > 0) {
           console.log(`   - AI spam filter removed: ${aiSpamCount} posts`);
         }
+      }
+    }
+
+    // CLASSIFY ALL APPROVED POSTS INTO CATEGORIES
+    if (approvedPosts.length > 0) {
+      try {
+        console.log(
+          `🏷️ Starting post classification for ${approvedPosts.length} approved posts...`
+        );
+
+        // PREPARE POSTS FOR CLASSIFICATION
+        const postsForClassification: ClassificationInput[] = approvedPosts.map(
+          (post) => ({
+            id: post.reddit_id,
+            title: post.title || "",
+            content: post.content,
+          })
+        );
+
+        // RUN AI CLASSIFICATION ON ALL APPROVED POSTS
+        const classificationResults = await classifyRedditPosts(
+          postsForClassification
+        );
+
+        // CREATE MAP OF POST ID TO CATEGORY FOR FAST LOOKUP
+        const categoryMap = new Map(
+          classificationResults.map((result) => [result.id, result.category])
+        );
+
+        // ASSIGN CATEGORIES TO APPROVED POSTS
+        approvedPosts = approvedPosts.map((post) => ({
+          ...post,
+          content_category: categoryMap.get(post.reddit_id) || "other",
+        }));
+
+        console.log(
+          `✅ Successfully classified ${classificationResults.length} posts`
+        );
+      } catch (error) {
+        console.error(`❌ Error classifying posts:`, error);
+        // CONTINUE WITHOUT CATEGORIES IF CLASSIFICATION FAILS
+        approvedPosts = approvedPosts.map((post) => ({
+          ...post,
+          content_category: "other",
+        }));
       }
     }
 

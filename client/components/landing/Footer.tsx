@@ -3,6 +3,7 @@
 import { IconBrandX } from "@tabler/icons-react";
 import Link from "next/link";
 import { BrandReddinbox } from "../icons/BrandReddinbox";
+import { Badge } from "../ui/badge";
 
 export default function Footer() {
   return (
@@ -67,12 +68,10 @@ export default function Footer() {
             <h3 className="font-semibold text-foreground mb-4">Services</h3>
             <ul className="space-y-2">
               <li>
-                <Link
-                  href="/blog"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
+                <div className="text-muted-foreground flex items-center gap-2">
                   Blog
-                </Link>
+                  <Badge variant="outline">Coming Soon...</Badge>
+                </div>
               </li>
             </ul>
           </div>

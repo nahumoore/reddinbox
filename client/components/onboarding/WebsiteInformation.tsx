@@ -23,15 +23,18 @@ export default function WebsiteInformation() {
     companyDescription: websiteAnalysis?.companyDescription || "",
     keywordsToMonitor: websiteAnalysis?.keywordsToMonitor || [],
     targetAudience: websiteAnalysis?.targetAudience || "",
+    expertise: websiteAnalysis?.expertise || [],
   });
 
   const [newKeyword, setNewKeyword] = useState("");
+  const [newExpertise, setNewExpertise] = useState("");
 
   const [errors, setErrors] = useState<{
     websiteName?: string;
     companyDescription?: string;
     keywordsToMonitor?: string;
     targetAudience?: string;
+    expertise?: string;
   }>({});
 
   const validateForm = () => {
@@ -51,6 +54,10 @@ export default function WebsiteInformation() {
 
     if (!formData.targetAudience.trim()) {
       newErrors.targetAudience = "Target audience is required";
+    }
+
+    if (formData.expertise.length === 0) {
+      newErrors.expertise = "At least one area of expertise is required";
     }
 
     setErrors(newErrors);
@@ -90,10 +97,39 @@ export default function WebsiteInformation() {
     handleFieldChange("keywordsToMonitor", updatedKeywords);
   };
 
+  const addExpertise = () => {
+    const expertise = newExpertise.trim();
+    if (
+      expertise &&
+      !formData.expertise.includes(expertise) &&
+      formData.expertise.length < 5
+    ) {
+      handleFieldChange("expertise", [
+        ...formData.expertise,
+        expertise,
+      ]);
+      setNewExpertise("");
+    }
+  };
+
+  const removeExpertise = (expertiseToRemove: string) => {
+    const updatedExpertise = formData.expertise.filter(
+      (expertise) => expertise !== expertiseToRemove
+    );
+    handleFieldChange("expertise", updatedExpertise);
+  };
+
   const handleKeywordInputKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       e.preventDefault();
       addKeyword();
+    }
+  };
+
+  const handleExpertiseInputKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addExpertise();
     }
   };
 
@@ -106,6 +142,7 @@ export default function WebsiteInformation() {
       companyDescription: formData.companyDescription,
       keywordsToMonitor: formData.keywordsToMonitor,
       targetAudience: formData.targetAudience,
+      expertise: formData.expertise,
     });
 
     setStep(3);
@@ -245,6 +282,66 @@ export default function WebsiteInformation() {
           {errors.keywordsToMonitor && (
             <p className="text-sm text-destructive">
               {errors.keywordsToMonitor}
+            </p>
+          )}
+        </div>
+
+        {/* Areas of Expertise */}
+        <div className="space-y-4">
+          <Label htmlFor="expertiseInput">Areas of expertise *</Label>
+
+          {/* Add New Expertise Input */}
+          <div className="flex gap-2">
+            <Input
+              id="expertiseInput"
+              type="text"
+              placeholder="Add an area of expertise and press Enter"
+              value={newExpertise}
+              onChange={(e) => setNewExpertise(e.target.value)}
+              onKeyPress={handleExpertiseInputKeyPress}
+              className={`flex-1 ${
+                errors.expertise ? "border-destructive" : ""
+              }`}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={addExpertise}
+              disabled={
+                !newExpertise.trim() || formData.expertise.length >= 5
+              }
+              className="px-3"
+            >
+              <IconPlus className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Existing Expertise Display */}
+          {formData.expertise.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {formData.expertise.map((expertise, index) => (
+                <Badge
+                  key={index}
+                  variant="secondary"
+                  className="flex items-center gap-2 px-3 py-1 text-sm"
+                >
+                  {expertise}
+                  <button
+                    type="button"
+                    onClick={() => removeExpertise(expertise)}
+                    className="ml-1 rounded-full p-1 hover:bg-destructive/20 transition-colors"
+                  >
+                    <IconX className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          )}
+
+          {errors.expertise && (
+            <p className="text-sm text-destructive">
+              {errors.expertise}
             </p>
           )}
         </div>

@@ -6,6 +6,7 @@ interface AnalysisResult {
   companyDescription: string;
   keywords: string[];
   targetAudience: string;
+  expertise: string[];
   error?: string;
 }
 
@@ -29,8 +30,64 @@ export async function analyzeWebsiteContent(
           content: content,
         },
       ],
+      store: true,
       response_format: {
-        type: "json_object",
+        type: "json_schema",
+        json_schema: {
+          name: "website_analysis",
+          strict: true,
+          schema: {
+            type: "object",
+            properties: {
+              websiteName: {
+                type: "string",
+                description: "Company name only",
+                minLength: 1,
+              },
+              companyDescription: {
+                type: "string",
+                description:
+                  "What the business does and core value proposition",
+                minLength: 1,
+              },
+              targetAudience: {
+                type: "string",
+                description: "Who the business serves",
+                minLength: 1,
+              },
+              expertise: {
+                type: "array",
+                description:
+                  "Keywords describing what the business is expert in",
+                items: {
+                  type: "string",
+                  minLength: 1,
+                },
+                minItems: 1,
+                maxItems: 10,
+              },
+              keywords: {
+                type: "array",
+                description:
+                  "5 terms potential customers use when discussing their problems on Reddit",
+                items: {
+                  type: "string",
+                  minLength: 1,
+                },
+                minItems: 1,
+                maxItems: 10,
+              },
+            },
+            required: [
+              "websiteName",
+              "companyDescription",
+              "targetAudience",
+              "expertise",
+              "keywords",
+            ],
+            additionalProperties: false,
+          },
+        },
       },
       verbosity: "medium",
       reasoning_effort: "medium",
@@ -61,6 +118,7 @@ export async function analyzeWebsiteContent(
       companyDescription: analysisData.companyDescription,
       keywords: analysisData.keywords,
       targetAudience: analysisData.targetAudience,
+      expertise: analysisData.expertise,
     };
   } catch (error) {
     console.error("OpenAI analysis error:", error);
@@ -69,6 +127,7 @@ export async function analyzeWebsiteContent(
       companyDescription: "",
       keywords: [],
       targetAudience: "",
+      expertise: [],
       error:
         error instanceof Error
           ? error.message

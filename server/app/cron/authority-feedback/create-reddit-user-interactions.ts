@@ -140,7 +140,7 @@ export const createRedditUserInteractionsJob = async ({
             {
               p_website_id: website.id,
               p_acceptance_score: 0.45,
-              p_limit: 50,
+              p_limit: 20,
             }
           );
 

@@ -28,7 +28,9 @@ export default async function DashboardLayoutServer({
     await Promise.all([
       supabase
         .from("user_info")
-        .select("id, auth_user_id, onboarding_completed, name, email")
+        .select(
+          "id, auth_user_id, onboarding_completed, name, email, stripe_customer_id, subscription_status, subscription_period_end_at, subscription_period_started_at"
+        )
         .eq("auth_user_id", user.id)
         .single(),
       supabase
@@ -57,18 +59,23 @@ export default async function DashboardLayoutServer({
         reddit_id
       `
         )
-        .eq("user_id", user.id),
+        .eq("user_id", user.id)
+        .eq("is_active", true),
       supabase
         .from("websites")
         .select(
-          "id, name, url, description, keywords, is_active, subreddit_reddit_ids"
+          "id, name, url, description, keywords, is_active, subreddit_reddit_ids, authority_feed_options"
         )
         .eq("user_id", user.id),
     ]);
 
-  // COMPLETED ONBOARDING CHECK
+  // VALIDATION CHECKS
   if (!userInfo?.onboarding_completed) {
     redirect("/onboarding");
+  } else if (userInfo?.subscription_status === "stopped") {
+    redirect("/subscription-ended");
+  } else if (redditAccounts?.length === 0) {
+    redirect("/no-reddit-account-active");
   }
 
   // QUERY FROM ACTIVE WEBSITE

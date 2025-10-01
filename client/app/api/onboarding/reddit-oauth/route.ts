@@ -1,4 +1,3 @@
-import { WEBSITE_INFO_EMBEDDING } from "@/defs/embeddings/website-info";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { supabaseServer } from "@/lib/supabase/server";
 import { WebsiteAnalysis } from "@/stores/onboarding-form";
@@ -64,6 +63,7 @@ export const POST = async (req: NextRequest) => {
       description: websiteAnalysis.companyDescription,
       keywords: websiteAnalysis.keywordsToMonitor,
       target_audience: websiteAnalysis.targetAudience,
+      expertise: websiteAnalysis.expertise,
       vector_ai_searcher: websiteInfoEmbedding as any,
       url: websiteUrl,
       subreddit_reddit_ids: targetSubreddits.map(
@@ -149,7 +149,7 @@ export const POST = async (req: NextRequest) => {
 const generateWebsiteInfoEmbedding = async (
   websiteAnalysis: WebsiteAnalysis
 ): Promise<number[]> => {
-  const prompt = promptForEmbedding(websiteAnalysis);
+  const prompt = websiteAnalysis.expertise.join(", ");
 
   // Retry logic with exponential backoff
   const maxRetries = 3;
@@ -192,14 +192,4 @@ const generateWebsiteInfoEmbedding = async (
 
   // This should never be reached, but TypeScript needs it
   throw new Error("Unexpected error in embedding generation");
-};
-
-const promptForEmbedding = (websiteAnalysis: WebsiteAnalysis) => {
-  return WEBSITE_INFO_EMBEDDING.replace(
-    "{PRODUCT_NAME}",
-    websiteAnalysis.websiteName
-  )
-    .replace("{PRODUCT_DESCRIPTION}", websiteAnalysis.companyDescription)
-    .replace("{TARGET_AUDIENCE}", websiteAnalysis.targetAudience)
-    .replace("{KEYWORDS}", websiteAnalysis.keywordsToMonitor.join(", "));
 };

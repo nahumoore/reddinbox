@@ -10,6 +10,7 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import {
   IconHeartHandshake,
@@ -48,15 +49,19 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { open } = useSidebar();
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <div className="px-2 mb-2">
           <div className="flex items-center gap-2">
             <BrandReddinbox className="size-6 text-primary" />
-            <span className="font-medium text-xl text-primary mt-1">
-              Reddinbox
-            </span>
+            {open && (
+              <span className="font-medium text-xl text-primary mt-1">
+                Reddinbox
+              </span>
+            )}
           </div>
         </div>
         <WebsiteSwitcher />

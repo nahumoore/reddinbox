@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Sparkles,
-} from "lucide-react";
-
+import { stripeBuyPlanRedirect } from "@/actions/stripe-buy-plan-redirect";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -26,17 +18,43 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { supabaseClient } from "@/lib/supabase/client";
+import { cn } from "@/lib/utils";
 import { useUserInfo } from "@/stores/user-info";
 import { IconLoader2 } from "@tabler/icons-react";
+import { ChevronsUpDown, LogOut, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { Badge } from "../ui/badge";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
   const { userInfo, isLoadingUserInfo } = useUserInfo();
+  const [isLoadingUpgrade, setIsLoadingUpgrade] = useState(false);
 
   const handleLogout = () => {
     const supabase = supabaseClient();
     supabase.auth.signOut();
     window.location.href = "/auth/login";
+  };
+
+  const handleUpgrade = async () => {
+    setIsLoadingUpgrade(true);
+    const url = await stripeBuyPlanRedirect();
+
+    if (url) {
+      window.location.href = url;
+    } else {
+      setIsLoadingUpgrade(false);
+    }
+  };
+
+  const getFreeTrialExpirationDate = () => {
+    const freeTrialExpirationDate = new Date(
+      userInfo?.subscription_period_end_at || ""
+    );
+    const daysUntilExpiration = Math.ceil(
+      (freeTrialExpirationDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+    );
+    return daysUntilExpiration;
   };
 
   return (
@@ -48,10 +66,22 @@ export function NavUser() {
       ) : (
         <SidebarMenuItem>
           <DropdownMenu>
+            {userInfo?.subscription_status === "free-trial" && (
+              <Badge
+                onClick={handleUpgrade}
+                variant="outline"
+                className={cn(
+                  "bg-yellow-100 text-yellow-800 border-yellow-500 hover:translate-y-[-1px] cursor-pointer transition-all duration-300",
+                  isLoadingUpgrade && "opacity-50 cursor-not-allowed"
+                )}
+              >
+                Your free trial expires in {getFreeTrialExpirationDate()} days
+              </Badge>
+            )}
             <DropdownMenuTrigger asChild>
               <SidebarMenuButton
                 size="lg"
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer"
               >
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarFallback className="rounded-lg">
@@ -88,24 +118,14 @@ export function NavUser() {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  <Sparkles />
+                <DropdownMenuItem
+                  onClick={handleUpgrade}
+                  disabled={isLoadingUpgrade}
+                >
+                  <Sparkles
+                    className={cn(isLoadingUpgrade && "animate-spin")}
+                  />
                   Upgrade to Pro
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  <BadgeCheck />
-                  Account
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <CreditCard />
-                  Billing
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Bell />
-                  Notifications
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />

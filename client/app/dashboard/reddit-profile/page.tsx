@@ -1,5 +1,6 @@
 "use client";
 
+import { IconBrandRedditNew } from "@/components/icons/BrandRedditNew";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,13 +11,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRedditAccounts } from "@/stores/reddit-accounts";
 import { generateRedditAuthUrl } from "@/utils/reddit/generate-auth-url";
 import {
   IconAlertTriangle,
   IconApi,
-  IconBrandReddit,
   IconCake,
   IconCoins,
   IconCrown,
@@ -29,6 +38,7 @@ import {
   IconUserX,
 } from "@tabler/icons-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface ProfileStatsProps {
   totalKarma: number | null;
@@ -112,7 +122,7 @@ function ProfileHeader({
           }}
         >
           Authenticate
-          <IconBrandReddit />
+          <IconBrandRedditNew className="text-primary" />
         </Button>
       </CardContent>
     </Card>
@@ -336,67 +346,103 @@ function ActivityInfo({ oauthScopes, lastApiCall }: ActivityInfoProps) {
   );
 }
 
-function DangerZone() {
-  const [showConfirmation, setShowConfirmation] = useState(false);
+function DangerZone({ profileName }: { profileName: string }) {
+  const [showDialog, setShowDialog] = useState(false);
+  const [confirmationInput, setConfirmationInput] = useState("");
 
-  const handleRemoveProfile = () => {
-    // TODO: Implement profile removal logic
-    console.log("Remove profile functionality to be implemented");
-    setShowConfirmation(false);
+  const isDeleteEnabled = confirmationInput === profileName;
+
+  const handleRemoveProfile = async () => {
+    try {
+      const response = await fetch("/api/reddit/remove-profile", {
+        method: "POST",
+      });
+      const result = await response.json();
+
+      if (result.error) {
+        console.error(result.error);
+        toast.error(result.error);
+        return;
+      }
+
+      window.location.reload();
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to remove Reddit profile");
+    }
+
+    setShowDialog(false);
+    setConfirmationInput("");
+  };
+
+  const handleDialogChange = (open: boolean) => {
+    setShowDialog(open);
+    if (!open) {
+      setConfirmationInput("");
+    }
   };
 
   return (
-    <Card className="border-destructive/20">
-      <CardHeader>
-        <CardTitle className="text-destructive flex items-center gap-2">
-          <IconAlertTriangle className="size-5" />
-          Danger Zone
-        </CardTitle>
-        <CardDescription>
-          <p className="text-sm text-muted-foreground">
-            Once you remove your Reddit profile, all associated data will be
-            permanently deleted. This action cannot be undone.
-          </p>
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {!showConfirmation ? (
+    <>
+      <Card className="border-destructive/20">
+        <CardHeader>
+          <CardTitle className="text-destructive flex items-center gap-2">
+            <IconAlertTriangle className="size-5" />
+            Danger Zone
+          </CardTitle>
+          <CardDescription>
+            <p className="text-sm text-muted-foreground">
+              Once you remove your Reddit profile, all associated data will be
+              permanently deleted. This action cannot be undone.
+            </p>
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
             <Button
               variant="destructive"
-              onClick={() => setShowConfirmation(true)}
+              onClick={() => setShowDialog(true)}
               className="w-full sm:w-auto"
             >
               <IconTrash className="size-4 mr-2" />
               Remove Reddit Profile
             </Button>
-          ) : (
-            <div className="space-y-3">
-              <p className="text-sm font-medium text-destructive">
-                Are you sure you want to remove your Reddit profile? This action
-                cannot be undone.
-              </p>
-              <div className="flex gap-2">
-                <Button
-                  variant="destructive"
-                  onClick={handleRemoveProfile}
-                  className="flex-1 sm:flex-none"
-                >
-                  Yes, Remove Profile
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setShowConfirmation(false)}
-                  className="flex-1 sm:flex-none"
-                >
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Dialog open={showDialog} onOpenChange={handleDialogChange}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Remove Reddit Profile</DialogTitle>
+            <DialogDescription>
+              This action cannot be undone. Please type{" "}
+              <span className="font-semibold">{profileName}</span> to confirm.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Input
+              placeholder={`Type ${profileName} to confirm`}
+              value={confirmationInput}
+              onChange={(e) => setConfirmationInput(e.target.value)}
+              autoComplete="off"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => handleDialogChange(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleRemoveProfile}
+              disabled={!isDeleteEnabled}
+            >
+              Remove Profile
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
@@ -556,7 +602,7 @@ export default function RedditProfilePage() {
         lastApiCall={activeRedditAccount.last_api_call}
       />
 
-      <DangerZone />
+      <DangerZone profileName={activeRedditAccount.name} />
     </div>
   );
 }

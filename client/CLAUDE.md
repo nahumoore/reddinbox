@@ -98,6 +98,6 @@ You are an expert **Next.js developer** with professional skills in:
 
 ## Notes
 
-- Always use &apos; and &quot; when designing or creating .tsx component, if not we'll get an error on build.
+- Use &apos; and &quot; when designing or creating the html of `.tsx` components.
 - You just need to make code updates, NEVER run servers or execute commands apart of coding updates.
-- When applying programmatic classes, use `cn` not `class1 ${}`
+- When applying programmatic classes, use `cn` not `class1 ${class2}`

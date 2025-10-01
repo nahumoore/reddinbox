@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useRedditAccounts } from "@/stores/reddit-accounts";
 import { useRedditUserInteractions } from "@/stores/reddit-user-interactions";
+import { useUserInfo } from "@/stores/user-info";
 import { RedditUserInteraction } from "@/types/db-schema";
-import { IconMessage, IconX } from "@tabler/icons-react";
+import { IconMessage, IconSparkles, IconX } from "@tabler/icons-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -15,13 +16,15 @@ interface CommentSectionProps {
 }
 
 export function InteractionPostFooter({ interaction }: CommentSectionProps) {
+  const { activeRedditAccount } = useRedditAccounts();
+  const { redditUserInteractions, setRedditUserInteractions } =
+    useRedditUserInteractions();
+  const { userInfo } = useUserInfo();
+
   const [comment, setComment] = useState(
     interaction.our_interaction_content?.replace(/\\n/g, "\n") || ""
   );
   const [isPosting, setIsPosting] = useState(false);
-  const { activeRedditAccount } = useRedditAccounts();
-  const { redditUserInteractions, setRedditUserInteractions } =
-    useRedditUserInteractions();
 
   const userAvatar =
     activeRedditAccount?.icon_img || activeRedditAccount?.snoovatar_img;
@@ -32,6 +35,14 @@ export function InteractionPostFooter({ interaction }: CommentSectionProps) {
     if (!comment.trim()) return;
 
     setIsPosting(true);
+
+    // Optimistic update
+    setRedditUserInteractions(
+      redditUserInteractions.map((item) =>
+        item.id === interaction.id ? { ...item, status: "scheduled" } : item
+      )
+    );
+
     const response = await fetchPostComment({
       comment,
       thing_id: interaction.reddit_content_discovered?.reddit_id!,
@@ -44,6 +55,12 @@ export function InteractionPostFooter({ interaction }: CommentSectionProps) {
       toast.error("Failed to post comment", {
         description: response.error,
       });
+      // Revert optimistic update
+      setRedditUserInteractions(
+        redditUserInteractions.map((item) =>
+          item.id === interaction.id ? { ...item, status: "new" } : item
+        )
+      );
       return;
     }
 
@@ -51,17 +68,17 @@ export function InteractionPostFooter({ interaction }: CommentSectionProps) {
       description:
         "We will post it in a few minutes to follow a human like pattern",
     });
-
-    // SUBMIT COMMENT
-    setRedditUserInteractions(
-      redditUserInteractions.map((item) =>
-        item.id === interaction.id ? { ...item, status: "scheduled" } : item
-      )
-    );
   };
 
   const handleIgnore = async () => {
     setIsPosting(true);
+
+    // Optimistic update - remove immediately
+    const previousInteractions = redditUserInteractions;
+    setRedditUserInteractions(
+      redditUserInteractions.filter((item) => item.id !== interaction.id)
+    );
+
     const response = await fetchIgnoreComment({
       interaction_id: interaction.id,
     });
@@ -72,13 +89,31 @@ export function InteractionPostFooter({ interaction }: CommentSectionProps) {
       toast.error("Failed to ignore comment", {
         description: response.error,
       });
+      // Revert optimistic update
+      setRedditUserInteractions(previousInteractions);
+      return;
+    }
+  };
+
+  const handleGenerateComment = async () => {
+    setIsPosting(true);
+    console.log("userInfo", userInfo);
+    console.log("interaction", interaction);
+    const response = await fetchGenerateComment({
+      interaction_id: interaction.id,
+      user_name: userInfo?.name || "",
+    });
+    setIsPosting(false);
+
+    if (response.error) {
+      console.error("Error generating comment:", response.error);
+      toast.error("Failed to generate comment", {
+        description: response.error,
+      });
       return;
     }
 
-    // IGNORE COMMENT
-    setRedditUserInteractions(
-      redditUserInteractions.filter((item) => item.id !== interaction.id)
-    );
+    setComment(response.comment);
   };
 
   return (
@@ -102,13 +137,23 @@ export function InteractionPostFooter({ interaction }: CommentSectionProps) {
             </span>
           </div>
 
-          <Textarea
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            placeholder={`Write a comment replying to u/${interaction.interacted_with_reddit_username}...`}
-            className="min-h-24 resize-none"
-            disabled={isPosting}
-          />
+          <div className="relative flex items-stretch">
+            <Textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder={`Write a comment replying to u/${interaction.interacted_with_reddit_username}...`}
+              className="min-h-24 resize-none rounded-r-none border-r-0 pr-2 border border-muted bg-white"
+              disabled={isPosting}
+            />
+            <Button
+              onClick={handleGenerateComment}
+              variant="outline"
+              disabled={isPosting}
+              className="rounded-l-none border border-muted border-l-0 px-8 h-auto self-stretch bg-white"
+            >
+              <IconSparkles className="size-5 text-primary fill-primary" />
+            </Button>
+          </div>
 
           <div className="flex items-center justify-between">
             <div className="flex justify-between items-center w-full gap-2">
@@ -179,6 +224,31 @@ const fetchIgnoreComment = async ({
     console.error("Error ignoring comment:", error);
     return {
       error: "Failed to ignore comment",
+    };
+  }
+};
+
+const fetchGenerateComment = async ({
+  interaction_id,
+  user_name,
+}: {
+  interaction_id: string;
+  user_name: string;
+}) => {
+  try {
+    const response = await fetch("/api/ai/generate-comment", {
+      method: "POST",
+      body: JSON.stringify({
+        interactionId: interaction_id,
+        userName: user_name,
+      }),
+    });
+
+    return response.json();
+  } catch (error) {
+    console.error("Error generating comment:", error);
+    return {
+      error: "Failed to generate comment",
     };
   }
 };

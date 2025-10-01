@@ -3,12 +3,14 @@
 import { InteractionPost } from "@/components/dashboard/authority-feed/InteractionPost";
 import InteractionRemoveAll from "@/components/dashboard/authority-feed/InteractionRemoveAll";
 import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRedditSubreddits } from "@/stores/reddit-subreddits";
 import { useRedditUserInteractions } from "@/stores/reddit-user-interactions";
 import { useUserWebsites } from "@/stores/user-wesbites";
-import { IconSearch } from "@tabler/icons-react";
+import { IconSearch, IconSettings } from "@tabler/icons-react";
+import Link from "next/link";
 
 export default function LeadsPage() {
   const { userActiveWebsite } = useUserWebsites();
@@ -23,8 +25,20 @@ export default function LeadsPage() {
     <div className="flex flex-col gap-6 p-6">
       {/* Header */}
       <div className="border-b py-3">
-        <div className="flex items-center gap-3 mb-2">
-          <h1 className="font-heading text-2xl font-bold">Authority Feed</h1>
+        <div className="flex justify-between">
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="font-heading text-2xl font-bold">Authority Feed</h1>
+          </div>
+          <Link
+            className={buttonVariants({
+              variant: "outline",
+              className: "bg-white hover:shadow-md transition-all",
+            })}
+            href="/dashboard/authority-feed/settings"
+          >
+            <IconSettings className="size-4" />
+            Settings
+          </Link>
         </div>
         <div className="space-y-2">
           <p className="text-muted-foreground">
@@ -72,8 +86,9 @@ export default function LeadsPage() {
           <IconSearch className="size-12 text-muted-foreground mx-auto mb-4 animate-pulse" />
           <h3 className="font-medium text-lg mb-2">Collecting posts...</h3>
           <p className="text-muted-foreground">
-            We&apos;re monitoring and analyzing posts 24/7 and will notify you
-            when we find new ones.
+            We&apos;re monitoring and analyzing posts for{" "}
+            <b>{userActiveWebsite?.name}</b>. We&apos;ll notify you when we find
+            new ones.
           </p>
         </div>
       )}

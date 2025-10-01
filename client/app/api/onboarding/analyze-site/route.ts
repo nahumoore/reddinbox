@@ -47,6 +47,7 @@ export async function POST(
       keywordsToMonitor: analysis.keywords,
       companyDescription: analysis.companyDescription,
       targetAudience: analysis.targetAudience,
+      expertise: analysis.expertise,
     });
   } catch (error) {
     console.error("Website analysis route error:", error);

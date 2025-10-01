@@ -1,7 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Highlighter } from "@/components/ui/highlighter";
 import { type BlogPostMeta } from "@/utils/mdx";
@@ -40,10 +40,10 @@ export default function BlogClientPage({ allPosts }: BlogClientPageProps) {
           <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-accent/5 rounded-3xl -z-10"></div>
           <div className="py-12">
             <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-              Authority-First{" "}
               <Highlighter action="underline" color="#ff5700">
-                Reddit Growth
-              </Highlighter>
+                <span className="text-primary font-bold">Reddit Marketing</span>
+              </Highlighter>{" "}
+              Strategies
             </h1>
             <p className="font-body text-lg md:text-xl text-muted-foreground max-w-4xl mx-auto mb-8 leading-relaxed">
               Learn the authentic strategies that turn Reddit lurking into
@@ -183,11 +183,11 @@ export default function BlogClientPage({ allPosts }: BlogClientPageProps) {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {regularPosts.map((post) => (
                     <Card
                       key={post.slug}
-                      className="group hover:shadow-xl transition-all duration-300 border-border hover:border-primary/30 bg-gradient-to-br from-background to-accent/5"
+                      className="group hover:shadow-xl transition-all duration-300 border-border hover:border-primary/30 bg-gradient-to-br from-background to-accent/5 flex flex-col"
                     >
                       <div className="relative overflow-hidden">
                         {post.image ? (
@@ -210,64 +210,66 @@ export default function BlogClientPage({ allPosts }: BlogClientPageProps) {
                         )}
                       </div>
 
-                      <CardHeader className="pb-4">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-                          <IconCalendar className="h-4 w-4" />
-                          <span className="font-body">
-                            {formatDate(post.date)}
-                          </span>
-                          {post.readTime && (
-                            <>
-                              <IconClock className="h-4 w-4 ml-2" />
-                              <span className="font-body">{post.readTime}</span>
-                            </>
-                          )}
-                        </div>
-
-                        <CardTitle className="font-heading text-xl leading-tight group-hover:text-primary transition-colors">
-                          <Link
-                            href={`/blog/${post.slug}`}
-                            className="hover:underline"
-                          >
-                            {post.title}
-                          </Link>
-                        </CardTitle>
-                      </CardHeader>
-
-                      <CardContent className="pt-0">
-                        <p className="font-body text-muted-foreground text-sm mb-6 line-clamp-3 leading-relaxed">
-                          {post.description}
-                        </p>
-
-                        {/* Tags */}
-                        {post.tags && post.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mb-6">
-                            {post.tags.slice(0, 3).map((tag) => (
-                              <Badge
-                                key={tag}
-                                variant="secondary"
-                                className="text-xs font-body"
-                              >
-                                {tag}
-                              </Badge>
-                            ))}
-                            {post.tags.length > 3 && (
-                              <Badge
-                                variant="outline"
-                                className="text-xs font-body"
-                              >
-                                +{post.tags.length - 3}
-                              </Badge>
+                      <div className="flex flex-col flex-1">
+                        <CardHeader className="pb-3">
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
+                            <IconCalendar className="h-4 w-4" />
+                            <span className="font-body">
+                              {formatDate(post.date)}
+                            </span>
+                            {post.readTime && (
+                              <>
+                                <IconClock className="h-4 w-4 ml-2" />
+                                <span className="font-body">{post.readTime}</span>
+                              </>
                             )}
                           </div>
-                        )}
 
-                        <Link href={`/blog/${post.slug}`}>
-                          <Button className="w-full font-body group-hover:shadow-md transition-shadow">
-                            Read Insights
-                          </Button>
-                        </Link>
-                      </CardContent>
+                          <CardTitle className="font-heading text-lg leading-tight group-hover:text-primary transition-colors">
+                            <Link
+                              href={`/blog/${post.slug}`}
+                              className="hover:underline"
+                            >
+                              {post.title}
+                            </Link>
+                          </CardTitle>
+                        </CardHeader>
+
+                        <CardContent className="pt-0 flex flex-col flex-1">
+                          <p className="font-body text-muted-foreground text-sm mb-4 line-clamp-3 leading-relaxed flex-1">
+                            {post.description}
+                          </p>
+
+                          {/* Tags */}
+                          {post.tags && post.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mb-4">
+                              {post.tags.slice(0, 2).map((tag) => (
+                                <Badge
+                                  key={tag}
+                                  variant="secondary"
+                                  className="text-xs font-body"
+                                >
+                                  {tag}
+                                </Badge>
+                              ))}
+                              {post.tags.length > 2 && (
+                                <Badge
+                                  variant="outline"
+                                  className="text-xs font-body"
+                                >
+                                  +{post.tags.length - 2}
+                                </Badge>
+                              )}
+                            </div>
+                          )}
+
+                          <Link href={`/blog/${post.slug}`} className="mt-auto">
+                            <Button className="w-full font-body group-hover:shadow-md transition-shadow">
+                              Read Insights
+                            </Button>
+                          </Link>
+                        </CardContent>
+                      </div>
                     </Card>
                   ))}
                 </div>
@@ -287,12 +289,25 @@ export default function BlogClientPage({ allPosts }: BlogClientPageProps) {
                     qualified leads through authentic community engagement.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button size="lg" className="font-body">
-                      Start Building Authority
-                    </Button>
-                    <Button variant="outline" size="lg" className="font-body">
+                    <Link
+                      href="/#how-it-works"
+                      className={buttonVariants({
+                        variant: "outline",
+                        size: "lg",
+                        className: "font-body",
+                      })}
+                    >
                       See How It Works
-                    </Button>
+                    </Link>
+                    <Link
+                      href="/auth/register"
+                      className={buttonVariants({
+                        variant: "default",
+                        size: "lg",
+                      })}
+                    >
+                      Start Building Authority
+                    </Link>
                   </div>
                 </CardContent>
               </Card>

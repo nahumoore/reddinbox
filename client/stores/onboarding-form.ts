@@ -5,6 +5,7 @@ export interface WebsiteAnalysis {
   companyDescription: string;
   targetAudience: string;
   keywordsToMonitor: string[];
+  expertise: string[];
 }
 
 interface OnboardingFormState {

@@ -69,6 +69,7 @@ export default function WebsiteAnalysisStep() {
       companyDescription: result.companyDescription,
       keywordsToMonitor: result.keywordsToMonitor,
       targetAudience: result.targetAudience,
+      expertise: result.expertise,
     });
 
     setStep(2);

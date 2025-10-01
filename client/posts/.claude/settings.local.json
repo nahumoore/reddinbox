@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:contensifyhq.com)",
+      "WebFetch(domain:www.saas-hackers.com)",
+      "WebFetch(domain:www.datadab.com)",
+      "WebFetch(domain:www.theclueless.company)",
+      "WebFetch(domain:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
