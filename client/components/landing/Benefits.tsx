@@ -1,4 +1,5 @@
 "use client";
+import TestimonialUser from "@/public/landing/user_3.webp";
 import {
   IconArrowRight,
   IconBrain,
@@ -7,10 +8,12 @@ import {
   IconRocket,
   IconSearch,
   IconShieldCheck,
+  IconStar,
   IconTarget,
   IconUsers,
   IconX,
 } from "@tabler/icons-react";
+import Image from "next/image";
 import { BrandReddinbox } from "../icons/BrandReddinbox";
 import { IconBrandRedditNew } from "../icons/BrandRedditNew";
 import { Badge } from "../ui/badge";
@@ -223,19 +226,49 @@ export default function Benefits() {
 
         {/* Bottom CTA */}
         <div className="text-center mt-20">
-          <div className="inline-flex items-center gap-4 bg-card/50 backdrop-blur-sm border border-primary/20 rounded-2xl p-6 shadow-lg">
-            <div className="flex items-center gap-2">
-              <IconBrandRedditNew className="size-8 text-destructive/50" />
-              <span className="text-lg font-medium text-muted-foreground">
-                Manual chaos
-              </span>
-            </div>
-            <IconArrowRight className="size-8 text-primary" />
-            <div className="flex items-center gap-2">
-              <BrandReddinbox className="size-8 text-primary" />
-              <span className="text-lg font-bold text-primary">
-                Automated growth
-              </span>
+          <div className="bg-card/50 backdrop-blur-sm border border-primary/20 rounded-2xl p-6 shadow-lg w-fit mx-auto space-y-8">
+            <div className="flex items-start gap-4">
+              <Image
+                alt="Reddinbox positive testimonial"
+                src={TestimonialUser}
+                width={60}
+                height={60}
+                className="rounded-full shadow-xl"
+              />
+              <div className="space-y-4 max-w-md text-left">
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold">Tomas Walsh</span>
+                    <div className="flex items-center gap-1">
+                      {[0, 1, 2, 3, 4].map((item, index) => (
+                        <IconStar
+                          key={index}
+                          className="size-4 text-yellow-500 fill-yellow-500"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <em>
+                    I got almost 3x more traffic into my landing page since I
+                    started using your tool. Nice!
+                  </em>
+                </div>
+                <div className="inline-flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <IconBrandRedditNew className="size-8 text-destructive/50" />
+                    <span className="text-lg font-medium text-muted-foreground">
+                      Manual chaos
+                    </span>
+                  </div>
+                  <IconArrowRight className="size-8 text-primary" />
+                  <div className="flex items-center gap-2">
+                    <BrandReddinbox className="size-8 text-primary" />
+                    <span className="text-lg font-bold text-primary">
+                      Inevitable growth
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

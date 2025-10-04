@@ -16,6 +16,7 @@ import {
 } from "@tabler/icons-react";
 import Image from "next/image";
 import { IconCurvedArrow } from "../icons/IconCurvedArrow";
+import { Badge } from "../ui/badge";
 import { Highlighter } from "../ui/highlighter";
 import { Separator } from "../ui/separator";
 import { SparklesText } from "../ui/sparkles-text";
@@ -214,16 +215,19 @@ export default function HeroIllustration() {
                 {/* Stats */}
                 <div className="flex flex-col">
                   <span className="text-sm text-muted-foreground">
-                    Profile views
+                    Website views
                   </span>
-                  <div className="flex items-center justify-end gap-1">
+                  <div className="flex flex-col items-end gap-1">
                     <span className="text-sm font-medium text-foreground">
-                      5.7k
+                      5.7k this week
                     </span>
-                    <div className="flex items-center gap-1 text-green-600">
-                      <IconTrendingUp className="w-3 h-3" />
+                    <Badge
+                      variant="outline"
+                      className="flex items-center gap-1 bg-green-600 text-green-50 border-none"
+                    >
                       <span className="text-xs font-medium">+2.3</span>
-                    </div>
+                      <IconTrendingUp className="w-3 h-3" />
+                    </Badge>
                   </div>
                 </div>
               </div>

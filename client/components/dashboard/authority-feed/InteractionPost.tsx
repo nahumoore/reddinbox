@@ -1,7 +1,9 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { MarkdownContent } from "@/components/ui/markdown-content";
+import { COMMENT_POST_CATEGORY } from "@/defs/comments/comment-post-category";
 import { cn } from "@/lib/utils";
 import { RedditUserInteraction } from "@/types/db-schema";
 import {
@@ -30,28 +32,38 @@ export function InteractionPost({
     <Card className={cn("h-fit hover:shadow-md transition-shadow", className)}>
       <CardHeader>
         <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <Avatar className="size-8">
-              <AvatarImage
-                src=""
-                alt={interaction.interacted_with_reddit_username}
-              />
-              <AvatarFallback className="text-xs font-medium">
-                {avatarFallback}
-              </AvatarFallback>
-            </Avatar>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-3">
+              <Avatar className="size-8">
+                <AvatarImage
+                  src=""
+                  alt={interaction.interacted_with_reddit_username}
+                />
+                <AvatarFallback className="text-xs font-medium">
+                  {avatarFallback}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-sm">
+                    u/{interaction.interacted_with_reddit_username}
+                  </span>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {
+                    interaction.reddit_content_discovered?.subreddit
+                      .display_name_prefixed
+                  }
+                </div>
+              </div>
+            </div>
             <div>
-              <div className="flex items-center gap-2">
-                <span className="font-medium text-sm">
-                  u/{interaction.interacted_with_reddit_username}
-                </span>
-              </div>
-              <div className="text-xs text-muted-foreground">
-                {
-                  interaction.reddit_content_discovered?.subreddit
-                    .display_name_prefixed
-                }
-              </div>
+              <Badge className="text-xs" variant="secondary">
+                {COMMENT_POST_CATEGORY[
+                  interaction.reddit_content_discovered?.content_category ||
+                    "other"
+                ] || "Other"}
+              </Badge>
             </div>
           </div>
           <div className="flex gap-2 items-center">
@@ -114,7 +126,7 @@ export function InteractionPost({
 }
 
 function formatTimeAgo(dateString: string) {
-  const date = new Date(dateString);
+  const date = new Date(dateString + 'Z'); // Append 'Z' to treat as UTC
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 

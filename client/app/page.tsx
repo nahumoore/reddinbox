@@ -6,6 +6,7 @@ import Hero from "@/components/landing/Hero";
 import HowItWorks from "@/components/landing/HowItWorks";
 import Navbar from "@/components/landing/Navbar";
 import Pricing from "@/components/landing/Pricing";
+import SocialProof from "@/components/landing/SocialProof";
 
 // please work vercel
 export default function Home() {
@@ -14,10 +15,9 @@ export default function Home() {
       <Navbar />
       <main>
         <Hero />
-        {/* <SocialProof /> */}
+        <SocialProof />
         <Benefits />
         <HowItWorks />
-        {/* <Features /> */}
         <Pricing />
         <FAQ />
         <FinalCTA />

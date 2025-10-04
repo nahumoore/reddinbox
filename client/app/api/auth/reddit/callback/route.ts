@@ -55,6 +55,8 @@ export async function GET(request: NextRequest) {
       .eq("reddit_id", userData.id)
       .single();
 
+    const { public_description, ...subredditInfo } = userData.subreddit;
+
     if (existingAccount) {
       // UPDATE EXISTING ACCOUNT
       const { error: updateError } = await supabase
@@ -65,6 +67,7 @@ export async function GET(request: NextRequest) {
           token_expires_at: expiresAt,
           oauth_scopes: scopes,
           user_id: user.id,
+          public_description: public_description || null,
           updated_at: new Date().toISOString(),
         })
         .eq("reddit_id", userData.id);
@@ -102,8 +105,8 @@ export async function GET(request: NextRequest) {
           is_suspended: userData.is_suspended || null,
           coins: userData.coins || null,
           num_friends: userData.num_friends || null,
-          subreddit: userData.subreddit || null,
-          public_description: userData.public_description || null,
+          subreddit: subredditInfo || null,
+          public_description: public_description || null,
         });
 
       if (insertError) {

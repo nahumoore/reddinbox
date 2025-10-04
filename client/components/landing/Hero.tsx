@@ -24,6 +24,7 @@ const avatars = [
 export default function Hero() {
   return (
     <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
+      {/* HERO */}
       <div className="max-w-4xl mx-auto text-center">
         <h1 className="text-4xl md:text-6xl lg:text-7xl max-w-4xl mx-auto font-bold text-foreground mb-6 font-heading leading-tight">
           Build{" "}
@@ -55,7 +56,7 @@ export default function Hero() {
           </Link>
           <div className="flex items-center gap-4">
             <AvatarCircles
-              numPeople={70}
+              numPeople={99}
               className="w-full sm:w-auto"
               avatars={avatars}
             />
@@ -69,12 +70,14 @@ export default function Hero() {
                 ))}
               </div>
               <span className="text-sm text-muted-foreground">
-                1,200+ Redditors Helped
+                3,000+ Redditors Helped
               </span>
             </div>
           </div>
         </div>
       </div>
+
+      {/* ILLUSTRATION */}
       <HeroIllustration />
     </section>
   );

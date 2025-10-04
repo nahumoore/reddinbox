@@ -129,7 +129,7 @@ export default function PricingPlans({
                 ))}
               </div>
               <p className="text-xs text-gray-600">
-                70+ Reddit marketers growing daily
+                99+ Reddit marketers growing daily
               </p>
             </div>
           </div>

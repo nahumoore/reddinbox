@@ -246,6 +246,7 @@ export type Database = {
           original_reddit_post_id: string
           our_interaction_content: string | null
           our_interaction_reddit_id: string | null
+          reddit_account_id: string | null
           reddit_content_discovered_id: string | null
           status: Database["public"]["Enums"]["reddit_interaction_status"]
           updated_at: string | null
@@ -260,6 +261,7 @@ export type Database = {
           original_reddit_post_id: string
           our_interaction_content?: string | null
           our_interaction_reddit_id?: string | null
+          reddit_account_id?: string | null
           reddit_content_discovered_id?: string | null
           status?: Database["public"]["Enums"]["reddit_interaction_status"]
           updated_at?: string | null
@@ -274,6 +276,7 @@ export type Database = {
           original_reddit_post_id?: string
           our_interaction_content?: string | null
           our_interaction_reddit_id?: string | null
+          reddit_account_id?: string | null
           reddit_content_discovered_id?: string | null
           status?: Database["public"]["Enums"]["reddit_interaction_status"]
           updated_at?: string | null
@@ -281,6 +284,13 @@ export type Database = {
           website_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "reddit_user_interactions_reddit_account_id_fkey"
+            columns: ["reddit_account_id"]
+            isOneToOne: false
+            referencedRelation: "reddit_accounts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "reddit_user_interactions_reddit_content_discovered_id_fkey"
             columns: ["reddit_content_discovered_id"]
@@ -313,7 +323,10 @@ export type Database = {
           last_connected: string
           name: string | null
           onboarding_completed: boolean
-          subscription_active: boolean | null
+          stripe_customer_id: string | null
+          subscription_period_end_at: string
+          subscription_period_started_at: string
+          subscription_status: Database["public"]["Enums"]["subscription_statuses"]
           updated_at: string
         }
         Insert: {
@@ -324,7 +337,10 @@ export type Database = {
           last_connected?: string
           name?: string | null
           onboarding_completed?: boolean
-          subscription_active?: boolean | null
+          stripe_customer_id?: string | null
+          subscription_period_end_at?: string
+          subscription_period_started_at?: string
+          subscription_status?: Database["public"]["Enums"]["subscription_statuses"]
           updated_at?: string
         }
         Update: {
@@ -335,13 +351,17 @@ export type Database = {
           last_connected?: string
           name?: string | null
           onboarding_completed?: boolean
-          subscription_active?: boolean | null
+          stripe_customer_id?: string | null
+          subscription_period_end_at?: string
+          subscription_period_started_at?: string
+          subscription_status?: Database["public"]["Enums"]["subscription_statuses"]
           updated_at?: string
         }
         Relationships: []
       }
       websites: {
         Row: {
+          authority_feed_options: Json | null
           created_at: string
           description: string | null
           expertise: string[] | null
@@ -357,6 +377,7 @@ export type Database = {
           vector_ai_searcher: string
         }
         Insert: {
+          authority_feed_options?: Json | null
           created_at?: string
           description?: string | null
           expertise?: string[] | null
@@ -372,6 +393,7 @@ export type Database = {
           vector_ai_searcher: string
         }
         Update: {
+          authority_feed_options?: Json | null
           created_at?: string
           description?: string | null
           expertise?: string[] | null
@@ -555,6 +577,7 @@ export type Database = {
         | "self_promotion"
         | "resource_compilation"
         | "other"
+      subscription_statuses: "free-trial" | "active" | "stopped"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -699,6 +722,7 @@ export const Constants = {
         "resource_compilation",
         "other",
       ],
+      subscription_statuses: ["free-trial", "active", "stopped"],
     },
   },
 } as const

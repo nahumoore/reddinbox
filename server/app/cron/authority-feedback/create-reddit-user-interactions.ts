@@ -50,14 +50,16 @@ export const createRedditUserInteractionsJob = async ({
           name,
           description,
           keywords,
-          subreddit_reddit_ids
+          subreddit_reddit_ids,
+          authority_feed_options
         ),
         reddit_accounts!inner (
+          id,
           name
         )
       `
       )
-      .eq("subscription_active", true)
+      .in("subscription_status", ["active", "free-trial"])
       .eq("websites.is_active", true);
 
     if (usersError) {
@@ -96,6 +98,7 @@ export const createRedditUserInteractionsJob = async ({
         }
 
         const redditUsername = redditAccounts[0].name;
+        const redditAccountId = redditAccounts[0].id;
 
         for (const website of websites) {
           if (
@@ -110,6 +113,20 @@ export const createRedditUserInteractionsJob = async ({
 
           console.log(
             `📡 Processing website ${website.name} with ${website.subreddit_reddit_ids.length} target subreddits...`
+          );
+
+          // EXTRACT AUTHORITY FEED OPTIONS
+          const authorityFeedOptions = website.authority_feed_options as {
+            posts_per_hour?: number;
+            post_categories_active?: string[];
+          } | null;
+
+          const postsPerHour = authorityFeedOptions?.posts_per_hour || 20;
+          const postCategoriesActive =
+            authorityFeedOptions?.post_categories_active || [];
+
+          console.log(
+            `⚙️ Authority feed settings: ${postsPerHour} posts/hour, ${postCategoriesActive.length} active categories`
           );
 
           // GET SUBREDDIT DATA FOR AI PROMPTS
@@ -134,13 +151,13 @@ export const createRedditUserInteractionsJob = async ({
             continue;
           }
 
-          // USE RPC FUNCTION TO FIND RELEVANT REDDIT CONTENT WITH SIMILARITY THRESHOLD 4.5 AND LIMIT 50
+          // USE RPC FUNCTION TO FIND RELEVANT REDDIT CONTENT WITH SIMILARITY THRESHOLD 4.5
           const { data: relevantPosts, error: rpcError } = await supabase.rpc(
             "find_relevant_reddit_content",
             {
               p_website_id: website.id,
               p_acceptance_score: 0.45,
-              p_limit: 20,
+              p_limit: postsPerHour,
             }
           );
 
@@ -164,14 +181,61 @@ export const createRedditUserInteractionsJob = async ({
             `🎯 Found ${relevantPosts.length} relevant posts for website ${website.name} (similarity >= 4.5)`
           );
 
+          // FILTER POSTS BY CONTENT CATEGORY IF CATEGORIES ARE SPECIFIED
+          let filteredPosts = relevantPosts;
+          if (postCategoriesActive.length > 0) {
+            // FETCH FULL CONTENT DETAILS TO GET CONTENT_CATEGORY
+            const { data: contentDetails, error: contentError } = await supabase
+              .from("reddit_content_discovered")
+              .select("id, content_category")
+              .in(
+                "id",
+                relevantPosts.map((p: { id: string }) => p.id)
+              );
+
+            if (contentError) {
+              console.error(
+                `❌ Error fetching content categories for website ${website.name}:`,
+                contentError
+              );
+              errors.push(`Website ${website.name}: ${contentError.message}`);
+              continue;
+            }
+
+            if (contentDetails) {
+              const allowedPostIds = contentDetails
+                .filter(
+                  (c) =>
+                    c.content_category &&
+                    postCategoriesActive.includes(c.content_category)
+                )
+                .map((c) => c.id);
+
+              filteredPosts = relevantPosts.filter((p: { id: string }) =>
+                allowedPostIds.includes(p.id)
+              );
+
+              console.log(
+                `🔍 Filtered to ${filteredPosts.length}/${relevantPosts.length} posts matching active categories`
+              );
+            }
+          }
+
+          if (filteredPosts.length === 0) {
+            console.log(
+              `ℹ️ No posts match the active categories for website ${website.name}`
+            );
+            continue;
+          }
+
           // UPDATE GLOBAL TRACKING VARIABLES
-          totalPostsAnalyzed += relevantPosts.length;
-          totalRelevantPosts += relevantPosts.length;
+          totalPostsAnalyzed += filteredPosts.length;
+          totalRelevantPosts += filteredPosts.length;
 
           // PREPARE COMMENT GENERATION TASKS
           const commentTasks = [];
 
-          for (const post of relevantPosts) {
+          for (const post of filteredPosts) {
             // FIND MATCHING SUBREDDIT FOR AI PROMPT
             const subreddit = subreddits.find(
               (s) => s.id === post.subreddit_id
@@ -250,6 +314,7 @@ export const createRedditUserInteractionsJob = async ({
                     our_interaction_content: processedComment,
                     our_interaction_reddit_id: null,
                     reddit_content_discovered_id: post.id,
+                    reddit_account_id: redditAccountId,
                     status: "new",
                   });
 

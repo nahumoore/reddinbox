@@ -27,7 +27,7 @@ interface RedditUserData {
   is_suspended: boolean;
   coins: number;
   num_friends: number;
-  subreddit: string;
+  subreddit: any;
   public_description: string;
 }
 

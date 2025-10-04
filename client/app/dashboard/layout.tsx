@@ -56,7 +56,8 @@ export default async function DashboardLayoutServer({
         is_suspended,
         oauth_scopes,
         last_api_call,
-        reddit_id
+        reddit_id,
+        public_description
       `
         )
         .eq("user_id", user.id)
@@ -113,6 +114,7 @@ export default async function DashboardLayoutServer({
         reddit_url,
         ups,
         downs,
+        content_category,
         reddit_created_at,
         subreddit:subreddit_id (
           id,
@@ -126,6 +128,7 @@ export default async function DashboardLayoutServer({
         )
         .eq("user_id", user.id)
         .eq("website_id", activeWebsite.id)
+        // add reddit_account_id == activeRedditAccount?.id
         .order("created_at", { ascending: false }),
       supabase
         .from("reddit_subreddits")

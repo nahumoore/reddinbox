@@ -210,7 +210,7 @@ export const Step2Illustration = () => {
               <button
                 onClick={handleIgnore}
                 disabled={isAnimating}
-                className="bg-red-500 hover:bg-red-600 border border-border/30 rounded-lg py-3 px-4 text-sm font-medium text-white flex items-center justify-center gap-2 w-fit transition-colors duration-200 disabled:opacity-50"
+                className="border border-border/30 rounded-lg py-3 px-4 text-sm font-medium flex items-center justify-center gap-2 w-fit transition-colors duration-200 disabled:opacity-50 cursor-pointer bg-muted/20 hover:bg-muted/50"
               >
                 Ignore <IconX className="size-4" />
               </button>

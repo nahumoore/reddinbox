@@ -18,7 +18,7 @@ export default function Navbar() {
               href="/"
               className="flex-shrink-0 flex items-center gap-2 hover:scale-105 transition-all"
             >
-              <BrandReddinbox className="text-primary w-8 h-8" />
+              <BrandReddinbox className="text-primary size-8" />
               <span className="text-xl font-bold text-foreground">
                 Reddinbox
               </span>
