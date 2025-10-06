@@ -1,4 +1,5 @@
 "use client";
+import { cn } from "@/lib/utils";
 import { IconArrowRight, IconCheck, IconStar } from "@tabler/icons-react";
 import { AvatarCircles } from "../ui/avatar-circles";
 import { Button } from "../ui/button";
@@ -56,14 +57,16 @@ const features = [
 export default function PricingPlans({
   ctaLabel,
   onCtaClick,
+  className,
   ctaLoading,
 }: {
   ctaLabel: string;
   ctaLoading?: boolean;
   onCtaClick: () => void;
+  className?: string;
 }) {
   return (
-    <div className="relative">
+    <div className={cn("relative", className)}>
       {/* Background card with glassmorphism effect */}
       <div className="bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-3xl p-8 shadow-2xl shadow-primary/10">
         {/* Plan header */}

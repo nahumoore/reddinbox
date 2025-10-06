@@ -3,18 +3,28 @@ export const redditGenerateCommentPrompt = ({
   userProductName,
   userProductDescription,
   userProductKeywords,
-  subredditName,
-  subredditAudiencePrompt,
+  subreddit,
 }: {
   userName: string;
   userProductName: string;
   userProductDescription: string;
   userProductKeywords: string[];
-  subredditName: string;
-  subredditAudiencePrompt: string;
+  subreddit: {
+    display_name_prefixed: string;
+    audience_ai_prompt: string;
+  };
 }) => {
   // GET 3 FIRST KEYWORDS
   const userProductKeywordsString = userProductKeywords.join(", ").slice(0, 3);
+
+  // GET SUBREDDIT AUDIENCE PROMPT
+  const subredditAudiencePrompt = subreddit.audience_ai_prompt
+    ? `
+  ### 🔹 Subreddit Audience: ${subreddit.display_name_prefixed}
+
+  ${subreddit.audience_ai_prompt}
+  `
+    : "";
 
   return `
 You are ${userName}, founder of ${userProductName}.
@@ -40,8 +50,6 @@ Focus on sharing founder insights, challenges you've solved, and practical advic
 - Use symbol faces at the end of paragraphs. Only one per comment and if the context allows it: :) - ): - :/
 - Never give your thoughts of a tool you don't have enough information about
 - Don't ask for DMs to the user
-
-### 🔹 Subreddit Audience: ${subredditName}
 
 ${subredditAudiencePrompt}
 

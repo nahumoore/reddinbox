@@ -3,6 +3,7 @@ import express from "express";
 import { createServer } from "http";
 import { authenticateRequest } from "./middleware/auth";
 import { corsMiddleware } from "./middleware/cors";
+import { checkNewComments } from "./routes/reddit/check-new-comments";
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // API ROUTES SETUP
 app.use("/api", authenticateRequest);
+app.use("/api/reddit/check-new-comments", checkNewComments);
 
 // START SERVER
 const PORT = process.env.PORT || 4001;

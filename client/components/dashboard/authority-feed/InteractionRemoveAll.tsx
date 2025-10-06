@@ -13,14 +13,20 @@ import { useRedditUserInteractions } from "@/stores/reddit-user-interactions";
 import { IconArrowUp, IconCheck, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 
-export default function InteractionRemoveAll() {
+export default function InteractionRemoveAll({
+  interactionType,
+}: {
+  interactionType: "post_reply" | "comment_reply";
+}) {
   const [showDialog, setShowDialog] = useState(false);
   const [isIgnoring, setIsIgnoring] = useState(false);
   const { redditUserInteractions, setRedditUserInteractions } =
     useRedditUserInteractions();
 
   const newPosts = redditUserInteractions.filter(
-    (interaction) => interaction.status === "new"
+    (interaction) =>
+      interaction.status === "new" &&
+      interaction.interaction_type === interactionType
   );
 
   const handleIgnoreAll = async () => {

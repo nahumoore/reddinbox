@@ -96,7 +96,7 @@ export default async function DashboardLayoutServer({
       id,
       interaction_type,
       interacted_with_reddit_username,
-      original_reddit_post_id,
+      original_reddit_parent_id,
       our_interaction_content,
       our_interaction_reddit_id,
       status,
@@ -104,6 +104,7 @@ export default async function DashboardLayoutServer({
       updated_at,
       user_id,
       website_id,
+      thread_context,
       reddit_content_discovered:reddit_content_discovered_id (
         id,
         author,

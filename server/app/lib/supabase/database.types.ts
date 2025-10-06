@@ -240,45 +240,60 @@ export type Database = {
       reddit_user_interactions: {
         Row: {
           created_at: string | null
+          discovered_reddit_id: string | null
+          error_message: string | null
           id: string
           interacted_with_reddit_username: string
           interaction_type: Database["public"]["Enums"]["interaction_type"]
-          original_reddit_post_id: string
+          original_reddit_parent_id: string
           our_interaction_content: string | null
           our_interaction_reddit_id: string | null
           reddit_account_id: string | null
           reddit_content_discovered_id: string | null
+          retry_count: number | null
+          scheduled_at: string | null
           status: Database["public"]["Enums"]["reddit_interaction_status"]
+          thread_context: Json | null
           updated_at: string | null
           user_id: string
           website_id: string
         }
         Insert: {
           created_at?: string | null
+          discovered_reddit_id?: string | null
+          error_message?: string | null
           id?: string
           interacted_with_reddit_username: string
           interaction_type: Database["public"]["Enums"]["interaction_type"]
-          original_reddit_post_id: string
+          original_reddit_parent_id: string
           our_interaction_content?: string | null
           our_interaction_reddit_id?: string | null
           reddit_account_id?: string | null
           reddit_content_discovered_id?: string | null
+          retry_count?: number | null
+          scheduled_at?: string | null
           status?: Database["public"]["Enums"]["reddit_interaction_status"]
+          thread_context?: Json | null
           updated_at?: string | null
           user_id: string
           website_id: string
         }
         Update: {
           created_at?: string | null
+          discovered_reddit_id?: string | null
+          error_message?: string | null
           id?: string
           interacted_with_reddit_username?: string
           interaction_type?: Database["public"]["Enums"]["interaction_type"]
-          original_reddit_post_id?: string
+          original_reddit_parent_id?: string
           our_interaction_content?: string | null
           our_interaction_reddit_id?: string | null
           reddit_account_id?: string | null
           reddit_content_discovered_id?: string | null
+          retry_count?: number | null
+          scheduled_at?: string | null
           status?: Database["public"]["Enums"]["reddit_interaction_status"]
+          thread_context?: Json | null
           updated_at?: string | null
           user_id?: string
           website_id?: string
@@ -563,7 +578,7 @@ export type Database = {
     Enums: {
       content_type: "post" | "comment"
       interaction_type: "comment_reply" | "post_reply" | "dm"
-      reddit_interaction_status: "new" | "ignored" | "submitted" | "scheduled"
+      reddit_interaction_status: "new" | "ignored" | "posted" | "scheduled"
       reddit_post_category:
         | "help_request"
         | "advice_seeking"
@@ -707,7 +722,7 @@ export const Constants = {
     Enums: {
       content_type: ["post", "comment"],
       interaction_type: ["comment_reply", "post_reply", "dm"],
-      reddit_interaction_status: ["new", "ignored", "submitted", "scheduled"],
+      reddit_interaction_status: ["new", "ignored", "posted", "scheduled"],
       reddit_post_category: [
         "help_request",
         "advice_seeking",

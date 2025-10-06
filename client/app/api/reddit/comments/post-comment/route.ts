@@ -2,7 +2,7 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { supabaseServer } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
-interface PostCommentRequest {
+interface ScheduleCommentRequest {
   thing_id: string;
   text: string;
   interaction_id: string;
@@ -11,13 +11,13 @@ interface PostCommentRequest {
 export const POST = async (req: NextRequest) => {
   try {
     // Parse request body
-    const { thing_id, text, interaction_id }: PostCommentRequest =
+    const { thing_id, text, interaction_id }: ScheduleCommentRequest =
       await req.json();
 
     // Validate required fields
-    if (!thing_id || !text) {
+    if (!thing_id || !text || !interaction_id) {
       return NextResponse.json(
-        { error: "Missing required fields: thing_id, text" },
+        { error: "Missing required fields: thing_id, text, interaction_id" },
         { status: 400 }
       );
     }
@@ -31,11 +31,11 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Get user's active Reddit account with access token
+    // Get user's active Reddit account
     const supabase = supabaseAdmin;
     const { data: redditAccount, error: redditAccountError } = await supabase
       .from("reddit_accounts")
-      .select("id, access_token")
+      .select("id")
       .eq("user_id", user.id)
       .eq("is_active", true)
       .single();
@@ -47,65 +47,41 @@ export const POST = async (req: NextRequest) => {
       );
     }
 
-    if (!redditAccount.access_token) {
-      return NextResponse.json(
-        { error: "Reddit account not authenticated" },
-        { status: 400 }
+    // Get the last scheduled interaction for this reddit account with interaction_type 'comment_reply'
+    const { data: lastScheduled } = await supabase
+      .from("reddit_user_interactions")
+      .select("scheduled_at")
+      .eq("reddit_account_id", redditAccount.id)
+      .eq("interaction_type", "comment_reply")
+      .not("scheduled_at", "is", null)
+      .order("scheduled_at", { ascending: false })
+      .limit(1)
+      .single();
+
+    // Calculate scheduled_at: last scheduled time + 5 minutes, or now if no previous scheduled
+    let scheduledAt: Date;
+    if (lastScheduled?.scheduled_at) {
+      scheduledAt = new Date(
+        new Date(lastScheduled.scheduled_at).getTime() + 5 * 60 * 1000
       );
+    } else {
+      scheduledAt = new Date(Date.now() + 5 * 60 * 1000);
     }
 
-    // Post comment to Reddit
-    const redditResponse = await fetch("https://oauth.reddit.com/api/comment", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${redditAccount.access_token}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-        "User-Agent": "Reddinbox/1.0",
-      },
-      body: new URLSearchParams({
-        thing_id,
-        text,
-        api_type: "json",
-      }),
-    });
-
-    if (!redditResponse.ok) {
-      const errorText = await redditResponse.text();
-      console.error("Reddit API error:", errorText);
-      return NextResponse.json(
-        { error: "Failed to post comment to Reddit", details: errorText },
-        { status: redditResponse.status }
-      );
-    }
-
-    const redditData = await redditResponse.json();
-
-    // Check for Reddit API errors
-    if (redditData.json?.errors?.length > 0) {
-      console.error("Reddit API returned errors:", redditData.json.errors);
-      return NextResponse.json(
-        { error: "Reddit API error", details: redditData.json.errors },
-        { status: 400 }
-      );
-    }
-
-    // Extract the comment ID from the response
-    const commentId = redditData.json?.data?.things?.[0]?.data?.id || null;
-
-    // Update interaction status to 'submitted'
+    // Update interaction to 'scheduled' status with scheduled_at time
     const { error: updateError } = await supabase
       .from("reddit_user_interactions")
       .update({
-        status: "submitted",
+        status: "scheduled",
         our_interaction_content: text,
-        our_interaction_reddit_id: commentId,
+        scheduled_at: scheduledAt.toISOString(),
       })
       .eq("id", interaction_id)
       .eq("user_id", user.id);
 
     if (updateError) {
       console.error(
-        `Error updating interaction (${interaction_id}) status:`,
+        `Error scheduling interaction (${interaction_id}):`,
         updateError
       );
       return NextResponse.json({ error: updateError.message }, { status: 500 });
@@ -114,18 +90,18 @@ export const POST = async (req: NextRequest) => {
     // Success response
     return NextResponse.json({
       success: true,
-      message: "Comment posted successfully",
+      message: "Comment scheduled successfully",
       data: {
         interaction_id,
-        comment_id: commentId,
+        scheduled_at: scheduledAt.toISOString(),
       },
     });
   } catch (error) {
-    console.error("Error in post-comment route:", error);
+    console.error("Error in schedule-comment route:", error);
     return NextResponse.json(
       {
         error: "Internal server error",
-        details: "Failed to post comment",
+        details: "Failed to schedule comment",
       },
       { status: 500 }
     );

@@ -1,3 +1,5 @@
+"use client";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -13,6 +15,7 @@ import {
   IconExternalLink,
 } from "@tabler/icons-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { InteractionPostFooter } from "./InteractionPostFooter";
 
 interface InteractionPostProps {
@@ -24,12 +27,26 @@ export function InteractionPost({
   interaction,
   className,
 }: InteractionPostProps) {
+  const [isRemoving, setIsRemoving] = useState(false);
   const avatarFallback = interaction.interacted_with_reddit_username
     .substring(0, 2)
     .toUpperCase();
 
+  // Trigger animation when status changes to scheduled (posted) or when being ignored
+  useEffect(() => {
+    if (interaction.status === "scheduled") {
+      setIsRemoving(true);
+    }
+  }, [interaction.status]);
+
   return (
-    <Card className={cn("h-fit hover:shadow-md transition-shadow", className)}>
+    <Card
+      className={cn(
+        "h-fit hover:shadow-md transition-all duration-500",
+        isRemoving && "opacity-0 scale-95 -translate-x-4",
+        className
+      )}
+    >
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex flex-col gap-2">
@@ -94,7 +111,6 @@ export function InteractionPost({
         {interaction.reddit_content_discovered?.content && (
           <MarkdownContent
             content={interaction.reddit_content_discovered?.content}
-            className="text-muted-foreground"
           />
         )}
 
@@ -119,14 +135,17 @@ export function InteractionPost({
           </div>
         </div>
 
-        <InteractionPostFooter interaction={interaction} />
+        <InteractionPostFooter
+          interaction={interaction}
+          onRemove={() => setIsRemoving(true)}
+        />
       </CardContent>
     </Card>
   );
 }
 
 function formatTimeAgo(dateString: string) {
-  const date = new Date(dateString + 'Z'); // Append 'Z' to treat as UTC
+  const date = new Date(dateString + "Z"); // Append 'Z' to treat as UTC
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 

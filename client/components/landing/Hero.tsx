@@ -35,10 +35,11 @@ export default function Hero() {
             Reddit Authority
             <IconBrandRedditNew className="size-8 -rotate-6 absolute -top-3 -left-2 text-primary" />
           </AuroraText>
-          ,{" "}
+          .{" "}
           <Highlighter action="underline" color="#ff5700">
-            Authentically
+            Get Customers
           </Highlighter>
+          .
         </h1>
 
         <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed">

@@ -1,4 +1,4 @@
-import { redditCallout } from "@/helpers/reddit-callout";
+import { redditCallout } from "@/helpers/reddit/reddit-callout";
 import Bottleneck from "bottleneck";
 
 export interface RedditPost {

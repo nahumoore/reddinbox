@@ -240,19 +240,13 @@ export const createRedditUserInteractionsJob = async ({
             const subreddit = subreddits.find(
               (s) => s.id === post.subreddit_id
             );
-            if (!subreddit || !subreddit.audience_ai_prompt) {
-              console.log(
-                `⏭️ No audience prompt found for subreddit ${post.subreddit_id}, skipping post ${post.reddit_id}`
-              );
-              continue;
-            }
 
             // CHECK IF USER ALREADY INTERACTED WITH THIS POST
             const { data: existingInteraction } = await supabase
               .from("reddit_user_interactions")
               .select("id")
               .eq("user_id", user.auth_user_id)
-              .eq("original_reddit_post_id", post.reddit_id)
+              .eq("original_reddit_parent_id", post.reddit_id)
               .single();
 
             if (existingInteraction) {
@@ -270,8 +264,11 @@ export const createRedditUserInteractionsJob = async ({
                   userProductName: website.name,
                   userProductDescription: website.description || "",
                   userProductKeywords: website.keywords || [],
-                  subredditName: subreddit.display_name_prefixed,
-                  subredditAudiencePrompt: subreddit.audience_ai_prompt,
+                  subreddit: {
+                    display_name_prefixed:
+                      subreddit?.display_name_prefixed || "",
+                    audience_ai_prompt: subreddit?.audience_ai_prompt || "",
+                  },
                 });
 
                 const response = await openai.chat.completions.create({
@@ -309,7 +306,7 @@ export const createRedditUserInteractionsJob = async ({
                     user_id: user.auth_user_id,
                     website_id: website.id,
                     interaction_type: "post_reply",
-                    original_reddit_post_id: post.reddit_id,
+                    original_reddit_parent_id: post.reddit_id,
                     interacted_with_reddit_username: post.author,
                     our_interaction_content: processedComment,
                     our_interaction_reddit_id: null,

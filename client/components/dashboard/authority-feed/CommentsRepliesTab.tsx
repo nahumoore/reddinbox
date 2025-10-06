@@ -1,20 +1,54 @@
 "use client";
 
-import { InteractionPost } from "@/components/dashboard/authority-feed/InteractionPost";
-import InteractionRemoveAll from "@/components/dashboard/authority-feed/InteractionRemoveAll";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRedditUserInteractions } from "@/stores/reddit-user-interactions";
 import { useUserWebsites } from "@/stores/user-wesbites";
-import { IconMessageOff } from "@tabler/icons-react";
+import { IconMessageOff, IconRefresh } from "@tabler/icons-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import InteractionRemoveAll from "./InteractionRemoveAll";
+import ThreadComments from "./ThreadComments";
 
 export default function CommentsRepliesTab() {
   const { userActiveWebsite } = useUserWebsites();
-  const { redditUserInteractions, isLoadingRedditUserInteractions } =
-    useRedditUserInteractions();
+  const {
+    redditUserInteractions,
+    isLoadingRedditUserInteractions,
+    setRedditUserInteractions,
+  } = useRedditUserInteractions();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
   const commentRepliesToReview = redditUserInteractions.filter(
-    (interaction) => interaction.status === "new" && interaction.interaction_type === "comment_reply"
+    (interaction) =>
+      interaction.status === "new" &&
+      interaction.interaction_type === "comment_reply"
   );
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      const response = await fetch("/api/reddit/comments/fetch-new", {
+        method: "POST",
+      });
+      const result = await response.json();
+      if (result.error) {
+        throw new Error(result.error);
+      }
+
+      setRedditUserInteractions(result.interactions);
+      toast.success("Comments refreshed successfully");
+    } catch (error) {
+      console.error("Failed to refresh comments:", error);
+      toast.error("Failed to refresh comments", {
+        description:
+          error instanceof Error ? error.message : "Please try again",
+      });
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   if (isLoadingRedditUserInteractions) {
     return (
@@ -26,25 +60,39 @@ export default function CommentsRepliesTab() {
     );
   }
 
-  if (commentRepliesToReview.length === 0) {
-    return (
-      <div className="text-center py-12 max-w-xl mx-auto">
-        <IconMessageOff className="size-12 text-muted-foreground mx-auto mb-4 animate-pulse" />
-        <h3 className="font-medium text-lg mb-2">No comment replies yet</h3>
-        <p className="text-muted-foreground">
-          When users reply to your comments on posts related to{" "}
-          <b>{userActiveWebsite?.name}</b>, they&apos;ll appear here.
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-4">
-      {commentRepliesToReview.map((comment) => (
-        <InteractionPost key={comment.id} interaction={comment} />
-      ))}
-      <InteractionRemoveAll />
+      <div className="flex justify-end">
+        <Button
+          variant="outline"
+          size="sm"
+          className="bg-white hover:shadow-md transition-all"
+          onClick={handleRefresh}
+          disabled={isRefreshing}
+        >
+          <IconRefresh
+            className={`size-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`}
+          />
+          {isRefreshing ? "Refreshing..." : "Refresh"}
+        </Button>
+      </div>
+      {commentRepliesToReview.length === 0 ? (
+        <div className="text-center py-12 max-w-xl mx-auto">
+          <IconMessageOff className="size-12 text-muted-foreground mx-auto mb-4 animate-pulse" />
+          <h3 className="font-medium text-lg mb-2">No comment replies yet</h3>
+          <p className="text-muted-foreground">
+            When users reply to your comments on posts related to{" "}
+            <b>{userActiveWebsite?.name}</b>, they&apos;ll appear here.
+          </p>
+        </div>
+      ) : (
+        <>
+          {commentRepliesToReview.map((comment) => (
+            <ThreadComments key={comment.id} interaction={comment} />
+          ))}
+          <InteractionRemoveAll interactionType="comment_reply" />
+        </>
+      )}
     </div>
   );
 }

@@ -7,15 +7,19 @@ import { useRedditAccounts } from "@/stores/reddit-accounts";
 import { useRedditUserInteractions } from "@/stores/reddit-user-interactions";
 import { useUserInfo } from "@/stores/user-info";
 import { RedditUserInteraction } from "@/types/db-schema";
-import { IconMessage, IconSparkles, IconX } from "@tabler/icons-react";
+import { IconMessage, IconX } from "@tabler/icons-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 interface CommentSectionProps {
   interaction: RedditUserInteraction;
+  onRemove?: () => void;
 }
 
-export function InteractionPostFooter({ interaction }: CommentSectionProps) {
+export function InteractionPostFooter({
+  interaction,
+  onRemove,
+}: CommentSectionProps) {
   const { activeRedditAccount } = useRedditAccounts();
   const { redditUserInteractions, setRedditUserInteractions } =
     useRedditUserInteractions();
@@ -35,6 +39,12 @@ export function InteractionPostFooter({ interaction }: CommentSectionProps) {
     if (!comment.trim()) return;
 
     setIsPosting(true);
+
+    // Trigger animation
+    onRemove?.();
+
+    // Wait for animation before updating state
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Optimistic update
     setRedditUserInteractions(
@@ -73,7 +83,13 @@ export function InteractionPostFooter({ interaction }: CommentSectionProps) {
   const handleIgnore = async () => {
     setIsPosting(true);
 
-    // Optimistic update - remove immediately
+    // Trigger animation
+    onRemove?.();
+
+    // Wait for animation before removing from list
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Optimistic update - remove after animation
     const previousInteractions = redditUserInteractions;
     setRedditUserInteractions(
       redditUserInteractions.filter((item) => item.id !== interaction.id)
@@ -97,8 +113,6 @@ export function InteractionPostFooter({ interaction }: CommentSectionProps) {
 
   const handleGenerateComment = async () => {
     setIsPosting(true);
-    console.log("userInfo", userInfo);
-    console.log("interaction", interaction);
     const response = await fetchGenerateComment({
       interaction_id: interaction.id,
       user_name: userInfo?.name || "",
@@ -145,14 +159,14 @@ export function InteractionPostFooter({ interaction }: CommentSectionProps) {
               className="min-h-24 resize-none rounded-r-none border-r-0 pr-2 border border-muted bg-white"
               disabled={isPosting}
             />
-            <Button
+            {/* <Button
               onClick={handleGenerateComment}
               variant="outline"
               disabled={isPosting}
               className="rounded-l-none border border-muted border-l-0 px-8 h-auto self-stretch bg-white"
             >
               <IconSparkles className="size-5 text-primary fill-primary" />
-            </Button>
+            </Button> */}
           </div>
 
           <div className="flex items-center justify-between">
@@ -165,7 +179,7 @@ export function InteractionPostFooter({ interaction }: CommentSectionProps) {
                 disabled={isPosting}
               >
                 <IconX className="size-4" />
-                Not Interested
+                Skip
               </Button>
               <Button
                 onClick={handleSubmit}
@@ -174,7 +188,7 @@ export function InteractionPostFooter({ interaction }: CommentSectionProps) {
                 className="gap-1"
               >
                 <IconMessage className="size-3" />
-                Post Comment
+                Approve Comment
               </Button>
             </div>
           </div>

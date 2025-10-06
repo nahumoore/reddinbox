@@ -1,15 +1,21 @@
 "use client";
 
+import ApprovedCommentsTab from "@/components/dashboard/authority-feed/ApprovedCommentsTab";
 import CommentsRepliesTab from "@/components/dashboard/authority-feed/CommentsRepliesTab";
 import NewPostsTab from "@/components/dashboard/authority-feed/NewPostsTab";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useUserWebsites } from "@/stores/user-wesbites";
-import { IconMessage, IconMessagePlus, IconSettings } from "@tabler/icons-react";
+import {
+  IconCheck,
+  IconMessage,
+  IconMessagePlus,
+  IconSettings,
+} from "@tabler/icons-react";
 import Link from "next/link";
 import { useState } from "react";
 
-type TabValue = "new-posts" | "comment-replies";
+type TabValue = "new-posts" | "approved-comments" | "comment-replies";
 
 interface Tab {
   value: TabValue;
@@ -27,6 +33,11 @@ const TABS: Tab[] = [
     value: "comment-replies",
     label: "Comment Replies",
     icon: IconMessage,
+  },
+  {
+    value: "approved-comments",
+    label: "Approved Comments",
+    icon: IconCheck,
   },
 ];
 
@@ -91,6 +102,7 @@ export default function LeadsPage() {
       <div>
         {activeTab === "new-posts" && <NewPostsTab />}
         {activeTab === "comment-replies" && <CommentsRepliesTab />}
+        {activeTab === "approved-comments" && <ApprovedCommentsTab />}
       </div>
     </div>
   );

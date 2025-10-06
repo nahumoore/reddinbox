@@ -1,20 +1,19 @@
 "use client";
 
 import { InteractionPost } from "@/components/dashboard/authority-feed/InteractionPost";
-import InteractionRemoveAll from "@/components/dashboard/authority-feed/InteractionRemoveAll";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRedditUserInteractions } from "@/stores/reddit-user-interactions";
 import { useUserWebsites } from "@/stores/user-wesbites";
-import { IconSearch } from "@tabler/icons-react";
+import { IconCalendarCheck } from "@tabler/icons-react";
 
-export default function NewPostsTab() {
+export default function ApprovedCommentsTab() {
   const { userActiveWebsite } = useUserWebsites();
   const { redditUserInteractions, isLoadingRedditUserInteractions } =
     useRedditUserInteractions();
-  const newPostsToReview = redditUserInteractions.filter(
+  const approvedComments = redditUserInteractions.filter(
     (interaction) =>
-      interaction.status === "new" &&
+      interaction.status === "scheduled" &&
       interaction.interaction_type === "post_reply"
   );
 
@@ -28,15 +27,14 @@ export default function NewPostsTab() {
     );
   }
 
-  if (newPostsToReview.length === 0) {
+  if (approvedComments.length === 0) {
     return (
       <div className="text-center py-12 max-w-xl mx-auto">
-        <IconSearch className="size-12 text-muted-foreground mx-auto mb-4 animate-pulse" />
-        <h3 className="font-medium text-lg mb-2">Collecting posts...</h3>
+        <IconCalendarCheck className="size-12 text-muted-foreground mx-auto mb-4" />
+        <h3 className="font-medium text-lg mb-2">No scheduled comments</h3>
         <p className="text-muted-foreground">
-          We&apos;re monitoring and analyzing posts for{" "}
-          <b>{userActiveWebsite?.name}</b>. We&apos;ll notify you when we find
-          new ones.
+          Comments you approve will appear here, scheduled to be posted on
+          Reddit following human like pattern.
         </p>
       </div>
     );
@@ -44,10 +42,9 @@ export default function NewPostsTab() {
 
   return (
     <div className="space-y-4">
-      {newPostsToReview.map((post) => (
+      {approvedComments.map((post) => (
         <InteractionPost key={post.id} interaction={post} />
       ))}
-      <InteractionRemoveAll interactionType="post_reply" />
     </div>
   );
 }

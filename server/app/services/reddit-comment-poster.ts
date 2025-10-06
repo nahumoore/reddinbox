@@ -1,5 +1,6 @@
+import { refreshRedditToken } from "@/helpers/reddit/refresh-access-token";
 import { SupabaseClient } from "@supabase/supabase-js";
-import { redditCallout } from "../helpers/reddit-callout";
+import { redditCallout } from "../helpers/reddit/reddit-callout";
 
 interface RedditAccount {
   id: string;
@@ -50,72 +51,6 @@ async function getRedditAccount(
   }
 }
 
-// REFRESH ACCESS TOKEN USING REFRESH TOKEN
-async function refreshAccessToken(
-  refreshToken: string
-): Promise<RefreshTokenResult> {
-  try {
-    if (!process.env.REDDIT_CLIENT_ID || !process.env.REDDIT_CLIENT_SECRET) {
-      return {
-        success: false,
-        error: "Reddit client configuration is missing",
-      };
-    }
-
-    const response = await fetch("https://www.reddit.com/api/v1/access_token", {
-      method: "POST",
-      headers: {
-        Authorization: `Basic ${Buffer.from(
-          `${process.env.REDDIT_CLIENT_ID}:${process.env.REDDIT_CLIENT_SECRET}`
-        ).toString("base64")}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-        "User-Agent": "Reddinbox/1.0",
-      },
-      body: new URLSearchParams({
-        grant_type: "refresh_token",
-        refresh_token: refreshToken,
-      }),
-    });
-
-    if (!response.ok) {
-      return {
-        success: false,
-        error: `HTTP ${response.status}: Failed to refresh Reddit token`,
-      };
-    }
-
-    const tokenData = (await response.json()) as {
-      error: string;
-      access_token: string;
-      expires_in: number;
-    };
-
-    if (tokenData.error) {
-      return {
-        success: false,
-        error: `Reddit API error: ${tokenData.error}`,
-      };
-    }
-
-    const expiresAt = new Date(
-      Date.now() + tokenData.expires_in * 1000
-    ).toISOString();
-
-    return {
-      success: true,
-      access_token: tokenData.access_token,
-      expires_at: expiresAt,
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error: `Unexpected error during token refresh: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`,
-    };
-  }
-}
-
 // PARSE REDDIT RATE LIMITING ERROR MESSAGE TO EXTRACT MINUTES
 function parseRedditRateLimitError(errorMessage: string): number | null {
   if (!errorMessage) return null;
@@ -154,7 +89,7 @@ async function ensureValidToken(
     return null;
   }
 
-  const refreshResult = await refreshAccessToken(account.refresh_token);
+  const refreshResult = await refreshRedditToken(supabase, account.id);
 
   if (!refreshResult.success) {
     console.error(
@@ -165,11 +100,12 @@ async function ensureValidToken(
   }
 
   // UPDATE DATABASE WITH NEW TOKEN
+  const expiresIn = refreshResult.data?.expires_in || 0;
   const { error: updateError } = await supabase
     .from("reddit_accounts")
     .update({
-      access_token: refreshResult.access_token,
-      token_expires_at: refreshResult.expires_at,
+      access_token: refreshResult.data?.access_token,
+      token_expires_at: new Date(Date.now() + expiresIn * 1000).toISOString(),
       last_api_call: new Date().toISOString(),
     })
     .eq("id", account.id);
@@ -182,7 +118,7 @@ async function ensureValidToken(
     return null;
   }
 
-  return refreshResult.access_token!;
+  return refreshResult.data?.access_token!;
 }
 
 // POST COMMENT TO REDDIT
