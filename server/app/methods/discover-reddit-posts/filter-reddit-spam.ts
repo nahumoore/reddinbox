@@ -104,7 +104,8 @@ async function filterSpamBatch(
         throw new Error("No response from OpenAI spam filter");
       }
 
-      const spamResults: SpamFilterResult[] = JSON.parse(result);
+      const parsedResult = JSON.parse(result);
+      const spamResults: SpamFilterResult[] = parsedResult.posts;
       return spamResults;
     } catch (error) {
       retryCount++;

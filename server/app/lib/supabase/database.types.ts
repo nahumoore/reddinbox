@@ -122,7 +122,6 @@ export type Database = {
           content_category:
             | Database["public"]["Enums"]["reddit_post_category"]
             | null
-          content_type: Database["public"]["Enums"]["content_type"] | null
           created_at: string | null
           downs: number | null
           embedded_content: string | null
@@ -131,6 +130,7 @@ export type Database = {
           reddit_id: string
           reddit_url: string | null
           subreddit_id: string | null
+          summarized_content: string | null
           title: string | null
           ups: number | null
         }
@@ -140,7 +140,6 @@ export type Database = {
           content_category?:
             | Database["public"]["Enums"]["reddit_post_category"]
             | null
-          content_type?: Database["public"]["Enums"]["content_type"] | null
           created_at?: string | null
           downs?: number | null
           embedded_content?: string | null
@@ -149,6 +148,7 @@ export type Database = {
           reddit_id: string
           reddit_url?: string | null
           subreddit_id?: string | null
+          summarized_content?: string | null
           title?: string | null
           ups?: number | null
         }
@@ -158,7 +158,6 @@ export type Database = {
           content_category?:
             | Database["public"]["Enums"]["reddit_post_category"]
             | null
-          content_type?: Database["public"]["Enums"]["content_type"] | null
           created_at?: string | null
           downs?: number | null
           embedded_content?: string | null
@@ -167,6 +166,7 @@ export type Database = {
           reddit_id?: string
           reddit_url?: string | null
           subreddit_id?: string | null
+          summarized_content?: string | null
           title?: string | null
           ups?: number | null
         }
@@ -464,13 +464,11 @@ export type Database = {
         Returns: unknown
       }
       find_relevant_reddit_content: {
-        Args:
-          | {
-              p_acceptance_score?: number
-              p_limit?: number
-              p_website_id: string
-            }
-          | { p_acceptance_score?: number; p_website_id: string }
+        Args: {
+          p_acceptance_score?: number
+          p_limit?: number
+          p_website_id: string
+        }
         Returns: {
           author: string
           content: string
@@ -576,7 +574,6 @@ export type Database = {
       }
     }
     Enums: {
-      content_type: "post" | "comment"
       interaction_type: "comment_reply" | "post_reply" | "dm"
       reddit_interaction_status: "new" | "ignored" | "posted" | "scheduled"
       reddit_post_category:
@@ -720,7 +717,6 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      content_type: ["post", "comment"],
       interaction_type: ["comment_reply", "post_reply", "dm"],
       reddit_interaction_status: ["new", "ignored", "posted", "scheduled"],
       reddit_post_category: [

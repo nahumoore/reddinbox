@@ -43,8 +43,8 @@ export default function SubscriptionEndedPageClient() {
             </span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            While you're paused, your competitors are building relationships in
-            the communities where your prospects need solutions
+            While you&apos;re paused, your competitors are building
+            relationships in the communities where your prospects need solutions
           </p>
         </div>
 

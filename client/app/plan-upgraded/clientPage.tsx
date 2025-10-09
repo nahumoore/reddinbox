@@ -69,7 +69,7 @@ export default function PlanUpgradedPageClient() {
           </div>
 
           <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 max-w-xl mx-auto">
-            You're All Set to{" "}
+            You&apos;re All Set to{" "}
             <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
               Build Authority
             </span>

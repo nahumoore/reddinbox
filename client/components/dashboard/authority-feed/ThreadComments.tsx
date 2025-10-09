@@ -95,7 +95,7 @@ export default function ThreadComments({
     });
   };
 
-  const handleIgnore = async () => {
+  const handleSkip = async () => {
     // Trigger animation
     setIsRemoving(true);
 
@@ -108,13 +108,13 @@ export default function ThreadComments({
       redditUserInteractions.filter((item) => item.id !== interaction.id)
     );
 
-    const response = await fetchIgnoreComment({
+    const response = await fetchSkipComment({
       interaction_id: interaction.id,
     });
 
     if (response.error) {
-      console.error("Error ignoring comment:", response.error);
-      toast.error("Failed to ignore comment", {
+      console.error("Error skipping comment:", response.error);
+      toast.error("Failed to skip comment", {
         description: response.error,
       });
       // Revert optimistic update
@@ -214,7 +214,7 @@ export default function ThreadComments({
               <div className="flex items-center justify-between">
                 <div className="flex justify-between items-center w-full gap-2">
                   <Button
-                    onClick={handleIgnore}
+                    onClick={handleSkip}
                     variant="outline"
                     size="sm"
                     className="gap-2"
@@ -306,22 +306,22 @@ function formatDate(dateString: string) {
   return `${Math.floor(diffInSeconds / 86400)}d ago`;
 }
 
-const fetchIgnoreComment = async ({
+const fetchSkipComment = async ({
   interaction_id,
 }: {
   interaction_id: string;
 }) => {
   try {
-    const response = await fetch("/api/reddit/comments/ignore-comments", {
+    const response = await fetch("/api/reddit/comments/skip-comments", {
       method: "POST",
       body: JSON.stringify({ interaction_ids: [interaction_id] }),
     });
 
     return response.json();
   } catch (error) {
-    console.error("Error ignoring comment:", error);
+    console.error("Error skipping comment:", error);
     return {
-      error: "Failed to ignore comment",
+      error: "Failed to skip comment",
     };
   }
 };

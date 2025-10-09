@@ -43,7 +43,7 @@ export default function SubredditSelector() {
     setIsSearching(true);
     setIsPopoverOpen(true);
     try {
-      const response = await fetch("/api/reddit/search-subreddits", {
+      const response = await fetch("/api/reddit/subreddit/search-subreddits", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: query.trim() }),

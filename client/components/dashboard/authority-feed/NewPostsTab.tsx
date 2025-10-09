@@ -44,6 +44,10 @@ export default function NewPostsTab() {
 
   return (
     <div className="space-y-4">
+      <p className="text-sm text-muted-foreground">
+        You have <b className="text-primary">{newPostsToReview.length}</b>{" "}
+        {newPostsToReview.length === 1 ? "new post" : "new posts"} to review.
+      </p>
       {newPostsToReview.map((post) => (
         <InteractionPost key={post.id} interaction={post} />
       ))}

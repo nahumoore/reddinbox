@@ -99,7 +99,7 @@ export default function PricingPlans({
         {/* Features section */}
         <div>
           <h4 className="font-semibold text-gray-900 mb-6 text-center">
-            What's included:
+            What&apos;s included:
           </h4>
 
           <div className="grid md:grid-cols-2 gap-4">

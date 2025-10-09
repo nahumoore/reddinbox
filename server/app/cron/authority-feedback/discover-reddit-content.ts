@@ -1,12 +1,12 @@
+import {
+  ClassificationInput,
+  classifyRedditPosts,
+} from "@/methods/discover-reddit-posts/classify-reddit-post";
 import { fetchAllSubredditPosts } from "@/methods/discover-reddit-posts/fetch-all-subreddit-posts";
 import {
   filterSpamPosts,
   SpamFilterInput,
 } from "@/methods/discover-reddit-posts/filter-reddit-spam";
-import {
-  classifyRedditPosts,
-  ClassificationInput,
-} from "@/methods/discover-reddit-posts/classify-reddit-post";
 import { generateEmbeddingsForPosts } from "@/methods/discover-reddit-posts/reddit-post-embedding";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { createRedditUserInteractionsJob } from "./create-reddit-user-interactions";
@@ -20,11 +20,11 @@ interface ProcessedPost {
   reddit_url: string;
   ups: number;
   downs: number;
-  content_type: "post";
   subreddit_id: string;
   subreddit_name: string;
   is_self: boolean;
   content_category?: string;
+  summarized_content?: string;
   embedded_content?: number[] | null;
 }
 
@@ -78,7 +78,7 @@ export const discoverRedditContentJob = async ({
 
         // MAP REDDIT API RESPONSE TO DATABASE SCHEMA
         allPostsToProcess.push({
-          reddit_id: postData.id,
+          reddit_id: `t3_${postData.id}`,
           title: postData.title || null,
           content: postData.selftext || "",
           author: postData.author,
@@ -88,7 +88,6 @@ export const discoverRedditContentJob = async ({
           reddit_url: `https://www.reddit.com${postData.permalink}`,
           ups: postData.ups || 0,
           downs: postData.downs || 0,
-          content_type: "post" as const,
           subreddit_id: fetchedData.subredditId,
           subreddit_name: fetchedData.subredditName,
           is_self: postData.is_self,
@@ -240,15 +239,19 @@ export const discoverRedditContentJob = async ({
           postsForClassification
         );
 
-        // CREATE MAP OF POST ID TO CATEGORY FOR FAST LOOKUP
+        // CREATE MAP OF POST ID TO CATEGORY AND SUMMARY FOR FAST LOOKUP
         const categoryMap = new Map(
           classificationResults.map((result) => [result.id, result.category])
         );
+        const summaryMap = new Map(
+          classificationResults.map((result) => [result.id, result.summary])
+        );
 
-        // ASSIGN CATEGORIES TO APPROVED POSTS
+        // ASSIGN CATEGORIES AND SUMMARIES TO APPROVED POSTS
         approvedPosts = approvedPosts.map((post) => ({
           ...post,
           content_category: categoryMap.get(post.reddit_id) || "other",
+          summarized_content: summaryMap.get(post.reddit_id) || "",
         }));
 
         console.log(
@@ -256,10 +259,11 @@ export const discoverRedditContentJob = async ({
         );
       } catch (error) {
         console.error(`❌ Error classifying posts:`, error);
-        // CONTINUE WITHOUT CATEGORIES IF CLASSIFICATION FAILS
+        // CONTINUE WITHOUT CATEGORIES AND SUMMARIES IF CLASSIFICATION FAILS
         approvedPosts = approvedPosts.map((post) => ({
           ...post,
           content_category: "other",
+          summarized_content: "",
         }));
       }
     }

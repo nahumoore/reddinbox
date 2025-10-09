@@ -42,6 +42,7 @@ You are an expert **Next.js developer** with professional skills in:
 - **ShadCN UI** - Accessible, composable component library
 - **Tabler Icons** - Consistent iconography system
 - **Framer Motion** - Smooth animations and micro-interactions
+- **Date FNS** - For formatting propertly the dates.
 
 ### Development Standards
 

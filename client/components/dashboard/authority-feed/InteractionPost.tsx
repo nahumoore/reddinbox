@@ -28,6 +28,7 @@ export function InteractionPost({
   className,
 }: InteractionPostProps) {
   const [isRemoving, setIsRemoving] = useState(false);
+  const [showFullContent, setShowFullContent] = useState(false);
   const avatarFallback = interaction.interacted_with_reddit_username
     .substring(0, 2)
     .toUpperCase();
@@ -42,7 +43,7 @@ export function InteractionPost({
   return (
     <Card
       className={cn(
-        "h-fit hover:shadow-md transition-all duration-500",
+        "h-fit hover:shadow-md transition-all duration-500 flex flex-col gap-4",
         isRemoving && "opacity-0 scale-95 -translate-x-4",
         className
       )}
@@ -109,9 +110,34 @@ export function InteractionPost({
           {interaction.reddit_content_discovered?.title}
         </h3>
         {interaction.reddit_content_discovered?.content && (
-          <MarkdownContent
-            content={interaction.reddit_content_discovered?.content}
-          />
+          <div className="space-y-2">
+            <MarkdownContent
+              content={
+                showFullContent
+                  ? interaction.reddit_content_discovered.content
+                  : interaction.reddit_content_discovered.summarized_content ||
+                    interaction.reddit_content_discovered.content
+              }
+            />
+            {interaction.reddit_content_discovered.summarized_content && (
+              <button
+                onClick={() => setShowFullContent(!showFullContent)}
+                className="text-sm text-primary transition-colors underline-offset-4 hover:underline cursor-pointer flex items-center gap-1"
+              >
+                {showFullContent ? (
+                  <>
+                    <IconArrowUp className="size-4" />
+                    Read summary
+                  </>
+                ) : (
+                  <>
+                    <IconArrowDown className="size-4" />
+                    Read full post
+                  </>
+                )}
+              </button>
+            )}
+          </div>
         )}
 
         <div className="flex items-center gap-4 text-sm text-muted-foreground">

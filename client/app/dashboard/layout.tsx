@@ -79,12 +79,20 @@ export default async function DashboardLayoutServer({
     redirect("/no-reddit-account-active");
   }
 
-  // QUERY FROM ACTIVE WEBSITE
+  // GET ACTIVE WEBSITE
   const activeWebsite = websites?.find(
     (website) => website.is_active
   ) as Website;
   if (!activeWebsite) {
     redirect("/");
+  }
+
+  // GET ACTIVE REDDIT ACCOUNT
+  const activeRedditAccount = redditAccounts?.find(
+    (account) => account.is_active
+  ) as RedditAccount;
+  if (!activeRedditAccount) {
+    redirect("/no-reddit-account-active");
   }
 
   const [{ data: redditUserInteractions }, { data: subreddits }] =
@@ -110,7 +118,7 @@ export default async function DashboardLayoutServer({
         author,
         reddit_id,
         content,
-        content_type,
+        summarized_content,
         title,
         reddit_url,
         ups,
@@ -129,12 +137,14 @@ export default async function DashboardLayoutServer({
         )
         .eq("user_id", user.id)
         .eq("website_id", activeWebsite.id)
-        // add reddit_account_id == activeRedditAccount?.id
+        .eq("reddit_account_id", activeRedditAccount?.id)
         .order("created_at", { ascending: false }),
       supabase
         .from("reddit_subreddits")
-        .select("id, display_name_prefixed")
-        .in("id", activeWebsite.subreddit_reddit_ids || []),
+        .select(
+          "id, display_name_prefixed, title, public_description, community_icon, subscribers, created_utc"
+        )
+        .eq("is_active", true),
     ]);
 
   return (

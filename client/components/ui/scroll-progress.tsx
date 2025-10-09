@@ -5,8 +5,7 @@ import { motion, MotionProps, useScroll } from "motion/react"
 
 import { cn } from "@/lib/utils"
 
-interface ScrollProgressProps
-  extends Omit<React.HTMLAttributes<HTMLElement>, keyof MotionProps> {}
+type ScrollProgressProps = Omit<React.HTMLAttributes<HTMLElement>, keyof MotionProps>
 
 export const ScrollProgress = React.forwardRef<
   HTMLDivElement,

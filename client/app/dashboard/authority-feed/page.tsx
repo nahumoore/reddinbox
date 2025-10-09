@@ -11,6 +11,7 @@ import {
   IconMessage,
   IconMessagePlus,
   IconSettings,
+  IconUserUp,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -51,7 +52,10 @@ export default function LeadsPage() {
       <div className="py-3">
         <div className="flex justify-between">
           <div className="flex items-center gap-3 mb-2">
-            <h1 className="font-heading text-2xl font-bold">Authority Feed</h1>
+            <h1 className="font-heading text-2xl font-bold flex items-center gap-2">
+              <IconUserUp className="size-6" />
+              Authority Feed
+            </h1>
           </div>
           <Link
             className={buttonVariants({

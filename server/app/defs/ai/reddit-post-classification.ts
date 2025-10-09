@@ -1,5 +1,5 @@
 export const REDDIT_CATEGORY_CLASSIFICATION_PROMPT = `
-Classify each Reddit post into ONE category that best describes its primary purpose.
+Classify each Reddit post into ONE category that best describes its primary purpose, and provide a concise summary.
 
 ## Categories:
 
@@ -28,11 +28,12 @@ Classify each Reddit post into ONE category that best describes its primary purp
 - When uncertain between two categories, choose the one with higher engagement value
 - Use other category as a last resort, if the any of the other categories don't fit
 
-## OUTPUT FORMAT:
-Return only a JSON array:
-[
-  {"id": "post1", "category": "help_request"},
-  {"id": "post2", "category": "self_promotion"},
-  ...
-]
+## Summary Guidelines:
+- Write 2-3 sentences maximum
+- Focus on the core question/problem/point (not background details)
+- Make it actionable - what does the user actually need/want?
+- For help_request: state the specific problem
+- For advice_seeking: state what they're deciding between
+- For problem_complaint: state what they're frustrated about
+- Keep it casual and scannable
 `;

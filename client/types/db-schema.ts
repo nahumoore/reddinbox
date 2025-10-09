@@ -5,8 +5,6 @@ export type UserInfo = Database["public"]["Tables"]["user_info"]["Row"];
 export type RedditAccount =
   Database["public"]["Tables"]["reddit_accounts"]["Row"];
 
-export type ContentType = Database["public"]["Enums"]["content_type"];
-
 export type Website = Database["public"]["Tables"]["websites"]["Row"];
 
 export type RedditContentDiscovered =

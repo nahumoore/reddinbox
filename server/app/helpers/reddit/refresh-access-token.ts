@@ -45,10 +45,7 @@ export async function refreshRedditToken(
       };
     }
 
-    if (
-      !process.env.NEXT_PUBLIC_REDDIT_CLIENT_ID ||
-      !process.env.REDDIT_CLIENT_SECRET_ID
-    ) {
+    if (!process.env.REDDIT_CLIENT_ID || !process.env.REDDIT_CLIENT_SECRET) {
       return {
         success: false,
         error: "Reddit client configuration is missing",
@@ -61,7 +58,7 @@ export async function refreshRedditToken(
       method: "POST",
       headers: {
         Authorization: `Basic ${Buffer.from(
-          `${process.env.NEXT_PUBLIC_REDDIT_CLIENT_ID}:${process.env.REDDIT_CLIENT_SECRET_ID}`
+          `${process.env.REDDIT_CLIENT_ID}:${process.env.REDDIT_CLIENT_SECRET}`
         ).toString("base64")}`,
         "Content-Type": "application/x-www-form-urlencoded",
         "User-Agent": `Reddinbox/1.0 (by /u/${redditAccount.name})`,

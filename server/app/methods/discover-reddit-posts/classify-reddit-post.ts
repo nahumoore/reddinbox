@@ -10,6 +10,7 @@ export interface ClassificationInput {
 export interface ClassificationResult {
   id: string;
   category: string;
+  summary: string;
 }
 
 const openai = new OpenAI({
@@ -20,9 +21,10 @@ const openai = new OpenAI({
 function truncatePostContent(post: ClassificationInput): ClassificationInput {
   return {
     ...post,
-    content: post.content.length > 1250
-      ? post.content.substring(0, 1250) + "..."
-      : post.content
+    content:
+      post.content.length > 1250
+        ? post.content.substring(0, 1250) + "..."
+        : post.content,
   };
 }
 
@@ -87,11 +89,16 @@ async function classifyPostsBatch(
                           "tool_announcement",
                           "self_promotion",
                           "resource_compilation",
-                          "other"
+                          "other",
                         ],
                       },
+                      summary: {
+                        type: "string",
+                        description:
+                          "A concise summary of the post. 2-3 sentences maximum.",
+                      },
                     },
-                    required: ["id", "category"],
+                    required: ["id", "category", "summary"],
                     additionalProperties: false,
                   },
                 },
@@ -115,7 +122,10 @@ async function classifyPostsBatch(
       return classificationResults;
     } catch (error) {
       retryCount++;
-      console.error(`🏷️ Classification API attempt ${retryCount} failed:`, error);
+      console.error(
+        `🏷️ Classification API attempt ${retryCount} failed:`,
+        error
+      );
 
       if (retryCount >= maxRetries) {
         console.error(
@@ -125,6 +135,7 @@ async function classifyPostsBatch(
         return posts.map((post) => ({
           id: post.id,
           category: "other",
+          summary: "",
         }));
       }
 
@@ -138,6 +149,7 @@ async function classifyPostsBatch(
   return posts.map((post) => ({
     id: post.id,
     category: "other",
+    summary: "",
   }));
 }
 
@@ -169,9 +181,9 @@ export async function classifyRedditPosts(
     const batchGroup = batches.slice(i, i + concurrencyLimit);
 
     console.log(
-      `🔄 Processing classification batch group ${Math.floor(i / concurrencyLimit) + 1} with ${
-        batchGroup.length
-      } batches`
+      `🔄 Processing classification batch group ${
+        Math.floor(i / concurrencyLimit) + 1
+      } with ${batchGroup.length} batches`
     );
 
     // PROCESS BATCHES IN PARALLEL (UP TO 10 AT A TIME)
@@ -207,6 +219,7 @@ export async function classifyRedditPosts(
               ...failedBatch.map((post) => ({
                 id: post.id,
                 category: "other",
+                summary: "",
               }))
             );
           }
@@ -214,7 +227,9 @@ export async function classifyRedditPosts(
       }
 
       console.log(
-        `✅ Completed classification batch group ${Math.floor(i / concurrencyLimit) + 1}`
+        `✅ Completed classification batch group ${
+          Math.floor(i / concurrencyLimit) + 1
+        }`
       );
     } catch (error) {
       console.error(
@@ -230,6 +245,7 @@ export async function classifyRedditPosts(
           ...batch.map((post) => ({
             id: post.id,
             category: "other",
+            summary: "",
           }))
         );
       }

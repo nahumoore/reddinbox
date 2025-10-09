@@ -1,6 +1,10 @@
-import { redditGenerateCommentPrompt } from "@/defs/ai/reddit-generate-comment";
-import { refreshRedditToken } from "@/helpers/reddit/refresh-access-token";
 import { supabaseAdmin } from "@/lib/supabase/client";
+import { fetchCommentContexts } from "@/methods/check-new-comments/fetch-comment-contexts";
+import { fetchInboxComments } from "@/methods/check-new-comments/fetch-inbox-comments";
+import { fetchRedditAccount } from "@/methods/check-new-comments/fetch-reddit-account";
+import { filterNewComments } from "@/methods/check-new-comments/filter-new-comments";
+import { generateAIReplies } from "@/methods/check-new-comments/generate-ai-replies";
+import { saveInteractions } from "@/methods/check-new-comments/save-interactions";
 import Bottleneck from "bottleneck";
 import { Request, Response } from "express";
 import OpenAI from "openai";
@@ -18,40 +22,6 @@ const redditLimiter = new Bottleneck({
   reservoirRefreshInterval: 60 * 1000, // per minute
 });
 
-// HELPER FUNCTION TO CLEAN GENERATED COMMENTS
-function cleanUpGeneratedComment(content: string): string {
-  let cleaned = content.replace(/—/g, ", ");
-  cleaned = cleaned.replace(/\s+-\s+/g, ", ");
-  cleaned = cleaned.replace(/[ \t]+/g, " ");
-  cleaned = cleaned.replace(/,\s+/g, ", ");
-  return cleaned.trim();
-}
-
-interface InboxMessage {
-  kind: string;
-  data: {
-    id: string;
-    subject: string;
-    author: string;
-    body: string;
-    parent_id: string;
-    context: string;
-    link_title: string;
-    subreddit: string;
-    new: boolean;
-  };
-}
-
-interface ContextResponse {
-  kind: string;
-  data: {
-    children: Array<{
-      kind: string;
-      data: any;
-    }>;
-  };
-}
-
 export const checkNewComments = async (req: Request, res: Response) => {
   const { redditAccountId } = req.body;
 
@@ -63,104 +33,28 @@ export const checkNewComments = async (req: Request, res: Response) => {
 
   try {
     // PHASE 1: FETCH REDDIT ACCOUNT WITH USER AND ACTIVE WEBSITE
-    const { data: redditAccount, error: accountError } = await supabase
-      .from("reddit_accounts")
-      .select(
-        `
-        id,
-        name,
-        access_token,
-        token_expires_at,
-        user_id,
-        user_info!inner (
-          auth_user_id,
-          name,
-          websites!inner (
-            id,
-            name,
-            description,
-            keywords
-          )
-        )
-      `
-      )
-      .eq("id", redditAccountId)
-      .eq("user_info.websites.is_active", true)
-      .single();
+    const accountResult = await fetchRedditAccount(supabase, redditAccountId);
 
-    if (accountError || !redditAccount) {
-      return res
-        .status(404)
-        .json({ error: "Reddit account not found or no active website" });
+    if (!accountResult.success || !accountResult.data) {
+      return res.status(404).json({ error: accountResult.error });
     }
 
-    const userInfo = Array.isArray(redditAccount.user_info)
-      ? redditAccount.user_info[0]
-      : redditAccount.user_info;
-
-    const activeWebsite = Array.isArray(userInfo.websites)
-      ? userInfo.websites[0]
-      : userInfo.websites;
-
-    if (!activeWebsite) {
-      return res.status(404).json({ error: "No active website found" });
-    }
-
-    // CHECK TOKEN EXPIRATION AND REFRESH IF NEEDED
-    let accessToken = redditAccount.access_token;
-    const tokenExpiresAt = redditAccount.token_expires_at
-      ? new Date(redditAccount.token_expires_at)
-      : null;
-
-    if (!tokenExpiresAt || tokenExpiresAt <= new Date()) {
-      console.log("🔄 Access token expired, refreshing...");
-      const refreshResult = await refreshRedditToken(supabase, redditAccountId);
-
-      if (!refreshResult.success || !refreshResult.data) {
-        return res.status(401).json({
-          error: "Failed to refresh access token",
-          details: refreshResult.error,
-        });
-      }
-
-      accessToken = refreshResult.data.access_token;
-    }
-
-    if (!accessToken) {
-      return res.status(401).json({ error: "No access token available" });
-    }
+    const { redditAccount, userInfo, activeWebsite, accessToken } =
+      accountResult.data;
 
     // PHASE 2: FETCH INBOX COMMENTS
-    console.log("📬 Fetching inbox messages...");
-    const inboxResponse = await fetch(
-      "https://oauth.reddit.com/message/inbox?limit=25",
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "User-Agent": `Reddinbox/1.0 (by /u/${redditAccount.name})`,
-        },
-      }
+    const inboxResult = await fetchInboxComments(
+      accessToken,
+      redditAccount.name
     );
 
-    if (!inboxResponse.ok) {
-      return res.status(inboxResponse.status).json({
-        error: "Failed to fetch inbox",
-        status: inboxResponse.status,
+    if (!inboxResult.success || !inboxResult.data) {
+      return res.status(inboxResult.status || 500).json({
+        error: inboxResult.error,
       });
     }
 
-    const inboxData = (await inboxResponse.json()) as {
-      kind: string;
-      data: { children: InboxMessage[] };
-    };
-    const messages: InboxMessage[] = inboxData.data?.children || [];
-
-    // FILTER BY COMMENT REPLY
-    const commentReplies = messages.filter(
-      (msg) => msg.data.subject === "comment reply"
-    );
-
-    console.log(`💬 Found ${commentReplies.length} comment replies`);
+    const { commentReplies } = inboxResult.data;
 
     if (commentReplies.length === 0) {
       return res
@@ -169,32 +63,17 @@ export const checkNewComments = async (req: Request, res: Response) => {
     }
 
     // PHASE 3: IDENTIFY NEW COMMENTS
-    const discoveredRedditIds = commentReplies.map((msg) => `t1_${msg.data.id}`);
+    const filterResult = await filterNewComments(
+      supabase,
+      userInfo.auth_user_id,
+      commentReplies
+    );
 
-    const { data: existingInteractions, error: interactionsError } =
-      await supabase
-        .from("reddit_user_interactions")
-        .select("discovered_reddit_id")
-        .eq("user_id", userInfo.auth_user_id)
-        .in("discovered_reddit_id", discoveredRedditIds);
-
-    if (interactionsError) {
-      console.error(
-        "❌ Error fetching existing interactions:",
-        interactionsError
-      );
-      return res.status(500).json({ error: "Database error" });
+    if (!filterResult.success || !filterResult.data) {
+      return res.status(500).json({ error: filterResult.error });
     }
 
-    const existingDiscoveredIds = new Set(
-      existingInteractions?.map((i) => i.discovered_reddit_id) || []
-    );
-
-    const newComments = commentReplies.filter(
-      (msg) => !existingDiscoveredIds.has(`t1_${msg.data.id}`)
-    );
-
-    console.log(`✨ Found ${newComments.length} new comments to process`);
+    const { newComments } = filterResult.data;
 
     if (newComments.length === 0) {
       return res
@@ -203,272 +82,56 @@ export const checkNewComments = async (req: Request, res: Response) => {
     }
 
     // PHASE 4: FETCH CONTEXT FOR EACH NEW COMMENT WITH RATE LIMITING
-    console.log("🔍 Fetching conversation contexts...");
-
-    const contextTasks = newComments.map((comment) =>
-      redditLimiter.schedule(async () => {
-        try {
-          const contextUrl = `https://oauth.reddit.com${comment.data.context}`;
-          const contextResponse = await fetch(contextUrl, {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              "User-Agent": `Reddinbox/1.0 (by /u/${redditAccount.name})`,
-            },
-          });
-
-          if (!contextResponse.ok) {
-            console.error(
-              `❌ Failed to fetch context for comment ${comment.data.id}`
-            );
-            return null;
-          }
-
-          const contextData =
-            (await contextResponse.json()) as ContextResponse[];
-          return {
-            comment,
-            context: contextData,
-          };
-        } catch (error) {
-          console.error(
-            `❌ Error fetching context for comment ${comment.data.id}:`,
-            error
-          );
-          return null;
-        }
-      })
+    const contextResult = await fetchCommentContexts(
+      newComments,
+      accessToken,
+      redditAccount.name,
+      redditLimiter
     );
 
-    const contextResults = await Promise.all(contextTasks);
-    const validContexts = contextResults.filter((r) => r !== null);
-
-    console.log(`✅ Successfully fetched ${validContexts.length} contexts`);
-
-    // PHASE 5: GENERATE AI REPLIES FOR EACH CONTEXT IN PARALLEL
-    console.log("🤖 Generating AI replies...");
-
-    // BUILD CONVERSATION THREAD XML HELPER
-    const userFullName = `t2_${redditAccount.id}`;
-    const buildThreadXML = (comments: any[], depth = 0): string => {
-      let xml = "";
-      for (const commentNode of comments) {
-        if (commentNode.kind !== "t1") continue;
-
-        const commentData = commentNode.data;
-        const isYou = commentData.author_fullname === userFullName;
-        const author = isYou ? "you" : commentData.author;
-
-        xml += `    <comment author="${author}" depth="${depth}">\n      ${commentData.body}\n    </comment>\n\n`;
-
-        // RECURSIVELY PROCESS REPLIES
-        if (commentData.replies && typeof commentData.replies === "object") {
-          const nestedComments = commentData.replies.data?.children || [];
-          xml += buildThreadXML(nestedComments, depth + 1);
-        }
-      }
-      return xml;
-    };
-
-    // GENERATE ALL AI REPLIES IN PARALLEL
-    const aiPromises = validContexts.map(async (item) => {
-      const { comment, context } = item;
-
-      // PARSE CONTEXT RESPONSE
-      const originalPostListing = context[0];
-      const threadListing = context[1];
-
-      if (!originalPostListing || !threadListing) {
-        console.error(
-          `❌ Invalid context structure for comment ${comment.data.id}`
-        );
-        return null;
-      }
-
-      const originalPost = originalPostListing.data.children[0]?.data;
-      if (!originalPost) {
-        console.error(
-          `❌ No original post found for comment ${comment.data.id}`
-        );
-        return null;
-      }
-
-      const threadComments = threadListing.data.children || [];
-
-      // CHECK IF THE LATEST COMMENT IN THE THREAD IS FROM THE USER
-      const latestComment = threadComments[threadComments.length - 1];
-
-      if (latestComment?.kind === "t1" && latestComment.data?.author_fullname === userFullName) {
-        console.log(
-          `⏭️ Skipping comment ${comment.data.id}: latest comment is from user`
-        );
-        return null;
-      }
-
-      const conversationThreadXML = buildThreadXML(threadComments);
-
-      const conversationContext = `<conversation_context>
-  <original_post>
-    <title>${originalPost.title || ""}</title>
-    <body>${originalPost.selftext || ""}</body>
-  </original_post>
-
-  <conversation_thread>
-${conversationThreadXML}  </conversation_thread>
-</conversation_context>`;
-
-      // GET SUBREDDIT AUDIENCE PROMPT
-      const { data: subreddit } = await supabase
-        .from("reddit_subreddits")
-        .select("audience_ai_prompt, display_name_prefixed")
-        .eq("display_name_prefixed", `r/${comment.data.subreddit}`)
-        .single();
-
-      const prompt = redditGenerateCommentPrompt({
-        userName: userInfo.name,
-        userProductName: activeWebsite.name,
-        userProductDescription: activeWebsite.description || "",
-        userProductKeywords: activeWebsite.keywords || [],
-        subreddit: {
-          display_name_prefixed:
-            subreddit?.display_name_prefixed || `r/${comment.data.subreddit}`,
-          audience_ai_prompt: subreddit?.audience_ai_prompt || "",
-        },
-      });
-
-      // GENERATE REPLY WITH OPENAI
-      const response = await openai.chat.completions.create({
-        model: "gpt-5-mini",
-        reasoning_effort: "medium",
-        messages: [
-          {
-            role: "developer",
-            content: prompt,
-          },
-          {
-            role: "user",
-            content: conversationContext,
-          },
-        ],
-        store: true,
-      });
-
-      const generatedReply = response.choices[0]?.message?.content;
-      if (!generatedReply) {
-        console.error(`❌ No reply generated for comment ${comment.data.id}`);
-        return null;
-      }
-
-      const processedReply = cleanUpGeneratedComment(generatedReply);
-
-      return {
-        comment,
-        originalPost,
-        processedReply,
-      };
-    });
-
-    const aiResults = await Promise.all(aiPromises);
-    const validResults = aiResults.filter((r) => r !== null);
-
-    console.log(`✅ Generated ${validResults.length} AI replies`);
-
-    // PHASE 6: BUILD THREAD CONTEXT AND INSERT INTERACTIONS
-    const buildThreadContext = (
-      originalPost: any,
-      threadComments: any[]
-    ): any => {
-      const buildRepliesTree = (comments: any[]): any[] => {
-        return comments.map((commentNode) => {
-          if (commentNode.kind !== "t1") return null;
-
-          const commentData = commentNode.data;
-          const comment: any = {
-            id: commentData.name,
-            author: commentData.author,
-            content: commentData.body,
-            date: new Date(commentData.created_utc * 1000)
-              .toISOString()
-              .split("T")[0],
-            replies: [],
-          };
-
-          // RECURSIVELY PROCESS REPLIES
-          if (
-            commentData.replies &&
-            typeof commentData.replies === "object" &&
-            commentData.replies.data?.children
-          ) {
-            const nestedReplies = buildRepliesTree(
-              commentData.replies.data.children
-            );
-            comment.replies = nestedReplies.filter((r) => r !== null);
-          }
-
-          return comment;
-        });
-      };
-
-      const comments = buildRepliesTree(threadComments).filter(
-        (c) => c !== null
-      );
-
-      return {
-        original_post: {
-          id: originalPost.name,
-          author: originalPost.author,
-          title: originalPost.title || "",
-          content: originalPost.selftext || "",
-        },
-        comments,
-      };
-    };
-
-    const interactionsToInsert = validResults.map((result) => {
-      // FETCH CONTEXT DATA FROM AI RESULTS TO BUILD THREAD CONTEXT
-      const contextItem = validContexts.find(
-        (ctx) => ctx.comment.data.id === result.comment.data.id
-      );
-
-      let threadContext = null;
-      if (contextItem) {
-        const threadListing = contextItem.context[1];
-        const threadComments = threadListing?.data?.children || [];
-        threadContext = buildThreadContext(result.originalPost, threadComments);
-      }
-
-      return {
-        user_id: userInfo.auth_user_id,
-        website_id: activeWebsite.id,
-        interaction_type: "comment_reply",
-        original_reddit_parent_id: result.originalPost.name, // t3_xxxxx format
-        interacted_with_reddit_username: result.comment.data.author,
-        our_interaction_content: result.processedReply,
-        our_interaction_reddit_id: null,
-        reddit_content_discovered_id: null,
-        reddit_account_id: redditAccountId,
-        status: "new",
-        thread_context: threadContext,
-        discovered_reddit_id: `t1_${result.comment.data.id}`, // t1_xxxxx format
-      };
-    });
-
-    const { data: newInteractions, error: insertError } = await supabase
-      .from("reddit_user_interactions")
-      .insert(interactionsToInsert)
-      .select();
-
-    if (insertError) {
-      console.error(`❌ Error inserting interactions:`, insertError);
-      return res.status(500).json({ error: "Failed to save interactions" });
+    if (!contextResult.success || !contextResult.data) {
+      return res.status(500).json({ error: "Failed to fetch contexts" });
     }
 
-    console.log(
-      `🎉 Successfully created ${newInteractions?.length || 0} new interactions`
-    );
+    const { validContexts } = contextResult.data;
+
+    // PHASE 5: GENERATE AI REPLIES FOR EACH CONTEXT IN PARALLEL
+    const userFullName = `t2_${redditAccount.id}`;
+    const aiResult = await generateAIReplies({
+      validContexts,
+      supabase,
+      redditAccountId,
+      userFullName,
+      userInfo,
+      activeWebsite,
+      openai,
+    });
+
+    if (!aiResult.success || !aiResult.data) {
+      return res.status(500).json({ error: "Failed to generate AI replies" });
+    }
+
+    const { validResults } = aiResult.data;
+
+    // PHASE 6: BUILD THREAD CONTEXT AND INSERT INTERACTIONS
+    const saveResult = await saveInteractions({
+      validResults,
+      validContexts,
+      userId: userInfo.auth_user_id,
+      websiteId: activeWebsite.id,
+      redditAccountId,
+      supabase,
+    });
+
+    if (!saveResult.success || !saveResult.data) {
+      return res.status(500).json({ error: saveResult.error });
+    }
+
+    const { newInteractions } = saveResult.data;
 
     return res.status(200).json({
-      newInteractionsCount: newInteractions?.length || 0,
-      interactions: newInteractions || [],
+      newInteractionsCount: newInteractions.length,
+      interactions: newInteractions,
     });
   } catch (error) {
     console.error("❌ Unexpected error in checkNewComments:", error);

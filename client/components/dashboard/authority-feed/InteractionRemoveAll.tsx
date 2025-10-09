@@ -29,12 +29,12 @@ export default function InteractionRemoveAll({
       interaction.interaction_type === interactionType
   );
 
-  const handleIgnoreAll = async () => {
+  const handleSkipAll = async () => {
     if (newPosts.length === 0) return;
 
     setIsIgnoring(true);
     try {
-      const response = await fetch("/api/reddit/comments/ignore-comments", {
+      const response = await fetch("/api/reddit/comments/skip-comments", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -45,7 +45,7 @@ export default function InteractionRemoveAll({
       });
 
       if (!response.ok) {
-        throw new Error("Failed to ignore comments");
+        throw new Error("Failed to skip comments");
       }
 
       // Update local state
@@ -57,7 +57,7 @@ export default function InteractionRemoveAll({
       setRedditUserInteractions(updatedInteractions);
       setShowDialog(false);
     } catch (error) {
-      console.error("Error ignoring comments:", error);
+      console.error("Error skipping comments:", error);
       // You could add a toast notification here for better UX
     } finally {
       setIsIgnoring(false);
@@ -98,8 +98,8 @@ export default function InteractionRemoveAll({
           >
             <IconTrash className="size-4" />
             {isIgnoring
-              ? "Ignoring..."
-              : `Ignore remaining ${newPosts.length} ${
+              ? "Skipping..."
+              : `Skip remaining ${newPosts.length} ${
                   newPosts.length === 1 ? "post" : "posts"
                 }`}
           </Button>
@@ -118,9 +118,9 @@ export default function InteractionRemoveAll({
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Ignore Remaining Posts?</DialogTitle>
+            <DialogTitle>Skip Remaining Posts?</DialogTitle>
             <DialogDescription>
-              Are you sure you want to ignore all {newPosts.length} remaining{" "}
+              Are you sure you want to skip all {newPosts.length} remaining{" "}
               {newPosts.length === 1 ? "post" : "posts"}? This action cannot be
               undone and these posts will no longer appear in your feed.
             </DialogDescription>
@@ -135,10 +135,10 @@ export default function InteractionRemoveAll({
             </Button>
             <Button
               variant="destructive"
-              onClick={handleIgnoreAll}
+              onClick={handleSkipAll}
               disabled={isIgnoring}
             >
-              {isIgnoring ? "Ignoring..." : "Confirm Ignore"}
+              {isIgnoring ? "Skipping..." : "Confirm Skip"}
             </Button>
           </DialogFooter>
         </DialogContent>

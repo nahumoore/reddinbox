@@ -1,6 +1,5 @@
 "use client";
 
-import { useRedditAccounts } from "@/stores/reddit-accounts";
 import { useRedditUserInteractions } from "@/stores/reddit-user-interactions";
 import { FileText, Mail, MessageSquare } from "lucide-react";
 import { useMemo } from "react";
@@ -19,13 +18,15 @@ const getInteractionIcon = (type: string) => {
 };
 
 export default function ActivityRedditProfile() {
-  const { activeRedditAccount } = useRedditAccounts();
   const { redditUserInteractions } = useRedditUserInteractions();
 
   const filteredInteractions = useMemo(() => {
-    return redditUserInteractions.filter(
-      (interaction) =>
-        interaction.status !== "ignored" && interaction.status !== "new"
+    return (
+      redditUserInteractions &&
+      redditUserInteractions.filter(
+        (interaction) =>
+          interaction.status !== "ignored" && interaction.status !== "new"
+      )
     );
   }, [redditUserInteractions]);
 
@@ -39,7 +40,7 @@ export default function ActivityRedditProfile() {
           </h3>
           <p className="text-sm text-gray-600">
             Start engaging on Reddit by posting comments or replying to users.
-            We'll automatically track your interactions here.
+            We&apos;ll automatically track your interactions here.
           </p>
         </div>
       </div>

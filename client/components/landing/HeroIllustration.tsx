@@ -112,8 +112,8 @@ export default function HeroIllustration() {
                 <p className="text-sm text-foreground leading-relaxed ml-[40px]">
                   tbh I hit my first 1k by doubling down on 3 repeatable plays:
                   niche communities, targeted 1:1 outreach, and turning customer
-                  wins into content and referrals! I've been working on this
-                  exact problem building{" "}
+                  wins into content and referrals! I&apos;ve been working on
+                  this exact problem building{" "}
                   <Highlighter color="#ff5700" action="underline">
                     Reddinbox
                   </Highlighter>
@@ -187,8 +187,8 @@ export default function HeroIllustration() {
 
               {/* Description */}
               <p className="text-sm text-foreground leading-relaxed">
-                The best marketing is the one that doesn't look like marketing
-                ✨
+                The best marketing is the one that doesn&apos;t look like
+                marketing ✨
               </p>
 
               {/* Product Link */}

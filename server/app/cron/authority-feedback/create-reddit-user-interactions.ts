@@ -1,34 +1,16 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import Bottleneck from "bottleneck";
-import OpenAI from "openai";
-import { redditGenerateCommentPrompt } from "../../defs/ai/reddit-generate-comment";
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+import { checkExistingInteraction } from "../../methods/create-reddit-user-interactions/check-existing-interaction";
+import { createInteractionRecord } from "../../methods/create-reddit-user-interactions/create-interaction-record";
+import { fetchActiveUsers } from "../../methods/create-reddit-user-interactions/fetch-active-users";
+import { fetchSubreddits } from "../../methods/create-reddit-user-interactions/fetch-subreddits";
+import { findRelevantPosts } from "../../methods/create-reddit-user-interactions/find-relevant-posts";
+import { generateComment } from "../../methods/create-reddit-user-interactions/generate-comment";
 
 // SETUP RATE LIMITER FOR OPENAI CALLS - 200 CONCURRENT REQUESTS
-const openaiLimiter = new Bottleneck({
+export const openaiLimiter = new Bottleneck({
   maxConcurrent: 200,
 });
-
-// HELPER FUNCTION TO PROCESS GENERATED COMMENTS
-function cleanUpGeneratedComment(content: string): string {
-  // REPLACE EM-DASHES WITH COMMA AND SPACE
-  let cleaned = content.replace(/—/g, ", ");
-
-  // REPLACE SPACED HYPHENS WITH COMMA AND SPACE
-  cleaned = cleaned.replace(/\s+-\s+/g, ", ");
-
-  // CLEAN UP MULTIPLE CONSECUTIVE SPACES BUT PRESERVE NEWLINES
-  cleaned = cleaned.replace(/[ \t]+/g, " ");
-
-  // CLEAN UP COMMA FOLLOWED BY MULTIPLE SPACES
-  cleaned = cleaned.replace(/,\s+/g, ", ");
-
-  // REMOVE LEADING AND TRAILING WHITESPACE
-  return cleaned;
-}
 
 export const createRedditUserInteractionsJob = async ({
   supabase,
@@ -39,35 +21,9 @@ export const createRedditUserInteractionsJob = async ({
 
   try {
     // QUERY ACTIVE USERS WITH THEIR WEBSITES AND REDDIT ACCOUNTS
-    const { data: activeUsers, error: usersError } = await supabase
-      .from("user_info")
-      .select(
-        `
-        auth_user_id,
-        name,
-        websites!inner (
-          id,
-          name,
-          description,
-          keywords,
-          subreddit_reddit_ids,
-          authority_feed_options
-        ),
-        reddit_accounts!inner (
-          id,
-          name
-        )
-      `
-      )
-      .in("subscription_status", ["active", "free-trial"])
-      .eq("websites.is_active", true);
+    const activeUsers = await fetchActiveUsers(supabase);
 
-    if (usersError) {
-      console.error("❌ Error fetching active users:", usersError);
-      throw usersError;
-    }
-
-    if (!activeUsers || activeUsers.length === 0) {
+    if (activeUsers.length === 0) {
       console.log("ℹ️ No active users with websites and Reddit accounts found");
       return { success: true, message: "No active users to process" };
     }
@@ -130,47 +86,57 @@ export const createRedditUserInteractionsJob = async ({
           );
 
           // GET SUBREDDIT DATA FOR AI PROMPTS
-          const { data: subreddits, error: subredditsError } = await supabase
-            .from("reddit_subreddits")
-            .select("id, display_name_prefixed, audience_ai_prompt")
-            .in("id", website.subreddit_reddit_ids);
-
-          if (subredditsError) {
+          let subreddits;
+          try {
+            subreddits = await fetchSubreddits(
+              supabase,
+              website.subreddit_reddit_ids
+            );
+          } catch (subredditsError) {
             console.error(
               `❌ Error fetching subreddits for website ${website.name}:`,
               subredditsError
             );
-            errors.push(`Website ${website.name}: ${subredditsError.message}`);
+            errors.push(
+              `Website ${website.name}: ${
+                subredditsError instanceof Error
+                  ? subredditsError.message
+                  : "Unknown error"
+              }`
+            );
             continue;
           }
 
-          if (!subreddits || subreddits.length === 0) {
+          if (subreddits.length === 0) {
             console.log(
               `⏭️ No matching subreddits found for website ${website.name}`
             );
             continue;
           }
 
-          // USE RPC FUNCTION TO FIND RELEVANT REDDIT CONTENT WITH SIMILARITY THRESHOLD 4.5
-          const { data: relevantPosts, error: rpcError } = await supabase.rpc(
-            "find_relevant_reddit_content",
-            {
-              p_website_id: website.id,
-              p_acceptance_score: 0.45,
-              p_limit: postsPerHour,
-            }
-          );
-
-          if (rpcError) {
+          // FIND RELEVANT REDDIT POSTS (WITH FILTERING BY CATEGORY)
+          let filteredPosts;
+          try {
+            filteredPosts = await findRelevantPosts(
+              supabase,
+              website.id,
+              postsPerHour,
+              postCategoriesActive
+            );
+          } catch (rpcError) {
             console.error(
               `❌ Error finding relevant content for website ${website.name}:`,
               rpcError
             );
-            errors.push(`Website ${website.name}: ${rpcError.message}`);
+            errors.push(
+              `Website ${website.name}: ${
+                rpcError instanceof Error ? rpcError.message : "Unknown error"
+              }`
+            );
             continue;
           }
 
-          if (!relevantPosts || relevantPosts.length === 0) {
+          if (filteredPosts.length === 0) {
             console.log(
               `ℹ️ No relevant posts found for website ${website.name}`
             );
@@ -178,55 +144,8 @@ export const createRedditUserInteractionsJob = async ({
           }
 
           console.log(
-            `🎯 Found ${relevantPosts.length} relevant posts for website ${website.name} (similarity >= 4.5)`
+            `🎯 Found ${filteredPosts.length} relevant posts for website ${website.name}`
           );
-
-          // FILTER POSTS BY CONTENT CATEGORY IF CATEGORIES ARE SPECIFIED
-          let filteredPosts = relevantPosts;
-          if (postCategoriesActive.length > 0) {
-            // FETCH FULL CONTENT DETAILS TO GET CONTENT_CATEGORY
-            const { data: contentDetails, error: contentError } = await supabase
-              .from("reddit_content_discovered")
-              .select("id, content_category")
-              .in(
-                "id",
-                relevantPosts.map((p: { id: string }) => p.id)
-              );
-
-            if (contentError) {
-              console.error(
-                `❌ Error fetching content categories for website ${website.name}:`,
-                contentError
-              );
-              errors.push(`Website ${website.name}: ${contentError.message}`);
-              continue;
-            }
-
-            if (contentDetails) {
-              const allowedPostIds = contentDetails
-                .filter(
-                  (c) =>
-                    c.content_category &&
-                    postCategoriesActive.includes(c.content_category)
-                )
-                .map((c) => c.id);
-
-              filteredPosts = relevantPosts.filter((p: { id: string }) =>
-                allowedPostIds.includes(p.id)
-              );
-
-              console.log(
-                `🔍 Filtered to ${filteredPosts.length}/${relevantPosts.length} posts matching active categories`
-              );
-            }
-          }
-
-          if (filteredPosts.length === 0) {
-            console.log(
-              `ℹ️ No posts match the active categories for website ${website.name}`
-            );
-            continue;
-          }
 
           // UPDATE GLOBAL TRACKING VARIABLES
           totalPostsAnalyzed += filteredPosts.length;
@@ -242,14 +161,13 @@ export const createRedditUserInteractionsJob = async ({
             );
 
             // CHECK IF USER ALREADY INTERACTED WITH THIS POST
-            const { data: existingInteraction } = await supabase
-              .from("reddit_user_interactions")
-              .select("id")
-              .eq("user_id", user.auth_user_id)
-              .eq("original_reddit_parent_id", post.reddit_id)
-              .single();
+            const alreadyInteracted = await checkExistingInteraction(
+              supabase,
+              user.auth_user_id,
+              post.reddit_id
+            );
 
-            if (existingInteraction) {
+            if (alreadyInteracted) {
               console.log(
                 `⏭️ User already interacted with post ${post.reddit_id}, skipping...`
               );
@@ -259,7 +177,7 @@ export const createRedditUserInteractionsJob = async ({
             // CREATE COMMENT GENERATION TASK
             const task = openaiLimiter.schedule(async () => {
               try {
-                const prompt = redditGenerateCommentPrompt({
+                const processedComment = await generateComment({
                   userName: user.name || redditUsername,
                   userProductName: website.name,
                   userProductDescription: website.description || "",
@@ -269,59 +187,28 @@ export const createRedditUserInteractionsJob = async ({
                       subreddit?.display_name_prefixed || "",
                     audience_ai_prompt: subreddit?.audience_ai_prompt || "",
                   },
+                  postTitle: post.title,
+                  postContent: post.content,
                 });
 
-                const response = await openai.chat.completions.create({
-                  model: "gpt-5-mini",
-                  reasoning_effort: "medium",
-                  messages: [
-                    {
-                      role: "developer",
-                      content: prompt,
-                    },
-                    {
-                      role: "user",
-                      content: `<post_title>${post.title}</post_title>\n\n<post_content>${post.content}</post_content>`,
-                    },
-                  ],
-                  store: true,
-                });
-
-                const generatedComment = response.choices[0]?.message?.content;
-                if (!generatedComment) {
+                if (!processedComment) {
                   console.error(
                     `❌ No comment generated for post ${post.reddit_id}`
                   );
                   return null;
                 }
 
-                // PROCESS GENERATED COMMENT
-                const processedComment =
-                  cleanUpGeneratedComment(generatedComment);
-
                 // INSERT INTERACTION INTO DATABASE
-                const { error: insertError } = await supabase
-                  .from("reddit_user_interactions")
-                  .insert({
-                    user_id: user.auth_user_id,
-                    website_id: website.id,
-                    interaction_type: "post_reply",
-                    original_reddit_parent_id: post.reddit_id,
-                    interacted_with_reddit_username: post.author,
-                    our_interaction_content: processedComment,
-                    our_interaction_reddit_id: null,
-                    reddit_content_discovered_id: post.id,
-                    reddit_account_id: redditAccountId,
-                    status: "new",
-                  });
+                await createInteractionRecord(supabase, {
+                  userId: user.auth_user_id,
+                  websiteId: website.id,
+                  originalRedditParentId: `t3_${post.reddit_id}`,
+                  interactedWithRedditUsername: post.author,
+                  ourInteractionContent: processedComment,
+                  redditContentDiscoveredId: post.id,
+                  redditAccountId: redditAccountId,
+                });
 
-                if (insertError) {
-                  console.error(
-                    `❌ Error inserting interaction for post ${post.reddit_id}:`,
-                    insertError
-                  );
-                  return null;
-                }
                 return { success: true, postId: post.reddit_id };
               } catch (error) {
                 console.error(

@@ -16,6 +16,7 @@ import {
   IconHeartHandshake,
   IconUser,
   IconUsersGroup,
+  IconUserUp,
 } from "@tabler/icons-react";
 import { BrandReddinbox } from "../icons/BrandReddinbox";
 import { NavFooter } from "./nav-footer";
@@ -28,8 +29,13 @@ const data = {
       items: [
         {
           title: "Authority Feed",
-          icon: IconUsersGroup,
+          icon: IconUserUp,
           url: "/dashboard/authority-feed",
+        },
+        {
+          title: "Tracking Subreddits",
+          icon: IconUsersGroup,
+          url: "/dashboard/tracking-subreddits",
         },
         {
           title: "Relationship Pipeline",
