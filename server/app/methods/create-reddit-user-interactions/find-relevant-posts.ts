@@ -7,6 +7,7 @@ export interface RelevantPost {
   title: string;
   content: string;
   author: string;
+  similarity_score: number;
 }
 
 export async function findRelevantPosts(

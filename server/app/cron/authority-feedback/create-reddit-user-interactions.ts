@@ -3,7 +3,6 @@ import Bottleneck from "bottleneck";
 import { checkExistingInteraction } from "../../methods/create-reddit-user-interactions/check-existing-interaction";
 import { createInteractionRecord } from "../../methods/create-reddit-user-interactions/create-interaction-record";
 import { fetchActiveUsers } from "../../methods/create-reddit-user-interactions/fetch-active-users";
-import { fetchSubreddits } from "../../methods/create-reddit-user-interactions/fetch-subreddits";
 import { findRelevantPosts } from "../../methods/create-reddit-user-interactions/find-relevant-posts";
 import { generateComment } from "../../methods/create-reddit-user-interactions/generate-comment";
 
@@ -30,6 +29,22 @@ export const createRedditUserInteractionsJob = async ({
 
     console.log(`📋 Found ${activeUsers.length} active users to process`);
 
+    // FETCH NEW INTERACTION COUNTS FOR ALL USERS IN ONE QUERY
+    const userIds = activeUsers.map((u) => u.auth_user_id);
+    const { data: interactionCounts } = await supabase
+      .from("reddit_user_interactions")
+      .select("user_id")
+      .in("user_id", userIds)
+      .eq("status", "new");
+
+    const newInteractionCountMap = new Map<string, number>();
+    if (interactionCounts) {
+      for (const interaction of interactionCounts) {
+        const currentCount = newInteractionCountMap.get(interaction.user_id) || 0;
+        newInteractionCountMap.set(interaction.user_id, currentCount + 1);
+      }
+    }
+
     let totalCommentsGenerated = 0;
     let totalInteractionsCreated = 0;
     let totalPostsAnalyzed = 0;
@@ -39,6 +54,15 @@ export const createRedditUserInteractionsJob = async ({
     // PROCESS EACH ACTIVE USER
     for (const user of activeUsers) {
       try {
+        // CHECK IF USER ALREADY HAS 30+ NEW INTERACTIONS
+        const newCount = newInteractionCountMap.get(user.auth_user_id) || 0;
+        if (newCount >= 30) {
+          console.log(
+            `⏭️ User ${user.auth_user_id} already has ${newCount} new interactions, skipping...`
+          );
+          continue;
+        }
+
         const websites = Array.isArray(user.websites)
           ? user.websites
           : [user.websites];
@@ -57,20 +81,6 @@ export const createRedditUserInteractionsJob = async ({
         const redditAccountId = redditAccounts[0].id;
 
         for (const website of websites) {
-          if (
-            !website.subreddit_reddit_ids ||
-            website.subreddit_reddit_ids.length === 0
-          ) {
-            console.log(
-              `⏭️ Website ${website.name} has no target subreddits, skipping...`
-            );
-            continue;
-          }
-
-          console.log(
-            `📡 Processing website ${website.name} with ${website.subreddit_reddit_ids.length} target subreddits...`
-          );
-
           // EXTRACT AUTHORITY FEED OPTIONS
           const authorityFeedOptions = website.authority_feed_options as {
             posts_per_hour?: number;
@@ -84,35 +94,6 @@ export const createRedditUserInteractionsJob = async ({
           console.log(
             `⚙️ Authority feed settings: ${postsPerHour} posts/hour, ${postCategoriesActive.length} active categories`
           );
-
-          // GET SUBREDDIT DATA FOR AI PROMPTS
-          let subreddits;
-          try {
-            subreddits = await fetchSubreddits(
-              supabase,
-              website.subreddit_reddit_ids
-            );
-          } catch (subredditsError) {
-            console.error(
-              `❌ Error fetching subreddits for website ${website.name}:`,
-              subredditsError
-            );
-            errors.push(
-              `Website ${website.name}: ${
-                subredditsError instanceof Error
-                  ? subredditsError.message
-                  : "Unknown error"
-              }`
-            );
-            continue;
-          }
-
-          if (subreddits.length === 0) {
-            console.log(
-              `⏭️ No matching subreddits found for website ${website.name}`
-            );
-            continue;
-          }
 
           // FIND RELEVANT REDDIT POSTS (WITH FILTERING BY CATEGORY)
           let filteredPosts;
@@ -155,11 +136,6 @@ export const createRedditUserInteractionsJob = async ({
           const commentTasks = [];
 
           for (const post of filteredPosts) {
-            // FIND MATCHING SUBREDDIT FOR AI PROMPT
-            const subreddit = subreddits.find(
-              (s) => s.id === post.subreddit_id
-            );
-
             // CHECK IF USER ALREADY INTERACTED WITH THIS POST
             const alreadyInteracted = await checkExistingInteraction(
               supabase,
@@ -182,11 +158,6 @@ export const createRedditUserInteractionsJob = async ({
                   userProductName: website.name,
                   userProductDescription: website.description || "",
                   userProductKeywords: website.keywords || [],
-                  subreddit: {
-                    display_name_prefixed:
-                      subreddit?.display_name_prefixed || "",
-                    audience_ai_prompt: subreddit?.audience_ai_prompt || "",
-                  },
                   postTitle: post.title,
                   postContent: post.content,
                 });
@@ -202,11 +173,12 @@ export const createRedditUserInteractionsJob = async ({
                 await createInteractionRecord(supabase, {
                   userId: user.auth_user_id,
                   websiteId: website.id,
-                  originalRedditParentId: `t3_${post.reddit_id}`,
+                  originalRedditParentId: post.reddit_id,
                   interactedWithRedditUsername: post.author,
                   ourInteractionContent: processedComment,
                   redditContentDiscoveredId: post.id,
                   redditAccountId: redditAccountId,
+                  similarityScore: post.similarity_score,
                 });
 
                 return { success: true, postId: post.reddit_id };

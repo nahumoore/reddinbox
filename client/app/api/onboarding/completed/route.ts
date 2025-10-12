@@ -25,5 +25,25 @@ export const POST = async (req: NextRequest) => {
     return NextResponse.json({ error: userInfoError.message }, { status: 500 });
   }
 
+  // GENERATE FIRST INTERACTIONS
+  try {
+    fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/reddit/generate-first-interactions`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.SERVER_API_KEY}`,
+        },
+        body: JSON.stringify({ userId: user.id }),
+      }
+    );
+
+    // ADD ONE SECOND DELAY
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  } catch (error) {
+    console.error("Failed to generate first interactions:", error);
+  }
+
   return NextResponse.json({ message: "Onboarding completed" });
 };

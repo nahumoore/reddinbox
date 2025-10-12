@@ -36,4 +36,5 @@ Classify each Reddit post into ONE category that best describes its primary purp
 - For advice_seeking: state what they're deciding between
 - For problem_complaint: state what they're frustrated about
 - Keep it casual and scannable
+- Each comment it's different- never say 'same than above'.
 `;

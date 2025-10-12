@@ -56,7 +56,7 @@ export default function WelcomeStep() {
                 htmlFor="name-input"
                 className="block text-sm font-medium text-muted-foreground text-left"
               >
-                Before start, what should we call you?
+                Before start, how should we call you?
               </label>
               <Input
                 id="name-input"

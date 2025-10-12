@@ -42,12 +42,7 @@ export const POST = async (req: NextRequest) => {
       reddit_content_discovered_id,
       reddit_content_discovered(
         title,
-        content,
-        subreddit_id,
-        reddit_subreddits(
-          display_name_prefixed,
-          audience_ai_prompt
-        )
+        content
       ),
       websites(
         name,
@@ -80,19 +75,12 @@ export const POST = async (req: NextRequest) => {
   }
 
   const website = interaction.websites;
-  const subreddit = interaction.reddit_content_discovered.reddit_subreddits;
-
-  if (!subreddit) {
-    return NextResponse.json({ error: "Subreddit not found" }, { status: 404 });
-  }
 
   const prompt = redditGenerateCommentPrompt({
     userName: userName,
     userProductName: website.name,
     userProductDescription: website.description || "",
     userProductKeywords: website.keywords || [],
-    subredditName: subreddit.display_name_prefixed,
-    subredditAudiencePrompt: subreddit.audience_ai_prompt || "",
   });
 
   let response;

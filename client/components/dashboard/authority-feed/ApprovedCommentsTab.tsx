@@ -3,12 +3,12 @@
 import { InteractionPost } from "@/components/dashboard/authority-feed/InteractionPost";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useRedditAccounts } from "@/stores/reddit-accounts";
 import { useRedditUserInteractions } from "@/stores/reddit-user-interactions";
-import { useUserWebsites } from "@/stores/user-wesbites";
 import { IconCalendarCheck } from "@tabler/icons-react";
 
 export default function ApprovedCommentsTab() {
-  const { userActiveWebsite } = useUserWebsites();
+  const { activeRedditAccount } = useRedditAccounts();
   const { redditUserInteractions, isLoadingRedditUserInteractions } =
     useRedditUserInteractions();
   const approvedComments = redditUserInteractions.filter(

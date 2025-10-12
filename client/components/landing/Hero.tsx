@@ -35,7 +35,7 @@ export default function Hero() {
             Reddit Authority
             <IconBrandRedditNew className="size-8 -rotate-6 absolute -top-3 -left-2 text-primary" />
           </AuroraText>
-          .{" "}
+          ,{" "}
           <Highlighter action="underline" color="#ff5700">
             Get Customers
           </Highlighter>
@@ -44,7 +44,7 @@ export default function Hero() {
 
         <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed">
           Join the right conversations, provide real value, and let your ideal
-          customers come to you—never losing track of a single lead!
+          customers come to you with <b>authentic replies!</b>
         </p>
 
         <div className="flex flex-col gap-6 justify-center items-center mb-16">

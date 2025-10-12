@@ -34,7 +34,7 @@ interface Tab {
 const TABS: Tab[] = [
   {
     value: "activity",
-    label: "Activity",
+    label: "Latest Activity",
     icon: IconActivity,
   },
   {

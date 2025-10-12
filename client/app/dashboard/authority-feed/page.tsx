@@ -16,7 +16,7 @@ import {
 import Link from "next/link";
 import { useState } from "react";
 
-type TabValue = "new-posts" | "approved-comments" | "comment-replies";
+type TabValue = "new-posts" | "scheduled-comments" | "comment-replies";
 
 interface Tab {
   value: TabValue;
@@ -36,8 +36,8 @@ const TABS: Tab[] = [
     icon: IconMessage,
   },
   {
-    value: "approved-comments",
-    label: "Approved Comments",
+    value: "scheduled-comments",
+    label: "Scheduled Comments",
     icon: IconCheck,
   },
 ];
@@ -106,7 +106,7 @@ export default function LeadsPage() {
       <div>
         {activeTab === "new-posts" && <NewPostsTab />}
         {activeTab === "comment-replies" && <CommentsRepliesTab />}
-        {activeTab === "approved-comments" && <ApprovedCommentsTab />}
+        {activeTab === "scheduled-comments" && <ApprovedCommentsTab />}
       </div>
     </div>
   );

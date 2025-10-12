@@ -252,6 +252,7 @@ export type Database = {
           reddit_content_discovered_id: string | null
           retry_count: number | null
           scheduled_at: string | null
+          similarity_score: number | null
           status: Database["public"]["Enums"]["reddit_interaction_status"]
           thread_context: Json | null
           updated_at: string | null
@@ -272,6 +273,7 @@ export type Database = {
           reddit_content_discovered_id?: string | null
           retry_count?: number | null
           scheduled_at?: string | null
+          similarity_score?: number | null
           status?: Database["public"]["Enums"]["reddit_interaction_status"]
           thread_context?: Json | null
           updated_at?: string | null
@@ -292,6 +294,7 @@ export type Database = {
           reddit_content_discovered_id?: string | null
           retry_count?: number | null
           scheduled_at?: string | null
+          similarity_score?: number | null
           status?: Database["public"]["Enums"]["reddit_interaction_status"]
           thread_context?: Json | null
           updated_at?: string | null
@@ -464,15 +467,10 @@ export type Database = {
         Returns: unknown
       }
       find_relevant_reddit_content: {
-        Args: {
-          p_acceptance_score?: number
-          p_limit?: number
-          p_website_id: string
-        }
+        Args: { p_limit?: number; p_website_id: string }
         Returns: {
           author: string
           content: string
-          content_type: string
           downs: number
           id: string
           reddit_created_at: string

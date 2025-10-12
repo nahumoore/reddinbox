@@ -49,7 +49,7 @@ export default function ActivityRedditProfile() {
 
   return (
     <div className="space-y-4">
-      {filteredInteractions.map((interaction) => (
+      {filteredInteractions.slice(0, 3).map((interaction) => (
         <div
           key={interaction.id}
           className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"

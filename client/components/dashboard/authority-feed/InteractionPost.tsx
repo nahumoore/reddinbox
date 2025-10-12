@@ -75,13 +75,33 @@ export function InteractionPost({
                 </div>
               </div>
             </div>
-            <div>
+            <div className="flex gap-2 items-center">
               <Badge className="text-xs" variant="secondary">
                 {COMMENT_POST_CATEGORY[
                   interaction.reddit_content_discovered?.content_category ||
                     "other"
                 ] || "Other"}
               </Badge>
+              {interaction.similarity_score !== null &&
+               interaction.similarity_score !== undefined && (
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    "text-xs font-semibold",
+                    interaction.similarity_score >= 0.5
+                      ? "bg-green-100 text-green-800 border-green-300 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700"
+                      : interaction.similarity_score >= 0.45
+                      ? "bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700"
+                      : "bg-gray-100 text-gray-800 border-gray-300 dark:bg-gray-900/30 dark:text-gray-400 dark:border-gray-700"
+                  )}
+                >
+                  {interaction.similarity_score >= 0.5
+                    ? "Perfect Match"
+                    : interaction.similarity_score >= 0.45
+                    ? "Strong Match"
+                    : "Relevant"}
+                </Badge>
+              )}
             </div>
           </div>
           <div className="flex gap-2 items-center">

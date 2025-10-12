@@ -3,33 +3,39 @@ import { SupabaseClient } from "@supabase/supabase-js";
 export interface ActiveUser {
   auth_user_id: string;
   name: string | null;
-  websites: {
-    id: string;
-    name: string;
-    description: string | null;
-    keywords: string[] | null;
-    subreddit_reddit_ids: string[];
-    authority_feed_options: unknown;
-  } | {
-    id: string;
-    name: string;
-    description: string | null;
-    keywords: string[] | null;
-    subreddit_reddit_ids: string[];
-    authority_feed_options: unknown;
-  }[];
-  reddit_accounts: {
-    id: string;
-    name: string;
-    is_active: boolean;
-  } | {
-    id: string;
-    name: string;
-    is_active: boolean;
-  }[];
+  websites:
+    | {
+        id: string;
+        name: string;
+        description: string | null;
+        keywords: string[] | null;
+        subreddit_reddit_ids: string[];
+        authority_feed_options: unknown;
+      }
+    | {
+        id: string;
+        name: string;
+        description: string | null;
+        keywords: string[] | null;
+        subreddit_reddit_ids: string[];
+        authority_feed_options: unknown;
+      }[];
+  reddit_accounts:
+    | {
+        id: string;
+        name: string;
+        is_active: boolean;
+      }
+    | {
+        id: string;
+        name: string;
+        is_active: boolean;
+      }[];
 }
 
-export async function fetchActiveUsers(supabase: SupabaseClient): Promise<ActiveUser[]> {
+export async function fetchActiveUsers(
+  supabase: SupabaseClient
+): Promise<ActiveUser[]> {
   const { data: activeUsers, error: usersError } = await supabase
     .from("user_info")
     .select(
@@ -47,6 +53,7 @@ export async function fetchActiveUsers(supabase: SupabaseClient): Promise<Active
       reddit_accounts!inner (
         id,
         name,
+        reddit_id,
         is_active
       )
     `

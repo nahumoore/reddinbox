@@ -43,7 +43,7 @@ export default function SubredditSelector() {
     setIsSearching(true);
     setIsPopoverOpen(true);
     try {
-      const response = await fetch("/api/reddit/subreddit/search-subreddits", {
+      const response = await fetch("/api/reddit/subreddits/search-subreddits", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: query.trim() }),
@@ -137,11 +137,14 @@ export default function SubredditSelector() {
   };
 
   const formatSubscriberCount = (count: number) => {
+    if (!count) return "0";
+
     if (count >= 1000000) {
       return `${(count / 1000000).toFixed(1)}M`;
     } else if (count >= 1000) {
       return `${(count / 1000).toFixed(1)}K`;
     }
+
     return count.toString();
   };
 

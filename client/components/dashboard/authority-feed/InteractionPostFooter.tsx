@@ -7,9 +7,10 @@ import { useRedditAccounts } from "@/stores/reddit-accounts";
 import { useRedditUserInteractions } from "@/stores/reddit-user-interactions";
 import { useUserInfo } from "@/stores/user-info";
 import { RedditUserInteraction } from "@/types/db-schema";
-import { IconMessage, IconX } from "@tabler/icons-react";
+import { IconCheck, IconMessage, IconX } from "@tabler/icons-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import LessThan30DaysAccountAgeDialog from "./LessThan30DaysAccountAgeDialog";
 
 interface CommentSectionProps {
   interaction: RedditUserInteraction;
@@ -29,11 +30,25 @@ export function InteractionPostFooter({
     interaction.our_interaction_content?.replace(/\\n/g, "\n") || ""
   );
   const [isPosting, setIsPosting] = useState(false);
+  const [showWarningDialog, setShowWarningDialog] = useState(false);
 
   const userAvatar =
     activeRedditAccount?.icon_img || activeRedditAccount?.snoovatar_img;
 
-  const handleSubmit = async () => {
+  const isNewAccount = () => {
+    if (!activeRedditAccount) return false;
+
+    const accountAgeInDays = activeRedditAccount.created_utc
+      ? (Date.now() - activeRedditAccount.created_utc * 1000) /
+        (1000 * 60 * 60 * 24)
+      : Infinity;
+
+    const commentKarma = activeRedditAccount.comment_karma || 0;
+
+    return accountAgeInDays < 30 && commentKarma < 50;
+  };
+
+  const proceedWithSubmit = async () => {
     if (!comment.trim()) return;
 
     setIsPosting(true);
@@ -76,6 +91,16 @@ export function InteractionPostFooter({
       description:
         "We will post it in a few minutes to follow a human like pattern",
     });
+  };
+
+  const handleSubmit = () => {
+    if (!comment.trim()) return;
+
+    if (isNewAccount()) {
+      setShowWarningDialog(true);
+    } else {
+      proceedWithSubmit();
+    }
   };
 
   const handleSkip = async () => {
@@ -128,71 +153,128 @@ export function InteractionPostFooter({
     setComment(response.comment);
   };
 
+  const handleMarkAsReplied = async () => {
+    setIsPosting(true);
+
+    // Trigger animation
+    onRemove?.();
+
+    // Wait for animation before updating state
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Optimistic update
+    setRedditUserInteractions(
+      redditUserInteractions.map((item) =>
+        item.id === interaction.id ? { ...item, status: "posted" } : item
+      )
+    );
+
+    const response = await fetchMarkAsReplied({
+      interaction_id: interaction.id,
+    });
+    setIsPosting(false);
+
+    if (response.error) {
+      console.error("Error marking as replied:", response.error);
+      toast.error("Failed to mark as replied", {
+        description: response.error,
+      });
+      // Revert optimistic update
+      setRedditUserInteractions(
+        redditUserInteractions.map((item) =>
+          item.id === interaction.id ? { ...item, status: "new" } : item
+        )
+      );
+      return;
+    }
+
+    toast.success("Marked as replied");
+  };
+
   return (
-    <div className="pt-3">
-      <div className="flex gap-3 pl-8">
-        <Avatar className="size-8 mt-2 shrink-0">
-          <AvatarImage
-            src={userAvatar || ""}
-            alt={activeRedditAccount?.name || "User"}
-          />
-          <AvatarFallback className="text-xs font-medium bg-primary/10 text-primary">
-            ME
-          </AvatarFallback>
-        </Avatar>
-
-        <div className="flex-1 space-y-3">
-          <div className="text-sm text-muted-foreground">
-            Replying as{" "}
-            <span className="font-medium text-foreground">
-              u/{activeRedditAccount?.name || "user"}
-            </span>
-          </div>
-
-          <div className="relative flex items-stretch">
-            <Textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder={`Write a comment replying to u/${interaction.interacted_with_reddit_username}...`}
-              className="min-h-24 resize-none rounded-r-none border-r-0 pr-2 border border-muted bg-white"
-              disabled={isPosting}
+    <>
+      <LessThan30DaysAccountAgeDialog
+        open={showWarningDialog}
+        onOpenChange={setShowWarningDialog}
+        onProceed={proceedWithSubmit}
+        postUrl={interaction.reddit_content_discovered?.reddit_url || undefined}
+      />
+      <div className="pt-3">
+        <div className="flex gap-3 pl-8">
+          <Avatar className="size-8 mt-2 shrink-0">
+            <AvatarImage
+              src={userAvatar || ""}
+              alt={activeRedditAccount?.name || "User"}
             />
-            {/* <Button
-              onClick={handleGenerateComment}
-              variant="outline"
-              disabled={isPosting}
-              className="rounded-l-none border border-muted border-l-0 px-8 h-auto self-stretch bg-white"
-            >
-              <IconSparkles className="size-5 text-primary fill-primary" />
-            </Button> */}
-          </div>
+            <AvatarFallback className="text-xs font-medium bg-primary/10 text-primary">
+              ME
+            </AvatarFallback>
+          </Avatar>
 
-          <div className="flex items-center justify-between">
-            <div className="flex justify-between items-center w-full gap-2">
-              <Button
-                onClick={handleSkip}
-                variant="outline"
-                size="sm"
-                className="gap-2"
+          <div className="flex-1 space-y-3">
+            <div className="text-sm text-muted-foreground">
+              Replying as{" "}
+              <span className="font-medium text-foreground">
+                u/{activeRedditAccount?.name || "user"}
+              </span>
+            </div>
+
+            <div className="relative flex items-stretch">
+              <Textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder={`Write a comment replying to u/${interaction.interacted_with_reddit_username}...`}
+                className="min-h-24 resize-none rounded-r-none border-r-0 pr-2 border border-muted bg-white"
                 disabled={isPosting}
+              />
+              {/* <Button
+                onClick={handleGenerateComment}
+                variant="outline"
+                disabled={isPosting}
+                className="rounded-l-none border border-muted border-l-0 px-8 h-auto self-stretch bg-white"
               >
-                <IconX className="size-4" />
-                Skip
-              </Button>
-              <Button
-                onClick={handleSubmit}
-                disabled={!comment.trim() || isPosting}
-                size="sm"
-                className="gap-1"
-              >
-                <IconMessage className="size-3" />
-                Approve Comment
-              </Button>
+                <IconSparkles className="size-5 text-primary fill-primary" />
+              </Button> */}
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex justify-between items-center w-full gap-2">
+                <Button
+                  onClick={handleSkip}
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  disabled={isPosting}
+                >
+                  <IconX className="size-4" />
+                  Skip
+                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleMarkAsReplied}
+                    disabled={!comment.trim() || isPosting}
+                    size="sm"
+                    className="gap-1"
+                  >
+                    <IconCheck className="size-3" />
+                    Mark as Replied
+                  </Button>
+                  <Button
+                    onClick={handleSubmit}
+                    disabled={!comment.trim() || isPosting}
+                    size="sm"
+                    className="gap-1"
+                  >
+                    <IconMessage className="size-3" />
+                    Approve
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -261,6 +343,26 @@ const fetchGenerateComment = async ({
     console.error("Error generating comment:", error);
     return {
       error: "Failed to generate comment",
+    };
+  }
+};
+
+const fetchMarkAsReplied = async ({
+  interaction_id,
+}: {
+  interaction_id: string;
+}) => {
+  try {
+    const response = await fetch("/api/reddit/comments/mark-replied", {
+      method: "POST",
+      body: JSON.stringify({ interaction_id }),
+    });
+
+    return response.json();
+  } catch (error) {
+    console.error("Error marking as replied:", error);
+    return {
+      error: "Failed to mark as replied",
     };
   }
 };

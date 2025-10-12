@@ -8,6 +8,7 @@ export interface CreateInteractionParams {
   ourInteractionContent: string;
   redditContentDiscoveredId: string;
   redditAccountId: string;
+  similarityScore: number;
 }
 
 export async function createInteractionRecord(
@@ -22,6 +23,7 @@ export async function createInteractionRecord(
     ourInteractionContent,
     redditContentDiscoveredId,
     redditAccountId,
+    similarityScore,
   } = params;
 
   const { error: insertError } = await supabase
@@ -37,6 +39,7 @@ export async function createInteractionRecord(
       reddit_content_discovered_id: redditContentDiscoveredId,
       reddit_account_id: redditAccountId,
       status: "new",
+      similarity_score: similarityScore,
     });
 
   if (insertError) {

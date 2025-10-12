@@ -7,6 +7,7 @@ interface RedditAccountData {
   access_token: string;
   token_expires_at: string | null;
   user_id: string;
+  reddit_id: string;
   user_info: {
     auth_user_id: string;
     name: string;
@@ -55,6 +56,7 @@ export async function fetchRedditAccount(
       `
         id,
         name,
+        reddit_id,
         access_token,
         token_expires_at,
         user_id,
@@ -126,8 +128,17 @@ export async function fetchRedditAccount(
   return {
     success: true,
     data: {
-      redditAccount: redditAccount as RedditAccountData,
-      userInfo,
+      redditAccount: redditAccount as unknown as RedditAccountData,
+      userInfo: userInfo as unknown as {
+        auth_user_id: string;
+        name: string;
+        websites: {
+          id: string;
+          name: string;
+          description: string | null;
+          keywords: string[] | null;
+        };
+      },
       activeWebsite,
       accessToken,
     },

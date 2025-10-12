@@ -11,10 +11,6 @@ export interface GenerateCommentParams {
   userProductName: string;
   userProductDescription: string;
   userProductKeywords: string[];
-  subreddit: {
-    display_name_prefixed: string;
-    audience_ai_prompt: string;
-  };
   postTitle: string;
   postContent: string;
 }
@@ -27,7 +23,6 @@ export async function generateComment(
     userProductName,
     userProductDescription,
     userProductKeywords,
-    subreddit,
     postTitle,
     postContent,
   } = params;
@@ -37,7 +32,6 @@ export async function generateComment(
     userProductName,
     userProductDescription,
     userProductKeywords,
-    subreddit,
   });
 
   const response = await openai.chat.completions.create({

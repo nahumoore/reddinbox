@@ -1,15 +1,25 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { MarkdownContent } from "@/components/ui/markdown-content";
 import { Textarea } from "@/components/ui/textarea";
+import { COMMENT_POST_CATEGORY } from "@/defs/comments/comment-post-category";
 import { cn } from "@/lib/utils";
 import { useRedditAccounts } from "@/stores/reddit-accounts";
 import { useRedditUserInteractions } from "@/stores/reddit-user-interactions";
 import { RedditUserInteraction } from "@/types/db-schema";
-import { IconClock, IconMessage, IconX } from "@tabler/icons-react";
+import {
+  IconArrowDown,
+  IconArrowUp,
+  IconClock,
+  IconExternalLink,
+  IconMessage,
+  IconX,
+} from "@tabler/icons-react";
+import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -48,6 +58,7 @@ export default function ThreadComments({
     interaction.our_interaction_content || ""
   );
   const [isPosting, setIsPosting] = useState(false);
+  const [showFullContent, setShowFullContent] = useState(false);
   const threadContext = interaction.thread_context as ThreadContext | null;
 
   const handleSubmit = async () => {
@@ -148,11 +159,70 @@ export default function ThreadComments({
                 </AvatarFallback>
               </Avatar>
               <div>
-                <span className="font-medium text-sm">
-                  u/{original_post.author}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-sm">
+                    u/{original_post.author}
+                  </span>
+                </div>
+                {interaction.reddit_content_discovered?.subreddit
+                  .display_name_prefixed && (
+                  <div className="text-xs text-muted-foreground">
+                    {
+                      interaction.reddit_content_discovered.subreddit
+                        .display_name_prefixed
+                    }
+                  </div>
+                )}
               </div>
             </div>
+            <div className="flex gap-2 items-center">
+              {interaction.reddit_content_discovered?.content_category && (
+                <Badge className="text-xs" variant="secondary">
+                  {COMMENT_POST_CATEGORY[
+                    interaction.reddit_content_discovered.content_category ||
+                      "other"
+                  ] || "Other"}
+                </Badge>
+              )}
+              {interaction.similarity_score !== null &&
+               interaction.similarity_score !== undefined && (
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    "text-xs font-semibold",
+                    interaction.similarity_score >= 0.5
+                      ? "bg-green-100 text-green-800 border-green-300 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700"
+                      : interaction.similarity_score >= 0.45
+                      ? "bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700"
+                      : "bg-gray-100 text-gray-800 border-gray-300 dark:bg-gray-900/30 dark:text-gray-400 dark:border-gray-700"
+                  )}
+                >
+                  {interaction.similarity_score >= 0.5
+                    ? "Perfect Match"
+                    : interaction.similarity_score >= 0.45
+                    ? "Strong Match"
+                    : "Relevant"}
+                </Badge>
+              )}
+            </div>
+          </div>
+          <div className="flex gap-2 items-center">
+            {interaction.reddit_content_discovered?.reddit_url && (
+              <Button variant="outline" size="sm" asChild>
+                <Link
+                  href={interaction.reddit_content_discovered.reddit_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="View on Reddit"
+                  className={buttonVariants({
+                    variant: "outline",
+                    size: "icon",
+                  })}
+                >
+                  <IconExternalLink />
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </CardHeader>
@@ -163,10 +233,60 @@ export default function ThreadComments({
         </h3>
 
         {original_post.content && (
-          <MarkdownContent
-            content={original_post.content}
-            className="text-muted-foreground"
-          />
+          <div className="space-y-2">
+            <MarkdownContent
+              content={
+                showFullContent
+                  ? original_post.content
+                  : interaction.reddit_content_discovered?.summarized_content ||
+                    original_post.content
+              }
+              className="text-muted-foreground"
+            />
+            {interaction.reddit_content_discovered?.summarized_content && (
+              <button
+                onClick={() => setShowFullContent(!showFullContent)}
+                className="text-sm text-primary transition-colors underline-offset-4 hover:underline cursor-pointer flex items-center gap-1"
+              >
+                {showFullContent ? (
+                  <>
+                    <IconArrowUp className="size-4" />
+                    Read summary
+                  </>
+                ) : (
+                  <>
+                    <IconArrowDown className="size-4" />
+                    Read full post
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+        )}
+
+        {interaction.reddit_content_discovered && (
+          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center gap-1">
+              <IconArrowUp className="size-6" />
+              <span>{interaction.reddit_content_discovered.ups || 0}</span>
+            </div>
+            {interaction.reddit_content_discovered.downs !== null && (
+              <div className="flex items-center gap-1">
+                <IconArrowDown className="size-6" />
+                <span>{interaction.reddit_content_discovered.downs}</span>
+              </div>
+            )}
+            {interaction.reddit_content_discovered.reddit_created_at && (
+              <div className="flex items-center gap-1">
+                <IconClock className="size-3" />
+                <span>
+                  {formatTimeAgo(
+                    interaction.reddit_content_discovered.reddit_created_at
+                  )}
+                </span>
+              </div>
+            )}
+          </div>
         )}
 
         {/* Thread Comments */}
@@ -297,6 +417,17 @@ function CommentThread({
 
 function formatDate(dateString: string) {
   const date = new Date(dateString);
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (diffInSeconds < 60) return `${diffInSeconds}s ago`;
+  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+  return `${Math.floor(diffInSeconds / 86400)}d ago`;
+}
+
+function formatTimeAgo(dateString: string) {
+  const date = new Date(dateString + "Z"); // Append 'Z' to treat as UTC
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 

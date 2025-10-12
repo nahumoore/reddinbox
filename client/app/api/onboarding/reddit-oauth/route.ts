@@ -2,7 +2,6 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { supabaseServer } from "@/lib/supabase/server";
 import { WebsiteAnalysis } from "@/stores/onboarding-form";
 import { SubredditData } from "@/types/reddit";
-import { generateSubreditAudience } from "@/utils/llm/generate-subredit-audience";
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
@@ -112,24 +111,12 @@ export const POST = async (req: NextRequest) => {
     );
   }
 
-  // CREATE AI AUDIENCE PROMPT
-  const subredditAudience = await generateSubreditAudience(newSubreddits);
-  if (subredditAudience.length === 0) {
-    return NextResponse.json(
-      { error: "Failed to generate subreddit audience" },
-      { status: 500 }
-    );
-  }
-
   // INSERT NEW SUBREDDITS
   const { error: insertError } = await supabase
     .from("reddit_subreddits")
     .insert(
       newSubreddits.map((subreddit: SubredditData) => ({
         ...subreddit,
-        audience_ai_prompt: subredditAudience.find(
-          (subredditAudience) => subredditAudience.id === subreddit.id
-        )?.ai_response,
       }))
     );
 

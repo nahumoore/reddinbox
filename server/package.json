@@ -24,6 +24,7 @@
     "helmet": "^8.1.0",
     "node-cron": "^4.2.1",
     "openai": "^5.20.2",
+    "resend": "^6.1.2",
     "supabase": "^2.47.2",
     "tsconfig-paths": "^4.2.0"
   },

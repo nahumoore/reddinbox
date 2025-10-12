@@ -1,4 +1,5 @@
 import { Toaster } from "@/components/ui/sonner";
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Lexend_Deca } from "next/font/google";
 import "./globals.css";
@@ -25,6 +26,7 @@ export default function RootLayout({
       <body className={`${mainFont.variable} font-main antialiased`}>
         {children}
         <Toaster richColors />
+        <Analytics />
       </body>
     </html>
   );

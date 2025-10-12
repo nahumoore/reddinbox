@@ -113,6 +113,7 @@ export default async function DashboardLayoutServer({
       user_id,
       website_id,
       thread_context,
+      similarity_score,
       reddit_content_discovered:reddit_content_discovered_id (
         id,
         author,

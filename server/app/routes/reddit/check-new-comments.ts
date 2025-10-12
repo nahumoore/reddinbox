@@ -99,8 +99,6 @@ export const checkNewComments = async (req: Request, res: Response) => {
     const userFullName = `t2_${redditAccount.id}`;
     const aiResult = await generateAIReplies({
       validContexts,
-      supabase,
-      redditAccountId,
       userFullName,
       userInfo,
       activeWebsite,
