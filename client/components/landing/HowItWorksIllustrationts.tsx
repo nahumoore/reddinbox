@@ -23,14 +23,14 @@ export const Step1Illustration = () => {
           <div className="text-center mb-4">
             <div className="inline-flex items-center gap-2 bg-card/80 border border-border/30 rounded-lg px-4 py-3">
               <div className="w-8 h-8 bg-primary/10 rounded border border-primary/20 flex items-center justify-center">
-                <span className="text-primary text-sm">🏢</span>
+                <span className="text-primary text-sm">🌐</span>
               </div>
               <div className="text-left">
                 <div className="text-sm font-semibold text-foreground">
-                  Your Product
+                  Your Website
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  SaaS Platform
+                  yourproduct.com
                 </div>
               </div>
             </div>
@@ -53,10 +53,10 @@ export const Step1Illustration = () => {
         <div>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { icon: "🎯", label: "Target Subs", value: "6 found" },
-              { icon: "👥", label: "Audience", value: "7.9k users" },
-              { icon: "💬", label: "Conversations", value: "847 active" },
-              { icon: "📊", label: "Match Score", value: "98%" },
+              { icon: "🔑", label: "Keywords", value: "12 found" },
+              { icon: "🎯", label: "Target Subs", value: "8 matched" },
+              { icon: "👥", label: "Audience", value: "14.2k users" },
+              { icon: "📊", label: "Match Score", value: "96%" },
             ].map((item, i) => (
               <div
                 key={i}
@@ -102,6 +102,121 @@ export const Step1Illustration = () => {
 };
 
 export const Step2Illustration = () => {
+  const [conversations, setConversations] = React.useState([
+    { id: 1, visible: false, subreddit: "r/startups", badge: "Help Needed" },
+    { id: 2, visible: false, subreddit: "r/marketing", badge: "Advice" },
+    { id: 3, visible: false, subreddit: "r/SEO", badge: "Question" },
+    {
+      id: 4,
+      visible: false,
+      subreddit: "r/entrepreneur",
+      badge: "Recommendation",
+    },
+  ]);
+
+  React.useEffect(() => {
+    // Stagger the appearance of conversations
+    conversations.forEach((_, index) => {
+      setTimeout(() => {
+        setConversations((prev) =>
+          prev.map((conv, i) =>
+            i === index ? { ...conv, visible: true } : conv
+          )
+        );
+      }, index * 600);
+    });
+  }, []);
+
+  const subreddits = [
+    { name: "r/startups", color: "bg-blue-500/20 text-blue-500" },
+    { name: "r/marketing", color: "bg-purple-500/20 text-purple-500" },
+    { name: "r/SEO", color: "bg-green-500/20 text-green-500" },
+    { name: "r/entrepreneur", color: "bg-orange-500/20 text-orange-500" },
+    { name: "r/SaaS", color: "bg-pink-500/20 text-pink-500" },
+    { name: "r/AI", color: "bg-cyan-500/20 text-cyan-500" },
+  ];
+
+  return (
+    <div className="relative w-full h-full rounded-2xl p-6 overflow-hidden">
+      <div className="h-full flex flex-col justify-center space-y-6">
+        {/* Subreddit Badges Cloud */}
+        <div className="flex flex-wrap justify-center gap-2 mb-6">
+          {subreddits.map((sub, i) => (
+            <div
+              key={i}
+              className={`${sub.color} px-3 py-1 rounded-full text-xs font-medium border border-current/20`}
+              style={{
+                animation: `float ${3 + i * 0.5}s ease-in-out infinite`,
+                animationDelay: `${i * 0.2}s`,
+              }}
+            >
+              {sub.name}
+            </div>
+          ))}
+        </div>
+
+        {/* Conversation Cards */}
+        <div className="space-y-3">
+          {conversations.map((conv, i) => (
+            <div
+              key={conv.id}
+              className={`
+                bg-card/80 border border-border/30 rounded-lg p-3
+                transition-all duration-500
+                ${
+                  conv.visible
+                    ? "opacity-100 translate-x-0"
+                    : "opacity-0 -translate-x-4"
+                }
+              `}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <div className="w-8 h-8 bg-primary/10 rounded border border-primary/20 flex items-center justify-center shrink-0">
+                    <IconMessage className="w-4 h-4 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-medium text-primary">
+                        {conv.subreddit}
+                      </span>
+                      <span className="text-xs text-muted-foreground">•</span>
+                      <span className="text-xs text-muted-foreground">
+                        2m ago
+                      </span>
+                    </div>
+                    <p className="text-sm text-foreground truncate">
+                      Looking for the best tool to...
+                    </p>
+                  </div>
+                </div>
+                <div className="shrink-0">
+                  <span className="inline-flex items-center gap-1 bg-primary/10 text-primary px-2 py-1 rounded text-xs font-medium border border-primary/20">
+                    {conv.badge}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <style jsx>{`
+        @keyframes float {
+          0%,
+          100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-8px);
+          }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export const Step3Illustration = () => {
   const [currentExample, setCurrentExample] = React.useState(0);
   const [isAnimating, setIsAnimating] = React.useState(false);
 
@@ -228,7 +343,7 @@ export const Step2Illustration = () => {
   );
 };
 
-export const Step3Illustration = () => {
+export const Step4Illustration = () => {
   const [activeStep, setActiveStep] = React.useState(0);
 
   const journeySteps = [

@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils";
 import {
   IconMessages,
+  IconRadar,
   IconTrendingUp,
   IconUserCheck,
 } from "@tabler/icons-react";
@@ -12,6 +13,7 @@ import {
   Step1Illustration,
   Step2Illustration,
   Step3Illustration,
+  Step4Illustration,
 } from "./HowItWorksIllustrationts";
 
 const steps = [
@@ -26,21 +28,30 @@ const steps = [
   },
   {
     step: 2,
+    icon: IconRadar,
+    title: "Find The Right Conversations",
+    description:
+      "We monitor 20+ subreddits across startups, marketing, SEO, AI, and more. When someone asks for help, advice, or recommendations in your niche, we instantly capture it for you.",
+    benefit: "Never miss an opportunity",
+    illustration: Step2Illustration,
+  },
+  {
+    step: 3,
     icon: IconMessages,
     title: "Generate Authentic Responses",
     description:
       "Create authentic, helpful responses with the main purpose of helping users and build your reputation while mentioning your product naturally.",
     benefit: "Never sound like a spam bot",
-    illustration: Step2Illustration,
+    illustration: Step3Illustration,
   },
   {
-    step: 3,
+    step: 4,
     icon: IconTrendingUp,
     title: "Track Authority Growth",
     description:
       "Track each conversation and follow ups to build a relationship and convert them into a lead.",
     benefit: "See your reputation compound",
-    illustration: Step3Illustration,
+    illustration: Step4Illustration,
   },
 ];
 

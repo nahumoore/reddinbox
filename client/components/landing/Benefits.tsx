@@ -46,7 +46,7 @@ const comparisons = [
     },
     reddinbox: {
       icon: IconMessageCircle,
-      title: "Smart Response Generator",
+      title: "Authentic Responses Only",
       description:
         "We generate authentic, helpful responses that build authority naturally and then you approve or reject",
       benefit: "Authority-building in auto-pilot",

@@ -11,9 +11,9 @@ const mainFont = Lexend_Deca({
 });
 
 export const metadata: Metadata = {
-  title: "Reddinbox - Your Reddit CRM Redefined",
+  title: "Reddinbox - Reddit Marketing Through Authority Building",
   description:
-    "The most powerful CRM platform designed specifically for Reddit marketing. Transform your Reddit outreach into measurable business results.",
+    "Build authentic authority in Reddit communities, then convert that trust into qualified leads for your startup. The anti-spam approach to Reddit marketing",
 };
 
 export default function RootLayout({
