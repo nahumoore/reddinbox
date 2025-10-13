@@ -75,8 +75,6 @@ export default async function DashboardLayoutServer({
     redirect("/onboarding");
   } else if (userInfo?.subscription_status === "stopped") {
     redirect("/subscription-ended");
-  } else if (redditAccounts?.length === 0) {
-    redirect("/no-reddit-account-active");
   }
 
   // GET ACTIVE WEBSITE
@@ -91,7 +89,7 @@ export default async function DashboardLayoutServer({
   const activeRedditAccount = redditAccounts?.find(
     (account) => account.is_active
   ) as RedditAccount;
-  if (!activeRedditAccount) {
+  if (redditAccounts?.length === 0 || !activeRedditAccount) {
     redirect("/no-reddit-account-active");
   }
 

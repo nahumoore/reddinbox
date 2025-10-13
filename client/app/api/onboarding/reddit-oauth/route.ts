@@ -55,23 +55,56 @@ export const POST = async (req: NextRequest) => {
       { status: 500 }
     );
   }
-  const { error: websiteAnalysisError } = await supabase
+
+  // CHECK IF WEBSITE EXISTS FOR USER
+  const { data: existingWebsite, error: checkError } = await supabase
     .from("websites")
-    .insert({
-      name: websiteAnalysis.websiteName,
-      description: websiteAnalysis.companyDescription,
-      keywords: websiteAnalysis.keywordsToMonitor,
-      target_audience: websiteAnalysis.targetAudience,
-      expertise: websiteAnalysis.expertise,
-      vector_ai_searcher: websiteInfoEmbedding as any,
-      url: websiteUrl,
-      subreddit_reddit_ids: targetSubreddits.map(
-        (subreddit: SubredditData) => subreddit.id
-      ),
-      user_id: user.id,
-    });
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("url", websiteUrl)
+    .maybeSingle();
+
+  if (checkError) {
+    console.error("Error checking existing website:", checkError);
+    return NextResponse.json(
+      {
+        error: checkError.message || "Failed to check existing website",
+      },
+      { status: 500 }
+    );
+  }
+
+  const websiteData = {
+    name: websiteAnalysis.websiteName,
+    description: websiteAnalysis.companyDescription,
+    keywords: websiteAnalysis.keywordsToMonitor,
+    target_audience: websiteAnalysis.targetAudience,
+    expertise: websiteAnalysis.expertise,
+    vector_ai_searcher: websiteInfoEmbedding as any,
+    url: websiteUrl,
+    subreddit_reddit_ids: targetSubreddits.map(
+      (subreddit: SubredditData) => subreddit.id
+    ),
+    user_id: user.id,
+  };
+
+  // UPDATE OR INSERT WEBSITE
+  let websiteAnalysisError;
+  if (existingWebsite) {
+    // Update existing website
+    const { error } = await supabase
+      .from("websites")
+      .update(websiteData)
+      .eq("id", existingWebsite.id);
+    websiteAnalysisError = error;
+  } else {
+    // Insert new website
+    const { error } = await supabase.from("websites").insert(websiteData);
+    websiteAnalysisError = error;
+  }
+
   if (websiteAnalysisError) {
-    console.log("Error inserting website analysis");
+    console.log("Error upserting website analysis");
     console.log(JSON.stringify(websiteAnalysisError));
 
     return NextResponse.json(
