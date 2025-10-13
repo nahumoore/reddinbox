@@ -13,9 +13,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 // EMAIL VALIDATION SCHEMA
-const emailSchema = z.object({
-  email: z.email().min(1, "Email is required"),
-});
+const emailSchema = z.string().email("Please enter a valid email");
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");

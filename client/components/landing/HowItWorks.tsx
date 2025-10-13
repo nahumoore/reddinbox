@@ -31,7 +31,7 @@ const steps = [
     icon: IconRadar,
     title: "Find The Right Conversations",
     description:
-      "We monitor 20+ subreddits across startups, marketing, SEO, AI, and more. When someone asks for help, advice, or recommendations in your niche, we instantly capture it for you.",
+      "We all your favourite subreddits EVERY HOUR. When someone asks for help, advice, or recommendations in your niche, we instantly capture it for you.",
     benefit: "Never miss an opportunity",
     illustration: Step2Illustration,
   },
@@ -78,7 +78,8 @@ export default function HowItWorks() {
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             Transform industry expertise into systematic lead generation through
-            trusted relationships. The <b>anti-spam approach</b> that gets better over time.
+            trusted relationships. The <b>anti-spam approach</b> that gets
+            better over time.
           </p>
         </div>
 
