@@ -4,6 +4,7 @@ interface RedditCalloutOptions {
   body?: string;
   retryAttempts?: number;
   retryDelay?: number;
+  useOAuth?: boolean; // Enable OAuth authentication
 }
 
 interface RedditCalloutResult<T = any> {
@@ -38,11 +39,30 @@ export async function redditCallout<T = any>(
     body,
     retryAttempts = 3,
     retryDelay = 1000,
+    useOAuth = false,
   } = options;
+
+  // If OAuth is enabled, get token and modify URL/headers
+  let finalUrl = url;
+  let oauthToken: string | null = null;
+
+  if (useOAuth) {
+    const { getRedditAppToken } = await import('./reddit-oauth');
+    oauthToken = await getRedditAppToken();
+
+    if (oauthToken) {
+      // Convert www.reddit.com URLs to oauth.reddit.com
+      finalUrl = url.replace('https://www.reddit.com/', 'https://oauth.reddit.com/');
+    } else {
+      console.warn('⚠️ OAuth requested but token unavailable, falling back to unauthenticated request');
+    }
+  }
 
   const requestHeaders = {
     ...DEFAULT_HEADERS,
     ...headers,
+    // Add OAuth Bearer token if available
+    ...(oauthToken && { 'Authorization': `Bearer ${oauthToken}` }),
   };
 
   for (let attempt = 1; attempt <= retryAttempts; attempt++) {
@@ -52,7 +72,7 @@ export async function redditCallout<T = any>(
         await sleep(delay);
       }
 
-      const response = await fetch(url, {
+      const response = await fetch(finalUrl, {
         method,
         headers: requestHeaders,
         body,

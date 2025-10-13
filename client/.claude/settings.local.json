@@ -5,7 +5,9 @@
       "Bash(npm run dev:*)",
       "Bash(npx next build:*)",
       "Bash(npx tsc:*)",
-      "WebSearch"
+      "WebSearch",
+      "Read(//c/Users/nicol/Documents/Projects/reddinbox/server/app/methods/discover-reddit-posts/**)",
+      "Read(//c/Users/nicol/Documents/Projects/reddinbox/server/app/helpers/reddit/**)"
     ],
     "deny": [],
     "ask": []

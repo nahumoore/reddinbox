@@ -40,7 +40,9 @@ export async function POST(request: NextRequest) {
       query.trim()
     )}&limit=20&sort=relevance`;
 
-    const result = await redditCallout<RedditSearchResponse>(searchUrl);
+    const result = await redditCallout<RedditSearchResponse>(searchUrl, {
+      useOAuth: true, // Use OAuth to bypass IP blocking
+    });
 
     if (!result.success) {
       throw new Error(result.error || "Failed to fetch from Reddit API");
