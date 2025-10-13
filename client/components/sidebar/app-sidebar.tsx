@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/sidebar";
 import {
   IconHeartHandshake,
+  IconNews,
   IconUser,
   IconUsersGroup,
   IconUserUp,
@@ -33,19 +34,24 @@ const data = {
           url: "/dashboard/authority-feed",
         },
         {
-          title: "Tracking Subreddits",
-          icon: IconUsersGroup,
-          url: "/dashboard/tracking-subreddits",
-        },
-        {
           title: "Relationship Pipeline",
           icon: IconHeartHandshake,
           url: "/dashboard/relationship-pipeline",
+        },
+        {
+          title: "Posts Builder",
+          icon: IconNews,
+          url: "/dashboard/posts-builder",
         },
       ],
     },
   ],
   navFooter: [
+    {
+      title: "Tracking Subreddits",
+      icon: IconUsersGroup,
+      url: "/dashboard/tracking-subreddits",
+    },
     {
       title: "Reddit Profile",
       icon: IconUser,

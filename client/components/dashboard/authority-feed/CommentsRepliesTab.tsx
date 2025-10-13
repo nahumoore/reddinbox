@@ -1,24 +1,17 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRedditUserInteractions } from "@/stores/reddit-user-interactions";
 import { useUserWebsites } from "@/stores/user-wesbites";
-import { IconMessageOff, IconRefresh } from "@tabler/icons-react";
-import { useState } from "react";
-import { toast } from "sonner";
+import { IconMessageOff } from "@tabler/icons-react";
 import InteractionRemoveAll from "./InteractionRemoveAll";
 import ThreadComments from "./ThreadComments";
 
 export default function CommentsRepliesTab() {
   const { userActiveWebsite } = useUserWebsites();
-  const {
-    redditUserInteractions,
-    isLoadingRedditUserInteractions,
-    setRedditUserInteractions,
-  } = useRedditUserInteractions();
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { redditUserInteractions, isLoadingRedditUserInteractions } =
+    useRedditUserInteractions();
 
   const commentRepliesToReview = redditUserInteractions.filter(
     (interaction) =>
@@ -26,29 +19,29 @@ export default function CommentsRepliesTab() {
       interaction.interaction_type === "comment_reply"
   );
 
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    try {
-      const response = await fetch("/api/reddit/comments/fetch-new", {
-        method: "POST",
-      });
-      const result = await response.json();
-      if (result.error) {
-        throw new Error(result.error);
-      }
+  // const handleRefresh = async () => {
+  //   setIsRefreshing(true);
+  //   try {
+  //     const response = await fetch("/api/reddit/comments/fetch-new", {
+  //       method: "POST",
+  //     });
+  //     const result = await response.json();
+  //     if (result.error) {
+  //       throw new Error(result.error);
+  //     }
 
-      setRedditUserInteractions(result.interactions);
-      toast.success("Comments refreshed successfully");
-    } catch (error) {
-      console.error("Failed to refresh comments:", error);
-      toast.error("Failed to refresh comments", {
-        description:
-          error instanceof Error ? error.message : "Please try again",
-      });
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
+  //     setRedditUserInteractions(result.interactions);
+  //     toast.success("Comments refreshed successfully");
+  //   } catch (error) {
+  //     console.error("Failed to refresh comments:", error);
+  //     toast.error("Failed to refresh comments", {
+  //       description:
+  //         error instanceof Error ? error.message : "Please try again",
+  //     });
+  //   } finally {
+  //     setIsRefreshing(false);
+  //   }
+  // };
 
   if (isLoadingRedditUserInteractions) {
     return (
@@ -62,7 +55,7 @@ export default function CommentsRepliesTab() {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      {/* <div className="flex justify-end">
         <Button
           variant="outline"
           size="sm"
@@ -75,7 +68,7 @@ export default function CommentsRepliesTab() {
           />
           {isRefreshing ? "Refreshing..." : "Refresh"}
         </Button>
-      </div>
+      </div> */}
       {commentRepliesToReview.length === 0 ? (
         <div className="text-center py-12 max-w-xl mx-auto">
           <IconMessageOff className="size-12 text-muted-foreground mx-auto mb-4 animate-pulse" />

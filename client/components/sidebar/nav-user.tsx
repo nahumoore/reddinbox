@@ -20,13 +20,13 @@ import {
 import { supabaseClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { useUserInfo } from "@/stores/user-info";
-import { IconLoader2 } from "@tabler/icons-react";
+import { IconCash, IconLoader2 } from "@tabler/icons-react";
 import { ChevronsUpDown, LogOut, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "../ui/badge";
 
 export function NavUser() {
-  const { isMobile } = useSidebar();
+  const { isMobile, open } = useSidebar();
   const { userInfo, isLoadingUserInfo } = useUserInfo();
   const [isLoadingUpgrade, setIsLoadingUpgrade] = useState(false);
 
@@ -75,7 +75,16 @@ export function NavUser() {
                   isLoadingUpgrade && "opacity-50 cursor-not-allowed"
                 )}
               >
-                Your free trial expires in {getFreeTrialExpirationDate()} days
+                {open ? (
+                  <>
+                    Your free trial expires in {getFreeTrialExpirationDate()}{" "}
+                    days
+                  </>
+                ) : (
+                  <>
+                    <IconCash className="size-4" />
+                  </>
+                )}
               </Badge>
             )}
             <DropdownMenuTrigger asChild>

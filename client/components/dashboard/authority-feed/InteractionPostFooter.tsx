@@ -7,7 +7,7 @@ import { useRedditAccounts } from "@/stores/reddit-accounts";
 import { useRedditUserInteractions } from "@/stores/reddit-user-interactions";
 import { useUserInfo } from "@/stores/user-info";
 import { RedditUserInteraction } from "@/types/db-schema";
-import { IconCheck, IconMessage, IconX } from "@tabler/icons-react";
+import { IconCheck, IconX } from "@tabler/icons-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import LessThan30DaysAccountAgeDialog from "./LessThan30DaysAccountAgeDialog";
@@ -187,18 +187,10 @@ export function InteractionPostFooter({
       );
       return;
     }
-
-    toast.success("Marked as replied");
   };
 
   return (
     <>
-      <LessThan30DaysAccountAgeDialog
-        open={showWarningDialog}
-        onOpenChange={setShowWarningDialog}
-        onProceed={proceedWithSubmit}
-        postUrl={interaction.reddit_content_discovered?.reddit_url || undefined}
-      />
       <div className="pt-3">
         <div className="flex gap-3 pl-8">
           <Avatar className="size-8 mt-2 shrink-0">
@@ -259,7 +251,7 @@ export function InteractionPostFooter({
                     <IconCheck className="size-3" />
                     Mark as Replied
                   </Button>
-                  <Button
+                  {/* <Button
                     onClick={handleSubmit}
                     disabled={!comment.trim() || isPosting}
                     size="sm"
@@ -267,13 +259,20 @@ export function InteractionPostFooter({
                   >
                     <IconMessage className="size-3" />
                     Approve
-                  </Button>
+                  </Button> */}
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <LessThan30DaysAccountAgeDialog
+        open={showWarningDialog}
+        onOpenChange={setShowWarningDialog}
+        onProceed={proceedWithSubmit}
+        postUrl={interaction.reddit_content_discovered?.reddit_url || undefined}
+      />
     </>
   );
 }

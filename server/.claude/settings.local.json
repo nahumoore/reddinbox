@@ -3,7 +3,9 @@
     "allow": [
       "Read(//c/Users/nicol/Documents/Projects/reddinbox/client/lib/supabase/**)",
       "Read(//c/Users/nicol/Documents/Projects/reddinbox/client/**)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(dir \"C:\\Users\\nicol\\Documents\\Projects\\reddinbox\\server\\app\\defs\" /b)",
+      "Bash(dir \"C:\\Users\\nicol\\Documents\\Projects\\reddinbox\\server\\app\\defs\\email-template\")"
     ],
     "deny": [],
     "ask": []

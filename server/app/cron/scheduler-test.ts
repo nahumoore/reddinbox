@@ -13,7 +13,7 @@ async function startCronJobs() {
   console.log("🕒 Starting testing process...");
   const supabase = supabaseAdmin;
 
-  await discoverRedditContentJob({ supabase });
+  await checkNewComments({ supabase });
 
   console.log("🚀 The test is complete!");
 }
