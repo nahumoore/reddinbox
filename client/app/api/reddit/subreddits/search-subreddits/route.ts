@@ -27,6 +27,7 @@ interface RedditSearchResponse {
   };
 }
 
+export const runtime = "edge";
 export async function POST(request: NextRequest) {
   try {
     const { query } = await request.json();
