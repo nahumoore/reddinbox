@@ -5,7 +5,11 @@
       "Read(//c/Users/nicol/Documents/Projects/reddinbox/client/**)",
       "Bash(npx tsc:*)",
       "Bash(dir \"C:\\Users\\nicol\\Documents\\Projects\\reddinbox\\server\\app\\defs\" /b)",
-      "Bash(dir \"C:\\Users\\nicol\\Documents\\Projects\\reddinbox\\server\\app\\defs\\email-template\")"
+      "Bash(dir \"C:\\Users\\nicol\\Documents\\Projects\\reddinbox\\server\\app\\defs\\email-template\")",
+      "Bash(dir \"C:\\Users\\nicol\\Documents\\Projects\\reddinbox\\server\\app\\defs\\email-template\" /b)",
+      "Bash(dir \"C:\\Users\\nicol\\Documents\\Projects\\reddinbox\\server\" /b)",
+      "Bash(findstr:*)",
+      "Bash(dir \"C:\\Users\\nicol\\Documents\\Projects\\reddinbox\\server\\app\" /b)"
     ],
     "deny": [],
     "ask": []

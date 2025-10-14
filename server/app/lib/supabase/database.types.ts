@@ -14,6 +14,56 @@ export type Database = {
   }
   public: {
     Tables: {
+      email_notifications: {
+        Row: {
+          created_at: string | null
+          email: string
+          error_message: string | null
+          id: string
+          reason: Database["public"]["Enums"]["email_notification_reason"]
+          sent_at: string
+          status:
+            | Database["public"]["Enums"]["email_notification_status"]
+            | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          error_message?: string | null
+          id?: string
+          reason: Database["public"]["Enums"]["email_notification_reason"]
+          sent_at?: string
+          status?:
+            | Database["public"]["Enums"]["email_notification_status"]
+            | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          error_message?: string | null
+          id?: string
+          reason?: Database["public"]["Enums"]["email_notification_reason"]
+          sent_at?: string
+          status?:
+            | Database["public"]["Enums"]["email_notification_status"]
+            | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_info"
+            referencedColumns: ["auth_user_id"]
+          },
+        ]
+      }
       reddit_accounts: {
         Row: {
           access_token: string | null
@@ -182,7 +232,6 @@ export type Database = {
       }
       reddit_subreddits: {
         Row: {
-          audience_ai_prompt: string | null
           banner_background_image: string | null
           community_icon: string | null
           created_at: string | null
@@ -200,7 +249,6 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
-          audience_ai_prompt?: string | null
           banner_background_image?: string | null
           community_icon?: string | null
           created_at?: string | null
@@ -218,7 +266,6 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
-          audience_ai_prompt?: string | null
           banner_background_image?: string | null
           community_icon?: string | null
           created_at?: string | null
@@ -572,6 +619,11 @@ export type Database = {
       }
     }
     Enums: {
+      email_notification_reason:
+        | "new-interactions-ready"
+        | "subscription-expired"
+        | "interactions-limit-reached"
+      email_notification_status: "pending" | "sent" | "failed"
       interaction_type: "comment_reply" | "post_reply" | "dm"
       reddit_interaction_status: "new" | "ignored" | "posted" | "scheduled"
       reddit_post_category:
@@ -715,6 +767,12 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      email_notification_reason: [
+        "new-interactions-ready",
+        "subscription-expired",
+        "interactions-limit-reached",
+      ],
+      email_notification_status: ["pending", "sent", "failed"],
       interaction_type: ["comment_reply", "post_reply", "dm"],
       reddit_interaction_status: ["new", "ignored", "posted", "scheduled"],
       reddit_post_category: [

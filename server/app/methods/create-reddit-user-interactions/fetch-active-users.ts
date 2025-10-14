@@ -3,6 +3,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 export interface ActiveUser {
   auth_user_id: string;
   name: string | null;
+  email: string | null;
   websites:
     | {
         id: string;
@@ -42,6 +43,7 @@ export async function fetchActiveUsers(
       `
       auth_user_id,
       name,
+      email,
       websites!inner (
         id,
         name,

@@ -1,6 +1,7 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
 import { subscriptionExpiredEmailTemplate } from "../../defs/email-template/subscription-expired";
+import { trackEmailNotification } from "../../helpers/track-email-notification";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -82,8 +83,26 @@ export const checkSubscriptions = async ({
               `❌ Error sending email to ${user.email}:`,
               emailError
             );
+            // TRACK FAILED EMAIL NOTIFICATION
+            await trackEmailNotification(supabase, {
+              userId: user.auth_user_id,
+              email: user.email,
+              reason: "subscription-expired",
+              status: "failed",
+              errorMessage:
+                emailError instanceof Error
+                  ? emailError.message
+                  : "Unknown error",
+            });
           } else {
             console.log(`✅ Sent expiration email to ${user.email}`);
+            // TRACK SUCCESSFUL EMAIL NOTIFICATION
+            await trackEmailNotification(supabase, {
+              userId: user.auth_user_id,
+              email: user.email,
+              reason: "subscription-expired",
+              status: "sent",
+            });
           }
         }
 

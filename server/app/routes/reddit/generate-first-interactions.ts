@@ -6,6 +6,7 @@ import { newInteractionsEmailTemplate } from "../../defs/email-template/new-inte
 import { createInteractionRecord } from "../../methods/create-reddit-user-interactions/create-interaction-record";
 import { findRelevantPosts } from "../../methods/create-reddit-user-interactions/find-relevant-posts";
 import { generateComment } from "../../methods/create-reddit-user-interactions/generate-comment";
+import { trackEmailNotification } from "../../helpers/track-email-notification";
 
 export const generateFirstInteractions = async (
   req: Request,
@@ -222,7 +223,7 @@ export const generateFirstInteractions = async (
           dashboard_url: dashboardUrl,
         });
 
-        await resend.emails.send({
+        const { error: emailError } = await resend.emails.send({
           from: "Reddinbox <notifications@reddinbox.com>",
           to: userData.email,
           subject: `${totalInteractionsCreated} New Interaction${
@@ -231,7 +232,27 @@ export const generateFirstInteractions = async (
           html: emailHtml,
         });
 
-        console.log(`📧 Email notification sent to ${userData.email}`);
+        if (emailError) {
+          console.error(`❌ Error sending email to ${userData.email}:`, emailError);
+          // TRACK FAILED EMAIL NOTIFICATION
+          await trackEmailNotification(supabase, {
+            userId: userData.auth_user_id,
+            email: userData.email,
+            reason: "new-interactions-ready",
+            status: "failed",
+            errorMessage:
+              emailError instanceof Error ? emailError.message : "Unknown error",
+          });
+        } else {
+          console.log(`📧 Email notification sent to ${userData.email}`);
+          // TRACK SUCCESSFUL EMAIL NOTIFICATION
+          await trackEmailNotification(supabase, {
+            userId: userData.auth_user_id,
+            email: userData.email,
+            reason: "new-interactions-ready",
+            status: "sent",
+          });
+        }
       } catch (emailError) {
         console.error("❌ Failed to send email notification:", emailError);
         // Don't fail the request if email fails
