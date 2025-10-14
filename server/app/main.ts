@@ -18,9 +18,8 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
 // API ROUTES SETUP
-app.use("/api", authenticateRequest);
-app.use("/api/reddit/check-new-comments", checkNewComments);
-app.use("/api/reddit/generate-first-interactions", generateFirstInteractions);
+app.post("/api/reddit/check-new-comments", authenticateRequest, checkNewComments);
+app.post("/api/reddit/generate-first-interactions", authenticateRequest, generateFirstInteractions);
 
 // START SERVER
 const PORT = process.env.PORT || 4001;

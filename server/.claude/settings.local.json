@@ -9,7 +9,8 @@
       "Bash(dir \"C:\\Users\\nicol\\Documents\\Projects\\reddinbox\\server\\app\\defs\\email-template\" /b)",
       "Bash(dir \"C:\\Users\\nicol\\Documents\\Projects\\reddinbox\\server\" /b)",
       "Bash(findstr:*)",
-      "Bash(dir \"C:\\Users\\nicol\\Documents\\Projects\\reddinbox\\server\\app\" /b)"
+      "Bash(dir \"C:\\Users\\nicol\\Documents\\Projects\\reddinbox\\server\\app\" /b)",
+      "Bash(dir:*)"
     ],
     "deny": [],
     "ask": []
