@@ -3,6 +3,7 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Lexend_Deca } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 const mainFont = Lexend_Deca({
@@ -34,6 +35,13 @@ export default function RootLayout({
 
             {/* // VERICEL ANALYTICS */}
             <Analytics />
+
+            {/* AHREFS ANALYTICS */}
+            <Script
+              src="https://analytics.ahrefs.com/analytics.js"
+              data-key="hbImKkk0joIgPnpgmbNl5g"
+              async
+            />
           </>
         )}
       </body>
