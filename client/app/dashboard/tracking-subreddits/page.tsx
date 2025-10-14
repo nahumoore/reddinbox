@@ -1,17 +1,22 @@
 "use client";
 
 import DialogSubredditSuggestion from "@/components/dashboard/tracking-subreddits/DialogSubredditSuggestion";
-import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useRedditSubreddits } from "@/stores/reddit-subreddits";
 import {
-  IconBuildingCommunity,
-  IconClock,
+  IconNews,
   IconUsers,
   IconUsersGroup,
   IconWorld,
 } from "@tabler/icons-react";
-import { formatDistanceToNow } from "date-fns";
 import { useEffect, useState } from "react";
 
 export default function TrackingSubredditsPage() {
@@ -61,11 +66,7 @@ export default function TrackingSubredditsPage() {
 
         {/* Content */}
         {isLoadingSubreddits || isLoadingPosts ? (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }, (_, index) => (
-              <SubredditCardSkeleton key={index} />
-            ))}
-          </div>
+          <SubredditTableSkeleton />
         ) : subreddits.length === 0 ? (
           <div className="text-center py-12 max-w-xl mx-auto">
             <IconWorld className="size-12 text-muted-foreground mx-auto mb-4" />
@@ -87,78 +88,83 @@ export default function TrackingSubredditsPage() {
                 are we missing any?
               </button>
             </p>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {subreddits.map((subreddit) => (
-                <Card
-                  key={subreddit.id}
-                  className="h-fit hover:shadow-md transition-shadow"
-                >
-                  <CardContent>
-                    {/* Subreddit Header */}
-                    <div className="flex items-start gap-3 mb-4">
-                      {subreddit.community_icon ? (
-                        <img
-                          src={subreddit.community_icon}
-                          alt={subreddit.display_name_prefixed}
-                          className="size-12 rounded-full bg-muted"
-                        />
-                      ) : (
-                        <div className="size-12 rounded-full bg-primary/10 flex items-center justify-center">
-                          <IconWorld className="size-6 text-primary" />
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-base truncate">
-                          {subreddit.display_name_prefixed}
-                        </h3>
-                        {subreddit.title && (
-                          <p className="text-xs text-muted-foreground truncate">
-                            {subreddit.title}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Description */}
-                    {subreddit.public_description && (
-                      <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
-                        {subreddit.public_description}
-                      </p>
-                    )}
-
-                    {/* Stats */}
-                    <div className="flex flex-col gap-2 pt-4 border-t">
-                      {subreddit.subscribers && (
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <IconUsers className="size-4" />
-                          <span>
-                            {subreddit.subscribers.toLocaleString()} members
-                          </span>
-                        </div>
-                      )}
-                      {subreddit.created_utc && (
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <IconClock className="size-4" />
-                          <span>
-                            Created{" "}
-                            {formatDistanceToNow(
-                              new Date(subreddit.created_utc * 1000),
-                              { addSuffix: true }
+            <div className="border rounded-lg">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="max-w-sm">Subreddit</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead className="text-right">Members</TableHead>
+                    <TableHead className="text-right">Posts (24h)</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {subreddits.map((subreddit) => (
+                    <TableRow key={subreddit.id}>
+                      <TableCell className="max-w-sm">
+                        <div className="flex items-center gap-3">
+                          {subreddit.community_icon ? (
+                            <img
+                              src={subreddit.community_icon}
+                              alt={subreddit.display_name_prefixed}
+                              className="size-10 rounded-full bg-muted flex-shrink-0"
+                            />
+                          ) : (
+                            <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                              <IconWorld className="size-5 text-primary" />
+                            </div>
+                          )}
+                          <div className="min-w-0">
+                            <div className="font-semibold text-sm">
+                              {subreddit.display_name_prefixed}
+                            </div>
+                            {subreddit.title && (
+                              <div className="text-xs text-muted-foreground truncate">
+                                {subreddit.title}
+                              </div>
                             )}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="max-w-md">
+                          {subreddit.public_description ? (
+                            <p className="text-sm text-muted-foreground line-clamp-2">
+                              {subreddit.public_description}
+                            </p>
+                          ) : (
+                            <span className="text-sm text-muted-foreground/50">
+                              No description
+                            </span>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {subreddit.subscribers ? (
+                          <div className="flex items-center justify-end gap-2 text-sm">
+                            <IconUsers className="size-4 text-muted-foreground" />
+                            <span>
+                              {subreddit.subscribers.toLocaleString()}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-sm text-muted-foreground/50">
+                            N/A
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <IconNews className="size-4 text-primary" />
+                          <span className="font-medium text-primary text-sm">
+                            {postsPerSubreddit[subreddit.id] || 0}
                           </span>
                         </div>
-                      )}
-                      <div className="flex items-center gap-2 text-xs">
-                        <IconBuildingCommunity className="size-4 text-primary" />
-                        <span className="font-medium text-primary">
-                          {postsPerSubreddit[subreddit.id] || 0} posts
-                          discovered last 24 hours
-                        </span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
           </>
         )}
@@ -172,31 +178,50 @@ export default function TrackingSubredditsPage() {
   );
 }
 
-function SubredditCardSkeleton() {
+function SubredditTableSkeleton() {
   return (
-    <Card className="h-fit">
-      <CardContent className="p-5">
-        {/* Header */}
-        <div className="flex items-start gap-3 mb-4">
-          <Skeleton className="size-12 rounded-full" />
-          <div className="flex-1 space-y-1">
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-3 w-24" />
-          </div>
-        </div>
-
-        {/* Description */}
-        <div className="space-y-2 mb-4">
-          <Skeleton className="h-3 w-full" />
-          <Skeleton className="h-3 w-4/5" />
-        </div>
-
-        {/* Stats */}
-        <div className="flex flex-col gap-2 pt-4 border-t">
-          <Skeleton className="h-3 w-24" />
-          <Skeleton className="h-3 w-32" />
-        </div>
-      </CardContent>
-    </Card>
+    <div className="border rounded-lg">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Subreddit</TableHead>
+            <TableHead>Description</TableHead>
+            <TableHead className="text-right">Members</TableHead>
+            <TableHead className="text-right">Created</TableHead>
+            <TableHead className="text-right">Posts (24h)</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {Array.from({ length: 5 }, (_, index) => (
+            <TableRow key={index}>
+              <TableCell>
+                <div className="flex items-center gap-3">
+                  <Skeleton className="size-10 rounded-full flex-shrink-0" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-3 w-24" />
+                  </div>
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className="space-y-2">
+                  <Skeleton className="h-3 w-64" />
+                  <Skeleton className="h-3 w-48" />
+                </div>
+              </TableCell>
+              <TableCell className="text-right">
+                <Skeleton className="h-4 w-20 ml-auto" />
+              </TableCell>
+              <TableCell className="text-right">
+                <Skeleton className="h-4 w-24 ml-auto" />
+              </TableCell>
+              <TableCell className="text-right">
+                <Skeleton className="h-4 w-12 ml-auto" />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 }

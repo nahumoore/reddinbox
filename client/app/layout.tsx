@@ -1,4 +1,5 @@
 import { Toaster } from "@/components/ui/sonner";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Lexend_Deca } from "next/font/google";
@@ -26,7 +27,15 @@ export default function RootLayout({
       <body className={`${mainFont.variable} font-main antialiased`}>
         {children}
         <Toaster richColors />
-        <Analytics />
+        {process.env.NODE_ENV === "production" && (
+          <>
+            {/* // GOOGLE ANALYTICS */}
+            <GoogleAnalytics gaId="G-B29FM3PKX5" />
+
+            {/* // VERICEL ANALYTICS */}
+            <Analytics />
+          </>
+        )}
       </body>
     </html>
   );
