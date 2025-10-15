@@ -1,13 +1,39 @@
 "use client";
 
-import { IconArrowRight } from "@tabler/icons-react";
+import { supabaseClient } from "@/lib/supabase/client";
+import { User } from "@supabase/supabase-js";
+import { IconArrowRight, IconLoader2 } from "@tabler/icons-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BrandReddinbox } from "../icons/BrandReddinbox";
 import { buttonVariants } from "../ui/button";
+import { Skeleton } from "../ui/skeleton";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [loggedUser, setLoggedUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const supabase = supabaseClient();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (user) {
+          setLoggedUser(user);
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-border">
@@ -47,19 +73,35 @@ export default function Navbar() {
 
           <div className="hidden md:block">
             <div className="flex items-baseline space-x-2">
-              <Link
-                href="/auth/login"
-                className={buttonVariants({ variant: "outline" })}
-              >
-                Login
-              </Link>
-              <Link
-                href="/auth/register"
-                className="bg-primary text-primary-foreground p-2 rounded-lg font-semibold hover:opacity-90 shadow-lg hover:scale-105 hover:shadow-lg transition-all hover:shadow-primary/20 cursor-pointer flex items-center gap-2"
-              >
-                Start Free Trial
-                <IconArrowRight className="size-4" />
-              </Link>
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <Skeleton className="w-20 h-8 bg-muted" />
+                </div>
+              ) : loggedUser ? (
+                <Link
+                  href="/dashboard"
+                  className="bg-primary text-primary-foreground p-2 rounded-lg font-semibold hover:opacity-90 shadow-lg hover:scale-105 hover:shadow-lg transition-all hover:shadow-primary/20 cursor-pointer flex items-center gap-2"
+                >
+                  Go to Dashboard
+                  <IconArrowRight className="size-4" />
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/auth/login"
+                    className={buttonVariants({ variant: "outline" })}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/auth/register"
+                    className="bg-primary text-primary-foreground p-2 rounded-lg font-semibold hover:opacity-90 shadow-lg hover:scale-105 hover:shadow-lg transition-all hover:shadow-primary/20 cursor-pointer flex items-center gap-2"
+                  >
+                    Start Free Trial
+                    <IconArrowRight className="size-4" />
+                  </Link>
+                </>
+              )}
             </div>
           </div>
 
@@ -88,21 +130,52 @@ export default function Navbar() {
         {isMenuOpen && (
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white/90 backdrop-blur-md border-t border-border">
-              <a
-                href="#features"
+              <Link
+                href="#benefits"
                 className="block px-3 py-2 text-muted-foreground hover:text-foreground"
               >
-                Features
-              </a>
-              <a
-                href="#about"
+                Benefits
+              </Link>
+              <Link
+                href="#how-it-works"
                 className="block px-3 py-2 text-muted-foreground hover:text-foreground"
               >
-                About
-              </a>
-              <button className="w-full text-left bg-primary text-primary-foreground px-3 py-2 rounded-lg hover:opacity-90 transition-opacity">
-                Get Notified
-              </button>
+                How it works
+              </Link>
+              <Link
+                href="#pricing"
+                className="block px-3 py-2 text-muted-foreground hover:text-foreground"
+              >
+                Pricing
+              </Link>
+              {loading ? (
+                <div className="w-full bg-primary/50 text-primary-foreground px-3 py-2 rounded-lg cursor-wait flex items-center justify-center gap-2">
+                  <IconLoader2 className="size-4 animate-spin" />
+                  <span>Loading...</span>
+                </div>
+              ) : loggedUser ? (
+                <Link
+                  href="/dashboard"
+                  className="w-full block text-center bg-primary text-primary-foreground px-3 py-2 rounded-lg hover:opacity-90 transition-opacity"
+                >
+                  Go to Dashboard
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/auth/login"
+                    className="w-full block text-center border border-border px-3 py-2 rounded-lg hover:bg-accent transition-colors"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/auth/register"
+                    className="w-full block text-center bg-primary text-primary-foreground px-3 py-2 rounded-lg hover:opacity-90 transition-opacity"
+                  >
+                    Start Free Trial
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}

@@ -21,23 +21,19 @@ const avatars = [
 
 const features = [
   {
+    title: "Unlimited Responses",
+    description: "Unlimited authentic, helpful responses that build authority",
+  },
+  {
     title: "Profile Optimization",
     description: "Get personalized Reddit profile improvement suggestions",
-  },
-  {
-    title: "Smart Response Generation",
-    description: "Create authentic, helpful responses that build authority",
-  },
-  {
-    title: "Subreddit Strategy",
-    description: "Discover and prioritize the best communities for your niche",
   },
   {
     title: "Authority Tracking",
     description: "Monitor your reputation and influence growth",
   },
   {
-    title: "Lead Discovery & CRM",
+    title: "Lead Discovery",
     description: "Identify and track potential customers from interactions",
   },
   {

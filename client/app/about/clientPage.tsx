@@ -2,6 +2,7 @@
 
 import Footer from "@/components/landing/Footer";
 import Navbar from "@/components/landing/Navbar";
+import { Highlighter } from "@/components/ui/highlighter";
 import { cn } from "@/lib/utils";
 import TopRedditPost from "@/public/about/top-reddit-post.webp";
 import FounderImage from "@/public/founder.webp";
@@ -48,7 +49,10 @@ export default function AboutPage() {
         <section className="py-16 px-4 sm:px-6 lg:px-8 bg-muted/30">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-4xl font-bold text-foreground mb-8 font-heading">
-              The Reddit Breakthrough{" "}
+              The{" "}
+              <Highlighter action="underline" color="#ff5700">
+                Reddit Breakthrough
+              </Highlighter>{" "}
               <span className="text-muted-foreground">(and Headache)</span>
             </h2>
             <div className="space-y-6 text-lg text-foreground/90 leading-relaxed">
@@ -56,11 +60,11 @@ export default function AboutPage() {
                 A few months ago, I wrote a post about idea validation on
                 r/SaaS. It went viral. Suddenly, my DMs exploded with people
                 asking for advice, validation help, and just wanting to connect.
-                It was incredible—I&apos;d accidentally built real authority in
+                It was incredible, I&apos;d accidentally built real authority in
                 the startup community.
               </p>
               <p className="text-2xl font-semibold text-foreground">
-                But here&apos;s the thing: Reddit became chaos.
+                but Reddit became chaos!
               </p>
             </div>
           </div>

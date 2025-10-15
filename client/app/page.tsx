@@ -7,6 +7,7 @@ import HowItWorks from "@/components/landing/HowItWorks";
 import Navbar from "@/components/landing/Navbar";
 import Pricing from "@/components/landing/Pricing";
 import SocialProof from "@/components/landing/SocialProof";
+import Link from "next/link";
 
 // please work vercel
 export default function Home() {
@@ -23,6 +24,16 @@ export default function Home() {
         <FinalCTA />
       </main>
       <Footer />
+      <Link
+        href="https://fazier.com/launches/reddinbox.com"
+        target="_blank"
+        className="opacity-0 hidden"
+      >
+        <img
+          src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=launched&theme=dark"
+          alt="Fazier badge"
+        />
+      </Link>
     </div>
   );
 }
