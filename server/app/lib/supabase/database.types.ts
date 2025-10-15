@@ -623,6 +623,7 @@ export type Database = {
         | "new-interactions-ready"
         | "subscription-expired"
         | "interactions-limit-reached"
+        | "feedback"
       email_notification_status: "pending" | "sent" | "failed"
       interaction_type: "comment_reply" | "post_reply" | "dm"
       reddit_interaction_status: "new" | "ignored" | "posted" | "scheduled"
@@ -771,6 +772,7 @@ export const Constants = {
         "new-interactions-ready",
         "subscription-expired",
         "interactions-limit-reached",
+        "feedback",
       ],
       email_notification_status: ["pending", "sent", "failed"],
       interaction_type: ["comment_reply", "post_reply", "dm"],

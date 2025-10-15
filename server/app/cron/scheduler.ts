@@ -3,12 +3,14 @@ import { supabaseAdmin } from "../lib/supabase/client";
 import { checkNewComments } from "./authority-feedback/check-new-comments";
 import { discoverRedditContentJob } from "./authority-feedback/discover-reddit-content";
 import { checkSubscriptions } from "./check-subscriptions/check-subscriptions";
+import { collectFeedback } from "./collect-feedback/collect-feedback";
 
 // CRON JOBS REGISTRY
 const cronJobs = {
   discoverRedditContentJob, // Collect content from Reddit and answer comments
   checkNewComments, // Check for new comments
   checkSubscriptions, // Check and update expired subscriptions
+  collectFeedback, // Collect user feedback from new users
 } as const;
 
 // CRON SCHEDULES
@@ -16,6 +18,7 @@ const cronSchedules = {
   discoverRedditContentJob: "0 0 */1 * * *", // Every hour
   checkNewComments: "0 0 */1 * * *", // Every hour
   checkSubscriptions: "0 0 0 * * *", // Every day at midnight UTC
+  collectFeedback: "0 0 */6 * * *", // Every 6 hours
 } as const;
 
 /**

@@ -1,13 +1,11 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import Bottleneck from "bottleneck";
-import { Resend } from "resend";
-import { interactionsLimitReachedEmailTemplate } from "../../defs/email-template/interactions-limit-reached";
 import { checkExistingInteraction } from "../../methods/create-reddit-user-interactions/check-existing-interaction";
 import { createInteractionRecord } from "../../methods/create-reddit-user-interactions/create-interaction-record";
 import { fetchActiveUsers } from "../../methods/create-reddit-user-interactions/fetch-active-users";
 import { findRelevantPosts } from "../../methods/create-reddit-user-interactions/find-relevant-posts";
 import { generateComment } from "../../methods/create-reddit-user-interactions/generate-comment";
-import { trackEmailNotification } from "../../helpers/track-email-notification";
+import { sendReviewReminderEmails } from "../../methods/create-reddit-user-interactions/send-review-reminder-emails";
 
 // MAXIMUM NUMBER OF NEW INTERACTIONS ALLOWED BEFORE REQUIRING USER REVIEW
 const MAX_INTERACTIONS = 20;
@@ -231,75 +229,12 @@ export const createRedditUserInteractionsJob = async ({
     }
 
     // SEND REVIEW REMINDER EMAILS TO USERS WHO REACHED MAX_INTERACTIONS
-    console.log("📧 Checking for users who need review reminder emails...");
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    const clientUrl = process.env.CLIENT_URL || "http://localhost:3000";
-    let emailsSent = 0;
-
-    // SEND EMAIL TO USERS WHO HAVE EXACTLY MAX_INTERACTIONS
-    for (const user of activeUsers) {
-      const interactionCount =
-        newInteractionCountMap.get(user.auth_user_id) || 0;
-
-      // ONLY SEND EMAIL IF USER HAS EXACTLY MAX_INTERACTIONS
-      if (interactionCount === MAX_INTERACTIONS && user.email) {
-        try {
-          const dashboardUrl = `${clientUrl}/dashboard/authority-feed`;
-
-          const emailHtml = interactionsLimitReachedEmailTemplate({
-            first_name: user.name || "there",
-            interaction_count: MAX_INTERACTIONS,
-            dashboard_url: dashboardUrl,
-          });
-
-          const { error: emailError } = await resend.emails.send({
-            from: "Reddinbox <notifications@reddinbox.com>",
-            to: user.email,
-            subject: "Action Required: Review Your Interactions",
-            html: emailHtml,
-          });
-
-          if (emailError) {
-            console.error(
-              `❌ Error sending email to ${user.email}:`,
-              emailError
-            );
-            // TRACK FAILED EMAIL NOTIFICATION
-            await trackEmailNotification(supabase, {
-              userId: user.auth_user_id,
-              email: user.email,
-              reason: "interactions-limit-reached",
-              status: "failed",
-              errorMessage:
-                emailError instanceof Error
-                  ? emailError.message
-                  : "Unknown error",
-            });
-          } else {
-            emailsSent++;
-            console.log(
-              `📧 Review reminder email sent to ${user.email} (User ID: ${user.auth_user_id})`
-            );
-            // TRACK SUCCESSFUL EMAIL NOTIFICATION
-            await trackEmailNotification(supabase, {
-              userId: user.auth_user_id,
-              email: user.email,
-              reason: "interactions-limit-reached",
-              status: "sent",
-            });
-          }
-        } catch (emailError) {
-          console.error(
-            `❌ Failed to send review reminder email to ${user.email}:`,
-            emailError
-          );
-        }
-      }
-    }
-
-    if (emailsSent > 0) {
-      console.log(`✅ Sent ${emailsSent} review reminder email(s)`);
-    }
+    const emailsSent = await sendReviewReminderEmails(
+      supabase,
+      activeUsers,
+      newInteractionCountMap,
+      MAX_INTERACTIONS
+    );
 
     // JOB COMPLETION SUMMARY
     const summary = {
