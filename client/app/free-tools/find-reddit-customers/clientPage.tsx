@@ -456,7 +456,7 @@ export default function FindRedditCustomersClientPage() {
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           <Card className="border-primary/20 bg-primary/10 backdrop-blur-sm shadow-xl">
-            <CardContent className="pt-12 pb-12 px-6 md:px-12 text-center">
+            <CardContent className="text-center">
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 font-heading">
                 Want Automated Lead Discovery?
               </h2>
