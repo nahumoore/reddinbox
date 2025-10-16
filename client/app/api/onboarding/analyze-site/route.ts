@@ -1,5 +1,5 @@
 import { SubredditData } from "@/types/reddit";
-import { analyzeWebsiteContent } from "@/utils/openai-analyzer";
+import { analyzeWebsiteContent } from "@/utils/llm/openai-analyzer";
 import { scrapeWebsite } from "@/utils/website-scraper";
 import { NextRequest, NextResponse } from "next/server";
 

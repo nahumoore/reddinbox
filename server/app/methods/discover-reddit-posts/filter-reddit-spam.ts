@@ -21,9 +21,10 @@ const openai = new OpenAI({
 function truncatePostContent(post: SpamFilterInput): SpamFilterInput {
   return {
     ...post,
-    content: post.content.length > 1250
-      ? post.content.substring(0, 1250) + "..."
-      : post.content
+    content:
+      post.content.length > 1250
+        ? post.content.substring(0, 1250) + "..."
+        : post.content,
   };
 }
 
@@ -95,7 +96,7 @@ async function filterSpamBatch(
             },
           },
         },
-        verbosity: "medium",
+        verbosity: "low",
         reasoning_effort: "medium",
       });
 
@@ -159,7 +160,7 @@ export async function filterSpamPosts(
 
   // PROCESS BATCHES WITH CONCURRENCY CONTROL (MAX 10 PARALLEL JOBS)
   const results: SpamFilterResult[] = [];
-  const concurrencyLimit = 10;
+  const concurrencyLimit = 50;
 
   for (let i = 0; i < batches.length; i += concurrencyLimit) {
     const batchGroup = batches.slice(i, i + concurrencyLimit);

@@ -581,6 +581,20 @@ export type Database = {
         Args: { "": string } | { "": unknown } | { "": unknown }
         Returns: unknown
       }
+      match_reddit_content: {
+        Args: { match_count?: number; query_embedding: string }
+        Returns: {
+          author: string
+          content: string
+          id: string
+          reddit_created_at: string
+          reddit_url: string
+          similarity: number
+          subreddit_name: string
+          title: string
+          ups: number
+        }[]
+      }
       sparsevec_out: {
         Args: { "": unknown }
         Returns: unknown

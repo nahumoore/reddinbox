@@ -35,3 +35,26 @@ Examples: "customer acquisition", "lead generation", "community building", etc.
 
 Return ONLY the JSON response.
 `;
+
+export const PROBLEM_IDENTIFICATION_PROMPT = `
+You're an expert business analyst. Analyze the website content provided and identify the core problem(s) the business solves for its customers.
+
+Provide a JSON response with this exact structure:
+{
+  "problemStatement": "A single, clear sentence describing the main problem this business solves"
+}
+
+## GUIDELINES:
+
+**problemStatement**: Write a concise sentence (15-25 words) that captures the primary problem or pain point this business addresses. Focus on:
+- The customer's challenge or frustration (not the product's features)
+- The gap or need the business fills
+- The outcome customers seek
+
+Examples:
+- "Helps businesses find and convert potential customers on Reddit without appearing spammy"
+- "Enables small teams to manage customer support efficiently without hiring more staff"
+- "Solves the challenge of keeping remote teams aligned and productive across time zones"
+
+Return ONLY the JSON response.
+`;

@@ -76,6 +76,14 @@ export default function Footer() {
             <h3 className="font-semibold text-foreground mb-4">Services</h3>
             <ul className="space-y-2">
               <li>
+                <Link
+                  href="/free-tools"
+                  className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2"
+                >
+                  Free Tools
+                </Link>
+              </li>
+              <li>
                 <div className="text-muted-foreground flex items-center gap-2">
                   Blog
                   <Badge variant="outline">Coming Soon...</Badge>

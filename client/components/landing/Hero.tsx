@@ -1,7 +1,6 @@
 import { IconArrowRight, IconStar } from "@tabler/icons-react";
 import Link from "next/link";
 import { IconBrandRedditNew } from "../icons/BrandRedditNew";
-import { AuroraText } from "../ui/aurora-text";
 import { AvatarCircles } from "../ui/avatar-circles";
 import { Highlighter } from "../ui/highlighter";
 import HeroIllustration from "./HeroIllustration";
@@ -28,13 +27,10 @@ export default function Hero() {
       <div className="max-w-4xl mx-auto text-center">
         <h1 className="text-4xl md:text-6xl lg:text-7xl max-w-4xl mx-auto font-bold text-foreground mb-6 font-heading leading-tight">
           Build{" "}
-          <AuroraText
-            colors={["#FF5700", "#fc5c21", "#de3f04", "#d63f06"]}
-            className="relative"
-          >
+          <span className="relative text-primary">
             Reddit Authority
             <IconBrandRedditNew className="size-8 -rotate-6 absolute -top-3 -left-2 text-primary" />
-          </AuroraText>
+          </span>
           ,{" "}
           <Highlighter action="underline" color="#ff5700">
             Get Customers
