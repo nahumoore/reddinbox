@@ -42,6 +42,9 @@ export default function RootLayout({
               data-key="hbImKkk0joIgPnpgmbNl5g"
               async
             />
+
+            {/* HEYO - CHATBOT */}
+            <Script src="https://heyo.so/embed/script?projectId=68f183027d28bb99332c2e2c"></Script>
           </>
         )}
       </body>
