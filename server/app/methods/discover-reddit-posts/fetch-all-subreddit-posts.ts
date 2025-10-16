@@ -73,6 +73,8 @@ export async function fetchAllSubredditPosts(
 
       if (!redditResponse.success || !redditResponse.data) {
         const errorMsg = `${subreddit.display_name_prefixed}: ${redditResponse.error}`;
+        console.error(errorMsg);
+
         return {
           subredditId: subreddit.id,
           subredditName: subreddit.display_name_prefixed,
@@ -95,6 +97,8 @@ export async function fetchAllSubredditPosts(
       const errorMsg = `${subreddit.display_name_prefixed}: ${
         error instanceof Error ? error.message : "Unknown error"
       }`;
+
+      console.error(errorMsg);
       return {
         subredditId: subreddit.id,
         subredditName: subreddit.display_name_prefixed,

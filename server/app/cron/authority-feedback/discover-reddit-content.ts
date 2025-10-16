@@ -98,9 +98,14 @@ export const discoverRedditContentJob = async ({
     console.log(
       `📁 Collected ${allPostsToProcess.length} posts from all subreddits for processing`
     );
+    if (fetchErrors.length > 0) {
+      console.error("❌ Errors encountered while fetching subreddit posts");
+      fetchErrors.forEach((error) => console.error(`   - ${error}`));
+    }
 
     if (allPostsToProcess.length === 0) {
       console.log("ℹ️ No posts to process");
+
       return {
         success: true,
         subredditsProcessed: subreddits.length,
