@@ -6,7 +6,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const origin =
   process.env.NODE_ENV === "development"
     ? "http://localhost:3000"
-    : "https://linkyleap.com";
+    : "https://reddinbox.com";
 
 const planPriceId = "price_1SDNNCQbv8t8qpayLFlpVIJv";
 
