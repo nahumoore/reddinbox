@@ -8,7 +8,7 @@ const origin =
     ? "http://localhost:3000"
     : "https://reddinbox.com";
 
-const planPriceId = "price_1SDNNCQbv8t8qpayLFlpVIJv";
+const planPriceId = "price_1SJdQmH8SnaGZmukSNqKEOfm";
 
 export async function stripeBuyPlanRedirect() {
   const supabaseAuth = await supabaseServer();
