@@ -47,13 +47,13 @@ export default function LeadsPage() {
   const [activeTab, setActiveTab] = useState<TabValue>("new-posts");
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="flex flex-col gap-6 p-4 md:p-6">
       {/* Header */}
       <div className="py-3">
         <div className="flex justify-between">
           <div className="flex items-center gap-3 mb-2">
-            <h1 className="font-heading text-2xl font-bold flex items-center gap-2">
-              <IconUserUp className="size-6" />
+            <h1 className="font-heading text-2xl md:text-3xl font-bold flex items-center gap-2 bg-primary text-primary-foreground px-2 py-1 rounded-md shadow-sm">
+              <IconUserUp className="size-6 md:size-7" />
               Authority Feed
             </h1>
           </div>
@@ -69,7 +69,7 @@ export default function LeadsPage() {
           </Link>
         </div>
         <div className="space-y-2">
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground font-medium">
             Start building authority on Reddit for content around{" "}
             <b className="text-primary italic">{userActiveWebsite?.name}</b>
           </p>

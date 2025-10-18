@@ -2,7 +2,6 @@ import { IconArrowRight, IconStar } from "@tabler/icons-react";
 import Link from "next/link";
 import { IconBrandRedditNew } from "../icons/BrandRedditNew";
 import { AvatarCircles } from "../ui/avatar-circles";
-import { Highlighter } from "../ui/highlighter";
 import HeroIllustration from "./HeroIllustration";
 
 const avatars = [
@@ -25,17 +24,18 @@ export default function Hero() {
     <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
       {/* HERO */}
       <div className="max-w-4xl mx-auto text-center">
-        <h1 className="text-4xl md:text-6xl lg:text-7xl max-w-4xl mx-auto font-bold text-foreground mb-6 font-heading leading-tight">
-          Build{" "}
-          <span className="relative text-primary">
-            Reddit Authority
-            <IconBrandRedditNew className="size-8 -rotate-6 absolute -top-3 -left-2 text-primary" />
+        <h1 className="text-4xl md:text-6xl lg:text-7xl max-w-3xl mx-auto font-bold text-foreground mb-6 font-heading leading-tight">
+          Your customers are on{" "}
+          <div className="inline-block">
+            <div className="text-primary flex items-center gap-2">
+              <IconBrandRedditNew className="size-8 md:size-12 lg:size-16 -rotate-6" />
+              Reddit...
+            </div>
+          </div>
+          <br />
+          <span className="text-3xl md:text-5xl lg:text-6xl text-red-600 underline">
+            but they don&apos;t know you!
           </span>
-          ,{" "}
-          <Highlighter action="underline" color="#ff5700">
-            Get Customers
-          </Highlighter>
-          .
         </h1>
 
         <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed">

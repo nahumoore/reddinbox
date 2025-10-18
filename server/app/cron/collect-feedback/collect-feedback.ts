@@ -27,7 +27,6 @@ export const collectFeedback = async ({
     const { data: potentialUsers, error: fetchError } = await supabase
       .from("user_info")
       .select("auth_user_id, email, name, created_at")
-      .eq("onboarding_completed", true)
       .lte("created_at", twoHoursAgoISO)
       .gte("created_at", twoDaysAgoISO)
       .not("email", "is", null);
