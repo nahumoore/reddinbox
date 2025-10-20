@@ -103,17 +103,9 @@ export default function TrackingSubredditsPage() {
                     <TableRow key={subreddit.id}>
                       <TableCell className="max-w-sm">
                         <div className="flex items-center gap-3">
-                          {subreddit.community_icon ? (
-                            <img
-                              src={subreddit.community_icon}
-                              alt={subreddit.display_name_prefixed}
-                              className="size-10 rounded-full bg-muted flex-shrink-0"
-                            />
-                          ) : (
-                            <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                              <IconWorld className="size-5 text-primary" />
-                            </div>
-                          )}
+                          <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                            <IconWorld className="size-5 text-primary" />
+                          </div>
                           <div className="min-w-0">
                             <div className="font-semibold text-sm">
                               {subreddit.display_name_prefixed}

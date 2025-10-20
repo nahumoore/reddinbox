@@ -8,6 +8,7 @@ Provide a JSON response with this exact structure:
   "targetAudience": "Who the business serves",
   "expertise": ["keyword1", "keyword2", "keyword3"],
   "keywords": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"],
+  "recommendedSubreddits": ["r/example1", "r/example2", "r/example3", "r/example4", "r/example5", "r/example6"]
 }
 
 ## DETAILED GUIDELINES:
@@ -32,6 +33,8 @@ Examples: "customer acquisition", "lead generation", "community building", etc.
 - Include both technical and casual terms
 - Prioritize search-friendly phrases (2-3 words max)
 - Example: "email deliverability" not "advanced email optimization"
+
+**recommendedSubreddits**: 6 recommended subreddits where the target audience for this website hangs out
 
 Return ONLY the JSON response.
 `;

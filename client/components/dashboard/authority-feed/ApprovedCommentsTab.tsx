@@ -3,15 +3,17 @@
 import { InteractionPost } from "@/components/dashboard/authority-feed/InteractionPost";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import { useRedditAccounts } from "@/stores/reddit-accounts";
 import { useRedditUserInteractions } from "@/stores/reddit-user-interactions";
-import { IconCalendarCheck } from "@tabler/icons-react";
+import { IconCalendarCheck, IconUserOff } from "@tabler/icons-react";
+import Link from "next/link";
 
 export default function ApprovedCommentsTab() {
   const { activeRedditAccount } = useRedditAccounts();
   const { redditUserInteractions, isLoadingRedditUserInteractions } =
     useRedditUserInteractions();
-  const approvedComments = redditUserInteractions.filter(
+  const approvedComments = redditUserInteractions?.filter(
     (interaction) =>
       interaction.status === "scheduled" &&
       interaction.interaction_type === "post_reply"
@@ -27,7 +29,25 @@ export default function ApprovedCommentsTab() {
     );
   }
 
-  if (approvedComments.length === 0) {
+  if (!activeRedditAccount) {
+    return (
+      <div className="text-center py-12 max-w-xl mx-auto">
+        <IconUserOff className="size-12 text-muted-foreground mx-auto mb-4" />
+        <h3 className="font-medium text-lg mb-2">No Reddit Account Connected</h3>
+        <p className="text-muted-foreground mb-6">
+          We cannot auto-schedule and post your approved comments without an active Reddit account.
+          Connect your account to start posting your approved responses automatically.
+        </p>
+        <Button asChild>
+          <Link href="/dashboard/reddit-profile">
+            Connect Reddit Account
+          </Link>
+        </Button>
+      </div>
+    );
+  }
+
+  if (!approvedComments || approvedComments.length === 0) {
     return (
       <div className="text-center py-12 max-w-xl mx-auto">
         <IconCalendarCheck className="size-12 text-muted-foreground mx-auto mb-4" />

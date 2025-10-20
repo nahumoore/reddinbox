@@ -1,10 +1,10 @@
 import { fetchCommentContexts } from "@/methods/check-new-comments/fetch-comment-contexts";
 import { fetchInboxComments } from "@/methods/check-new-comments/fetch-inbox-comments";
 import { fetchRedditAccount } from "@/methods/check-new-comments/fetch-reddit-account";
+import { fetchUsersToProcess } from "@/methods/check-new-comments/fetch-users-to-process";
 import { filterNewComments } from "@/methods/check-new-comments/filter-new-comments";
 import { generateAIReplies } from "@/methods/check-new-comments/generate-ai-replies";
 import { saveInteractions } from "@/methods/check-new-comments/save-interactions";
-import { fetchActiveUsers } from "@/methods/create-reddit-user-interactions/fetch-active-users";
 import { SupabaseClient } from "@supabase/supabase-js";
 import Bottleneck from "bottleneck";
 import OpenAI from "openai";
@@ -31,7 +31,7 @@ export const checkNewComments = async ({
 
   try {
     // Fetch all active users with their websites and reddit accounts
-    const activeUsers = await fetchActiveUsers(supabase);
+    const activeUsers = await fetchUsersToProcess(supabase);
 
     if (!activeUsers || activeUsers.length === 0) {
       console.log("✅ No active users found");

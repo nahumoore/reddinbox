@@ -89,9 +89,6 @@ export default async function DashboardLayoutServer({
   const activeRedditAccount = redditAccounts?.find(
     (account) => account.is_active
   ) as RedditAccount;
-  if (redditAccounts?.length === 0 || !activeRedditAccount) {
-    redirect("/no-reddit-account-active");
-  }
 
   const [{ data: redditUserInteractions }, { data: subreddits }] =
     await Promise.all([
@@ -136,7 +133,6 @@ export default async function DashboardLayoutServer({
         )
         .eq("user_id", user.id)
         .eq("website_id", activeWebsite.id)
-        .eq("reddit_account_id", activeRedditAccount?.id)
         .order("created_at", { ascending: false }),
       supabase
         .from("reddit_subreddits")

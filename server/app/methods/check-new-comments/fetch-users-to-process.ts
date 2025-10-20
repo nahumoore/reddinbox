@@ -34,7 +34,7 @@ export interface ActiveUser {
       }[];
 }
 
-export async function fetchActiveUsers(
+export async function fetchUsersToProcess(
   supabase: SupabaseClient
 ): Promise<ActiveUser[]> {
   const { data: activeUsers, error: usersError } = await supabase
@@ -52,7 +52,7 @@ export async function fetchActiveUsers(
         subreddit_reddit_ids,
         authority_feed_options
       ),
-      reddit_accounts (
+      reddit_accounts!inner (
         id,
         name,
         reddit_id,
@@ -61,7 +61,8 @@ export async function fetchActiveUsers(
     `
     )
     .in("subscription_status", ["active", "free-trial"])
-    .eq("websites.is_active", true);
+    .eq("websites.is_active", true)
+    .eq("reddit_accounts.is_active", true);
 
   if (usersError) {
     console.error("❌ Error fetching active users:", usersError);

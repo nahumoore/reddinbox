@@ -32,9 +32,10 @@ export default function RelationshipPipelinePage() {
   // Group interactions by user (only 'posted' interactions)
   const processedUsers = useMemo(() => {
     // Filter only 'posted' interactions (exclude ignored, new, scheduled)
-    const postedInteractions = redditUserInteractions.filter(
+    const postedInteractions = redditUserInteractions?.filter(
       (interaction) => interaction.status === "posted"
     );
+    if (!postedInteractions) return [];
 
     // Group by username
     const groupedByUser = postedInteractions.reduce((acc, interaction) => {

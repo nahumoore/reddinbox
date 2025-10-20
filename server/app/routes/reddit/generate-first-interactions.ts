@@ -3,10 +3,10 @@ import { Request, Response } from "express";
 import { Resend } from "resend";
 import { openaiLimiter } from "../../cron/authority-feedback/create-reddit-user-interactions";
 import { newInteractionsEmailTemplate } from "../../defs/email-template/new-interactions";
+import { trackEmailNotification } from "../../helpers/track-email-notification";
 import { createInteractionRecord } from "../../methods/create-reddit-user-interactions/create-interaction-record";
 import { findRelevantPosts } from "../../methods/create-reddit-user-interactions/find-relevant-posts";
 import { generateComment } from "../../methods/create-reddit-user-interactions/generate-comment";
-import { trackEmailNotification } from "../../helpers/track-email-notification";
 
 export const generateFirstInteractions = async (
   req: Request,
@@ -32,7 +32,7 @@ export const generateFirstInteractions = async (
           keywords,
           authority_feed_options
         ),
-        reddit_accounts:reddit_accounts!inner(
+        reddit_accounts:reddit_accounts(
           id,
           name
         )
@@ -49,24 +49,27 @@ export const generateFirstInteractions = async (
     const websites = Array.isArray(userData.websites)
       ? userData.websites
       : [userData.websites];
-    const redditAccounts = Array.isArray(userData.reddit_accounts)
-      ? userData.reddit_accounts
-      : [userData.reddit_accounts];
-
-    if (redditAccounts.length === 0) {
-      console.log(`⏭️ User ${userId} has no Reddit accounts`);
-      return res
-        .status(400)
-        .json({ error: "User has no connected Reddit accounts" });
-    }
 
     if (websites.length === 0) {
       console.log(`⏭️ Website not found`);
       return res.status(404).json({ error: "Website not found" });
     }
 
-    const redditUsername = redditAccounts[0].name;
-    const redditAccountId = redditAccounts[0].id;
+    // EXTRACT REDDIT ACCOUNT INFO (OPTIONAL)
+    let redditUsername: string | null = null;
+    let redditAccountId: string | null = null;
+
+    if (userData.reddit_accounts) {
+      const redditAccounts = Array.isArray(userData.reddit_accounts)
+        ? userData.reddit_accounts
+        : [userData.reddit_accounts];
+
+      if (redditAccounts.length > 0) {
+        redditUsername = redditAccounts[0].name;
+        redditAccountId = redditAccounts[0].id;
+      }
+    }
+
     const website = websites[0];
 
     let totalCommentsGenerated = 0;
@@ -133,7 +136,7 @@ export const generateFirstInteractions = async (
       const task = openaiLimiter.schedule(async () => {
         try {
           const processedComment = await generateComment({
-            userName: userData.name || redditUsername,
+            userName: userData.name || redditUsername || "Anonymous",
             userProductName: website.name,
             userProductDescription: website.description || "",
             userProductKeywords: website.keywords || [],
@@ -154,7 +157,7 @@ export const generateFirstInteractions = async (
             interactedWithRedditUsername: post.author,
             ourInteractionContent: processedComment,
             redditContentDiscoveredId: post.id,
-            redditAccountId: redditAccountId,
+            redditAccountId: redditAccountId || undefined,
             similarityScore: post.similarity_score,
           });
 
@@ -233,7 +236,10 @@ export const generateFirstInteractions = async (
         });
 
         if (emailError) {
-          console.error(`❌ Error sending email to ${userData.email}:`, emailError);
+          console.error(
+            `❌ Error sending email to ${userData.email}:`,
+            emailError
+          );
           // TRACK FAILED EMAIL NOTIFICATION
           await trackEmailNotification(supabase, {
             userId: userData.auth_user_id,
@@ -241,7 +247,9 @@ export const generateFirstInteractions = async (
             reason: "new-interactions-ready",
             status: "failed",
             errorMessage:
-              emailError instanceof Error ? emailError.message : "Unknown error",
+              emailError instanceof Error
+                ? emailError.message
+                : "Unknown error",
           });
         } else {
           console.log(`📧 Email notification sent to ${userData.email}`);

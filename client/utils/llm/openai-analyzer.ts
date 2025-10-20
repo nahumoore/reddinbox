@@ -7,6 +7,7 @@ interface AnalysisResult {
   keywords: string[];
   targetAudience: string;
   expertise: string[];
+  recommendedSubreddits: string[];
   error?: string;
 }
 
@@ -77,6 +78,17 @@ export async function analyzeWebsiteContent(
                 minItems: 1,
                 maxItems: 10,
               },
+              recommendedSubreddits: {
+                type: "array",
+                description:
+                  "6 recommended subreddits where the target audience hangs out",
+                items: {
+                  type: "string",
+                  minLength: 1,
+                },
+                minItems: 1,
+                maxItems: 10,
+              },
             },
             required: [
               "websiteName",
@@ -84,6 +96,7 @@ export async function analyzeWebsiteContent(
               "targetAudience",
               "expertise",
               "keywords",
+              "recommendedSubreddits",
             ],
             additionalProperties: false,
           },
@@ -108,7 +121,9 @@ export async function analyzeWebsiteContent(
     if (
       !analysisData.companyDescription ||
       !analysisData.keywords ||
-      !Array.isArray(analysisData.keywords)
+      !Array.isArray(analysisData.keywords) ||
+      !analysisData.recommendedSubreddits ||
+      !Array.isArray(analysisData.recommendedSubreddits)
     ) {
       throw new Error("Invalid analysis response structure");
     }
@@ -119,6 +134,7 @@ export async function analyzeWebsiteContent(
       keywords: analysisData.keywords,
       targetAudience: analysisData.targetAudience,
       expertise: analysisData.expertise,
+      recommendedSubreddits: analysisData.recommendedSubreddits,
     };
   } catch (error) {
     console.error("OpenAI analysis error:", error);
@@ -128,6 +144,7 @@ export async function analyzeWebsiteContent(
       keywords: [],
       targetAudience: "",
       expertise: [],
+      recommendedSubreddits: [],
       error:
         error instanceof Error
           ? error.message

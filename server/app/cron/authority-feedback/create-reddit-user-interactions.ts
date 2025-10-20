@@ -27,7 +27,7 @@ export const createRedditUserInteractionsJob = async ({
     const activeUsers = await fetchActiveUsers(supabase);
 
     if (activeUsers.length === 0) {
-      console.log("ℹ️ No active users with websites and Reddit accounts found");
+      console.log("ℹ️ No active users found");
       return { success: true, message: "No active users to process" };
     }
 
@@ -71,19 +71,21 @@ export const createRedditUserInteractionsJob = async ({
         const websites = Array.isArray(user.websites)
           ? user.websites
           : [user.websites];
-        const redditAccounts = Array.isArray(user.reddit_accounts)
-          ? user.reddit_accounts
-          : [user.reddit_accounts];
 
-        if (redditAccounts.length === 0) {
-          console.log(
-            `⏭️ User ${user.auth_user_id} has no Reddit accounts, skipping...`
-          );
-          continue;
+        // EXTRACT REDDIT ACCOUNT INFO (OPTIONAL)
+        let redditUsername: string | null = null;
+        let redditAccountId: string | null = null;
+
+        if (user.reddit_accounts) {
+          const redditAccounts = Array.isArray(user.reddit_accounts)
+            ? user.reddit_accounts
+            : [user.reddit_accounts];
+
+          if (redditAccounts.length > 0) {
+            redditUsername = redditAccounts[0].name;
+            redditAccountId = redditAccounts[0].id;
+          }
         }
-
-        const redditUsername = redditAccounts[0].name;
-        const redditAccountId = redditAccounts[0].id;
 
         for (const website of websites) {
           // EXTRACT AUTHORITY FEED OPTIONS
@@ -159,7 +161,7 @@ export const createRedditUserInteractionsJob = async ({
             const task = openaiLimiter.schedule(async () => {
               try {
                 const processedComment = await generateComment({
-                  userName: user.name || redditUsername,
+                  userName: user.name || redditUsername || "Anonymous",
                   userProductName: website.name,
                   userProductDescription: website.description || "",
                   userProductKeywords: website.keywords || [],
@@ -182,7 +184,7 @@ export const createRedditUserInteractionsJob = async ({
                   interactedWithRedditUsername: post.author,
                   ourInteractionContent: processedComment,
                   redditContentDiscoveredId: post.id,
-                  redditAccountId: redditAccountId,
+                  redditAccountId: redditAccountId || undefined,
                   similarityScore: post.similarity_score,
                 });
 

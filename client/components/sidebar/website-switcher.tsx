@@ -10,12 +10,10 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useUserWebsites } from "@/stores/user-wesbites";
-import { IconWorld } from "@tabler/icons-react";
 import { Skeleton } from "../ui/skeleton";
 
 export function WebsiteSwitcher() {
-  const { userActiveWebsite, isLoadingUserWebsites, userWebsites } =
-    useUserWebsites();
+  const { userActiveWebsite, isLoadingUserWebsites } = useUserWebsites();
 
   if (!userActiveWebsite) {
     return null;
@@ -32,8 +30,11 @@ export function WebsiteSwitcher() {
               size="lg"
               // className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                <IconWorld className="size-4" />
+              <div className="bg-muted/20 text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                <img
+                  src={`https://www.google.com/s2/favicons?domain=${userActiveWebsite.url}`}
+                  className="w-6 h-6"
+                />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">

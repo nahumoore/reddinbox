@@ -102,3 +102,4 @@ You are an expert **Next.js developer** with professional skills in:
 - Use &apos; and &quot; when designing or creating the html of `.tsx` components.
 - You just need to make code updates, NEVER run servers or execute commands apart of coding updates.
 - When applying programmatic classes, use `cn` not `class1 ${class2}`
+- Never add padding into <CardContent> components

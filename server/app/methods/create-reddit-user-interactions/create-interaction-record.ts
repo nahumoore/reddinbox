@@ -7,8 +7,8 @@ export interface CreateInteractionParams {
   interactedWithRedditUsername: string;
   ourInteractionContent: string;
   redditContentDiscoveredId: string;
-  redditAccountId: string;
   similarityScore: number;
+  redditAccountId?: string;
 }
 
 export async function createInteractionRecord(

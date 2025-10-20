@@ -1,5 +1,6 @@
 import { SubredditData } from "@/types/reddit";
 import { analyzeWebsiteContent } from "@/utils/llm/openai-analyzer";
+import { fetchMultipleSubreddits } from "@/utils/reddit/fetch-subreddit";
 import { scrapeWebsite } from "@/utils/website-scraper";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -41,13 +42,19 @@ export async function POST(
       );
     }
 
-    // Return the complete analysis
+    // Step 3: Fetch all recommended subreddits in parallel
+    const subreddits = await fetchMultipleSubreddits(
+      analysis.recommendedSubreddits
+    );
+
+    // Return the complete analysis with subreddit data
     return NextResponse.json({
       websiteName: analysis.websiteName,
       keywordsToMonitor: analysis.keywords,
       companyDescription: analysis.companyDescription,
       targetAudience: analysis.targetAudience,
       expertise: analysis.expertise,
+      subreddits: subreddits,
     });
   } catch (error) {
     console.error("Website analysis route error:", error);

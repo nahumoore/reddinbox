@@ -1,6 +1,7 @@
 "use client";
 
 import ActivityRedditProfile from "@/components/dashboard/reddit-profile/ActivityRedditProfile";
+import NoRedditProfile from "@/components/dashboard/reddit-profile/NoRedditProfile";
 import SettingsRedditProfile from "@/components/dashboard/reddit-profile/SettingsRedditProfile";
 import { IconBrandRedditNew } from "@/components/icons/BrandRedditNew";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -86,6 +87,11 @@ export default function RedditProfilePage() {
     return parts.join(", ").replace(/, ([^,]*)$/, " and $1");
   };
 
+  const handleRedditReauth = () => {
+    const authUrl = generateRedditAuthUrl();
+    window.location.href = authUrl;
+  };
+
   const refreshRedditAccountStatistics = async () => {
     setIsRefreshing(true);
     try {
@@ -120,17 +126,7 @@ export default function RedditProfilePage() {
   }
 
   if (!activeRedditAccount) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center space-y-3">
-          <IconUser className="size-16 text-muted-foreground mx-auto" />
-          <h2 className="text-xl font-semibold">No Reddit Account Connected</h2>
-          <p className="text-muted-foreground">
-            Connect your Reddit account to view your profile information.
-          </p>
-        </div>
-      </div>
-    );
+    return <NoRedditProfile />;
   }
 
   return (
@@ -171,13 +167,7 @@ export default function RedditProfilePage() {
               </div>
             </div>
             <div className="flex flex-col gap-2">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  const authUrl = generateRedditAuthUrl();
-                  window.location.href = authUrl;
-                }}
-              >
+              <Button variant="outline" onClick={handleRedditReauth}>
                 Re-Authenticate
                 <IconBrandRedditNew className="text-primary size-6" />
               </Button>

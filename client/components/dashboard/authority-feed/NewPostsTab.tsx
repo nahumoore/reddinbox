@@ -12,7 +12,7 @@ export default function NewPostsTab() {
   const { userActiveWebsite } = useUserWebsites();
   const { redditUserInteractions, isLoadingRedditUserInteractions } =
     useRedditUserInteractions();
-  const newPostsToReview = redditUserInteractions.filter(
+  const newPostsToReview = redditUserInteractions?.filter(
     (interaction) =>
       interaction.status === "new" &&
       interaction.interaction_type === "post_reply"
@@ -28,7 +28,7 @@ export default function NewPostsTab() {
     );
   }
 
-  if (newPostsToReview.length === 0) {
+  if (!newPostsToReview || newPostsToReview.length === 0) {
     return (
       <div className="text-center py-12 max-w-xl mx-auto">
         <IconSearch className="size-12 text-muted-foreground mx-auto mb-4 animate-pulse" />

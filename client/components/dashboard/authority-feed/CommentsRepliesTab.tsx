@@ -2,9 +2,12 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { useRedditAccounts } from "@/stores/reddit-accounts";
 import { useRedditUserInteractions } from "@/stores/reddit-user-interactions";
 import { useUserWebsites } from "@/stores/user-wesbites";
-import { IconMessageOff } from "@tabler/icons-react";
+import { IconMessageOff, IconUserOff } from "@tabler/icons-react";
+import Link from "next/link";
 import InteractionRemoveAll from "./InteractionRemoveAll";
 import ThreadComments from "./ThreadComments";
 
@@ -12,8 +15,9 @@ export default function CommentsRepliesTab() {
   const { userActiveWebsite } = useUserWebsites();
   const { redditUserInteractions, isLoadingRedditUserInteractions } =
     useRedditUserInteractions();
+  const { activeRedditAccount } = useRedditAccounts();
 
-  const commentRepliesToReview = redditUserInteractions.filter(
+  const commentRepliesToReview = redditUserInteractions?.filter(
     (interaction) =>
       interaction.status === "new" &&
       interaction.interaction_type === "comment_reply"
@@ -53,6 +57,24 @@ export default function CommentsRepliesTab() {
     );
   }
 
+  if (!activeRedditAccount) {
+    return (
+      <div className="text-center py-12 max-w-xl mx-auto">
+        <IconUserOff className="size-12 text-muted-foreground mx-auto mb-4" />
+        <h3 className="font-medium text-lg mb-2">No Reddit Account Connected</h3>
+        <p className="text-muted-foreground mb-6">
+          We cannot track the comments you receive without an active Reddit account.
+          Connect your account to monitor replies and generate helpful responses.
+        </p>
+        <Button asChild>
+          <Link href="/dashboard/reddit-profile">
+            Connect Reddit Account
+          </Link>
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       {/* <div className="flex justify-end">
@@ -69,7 +91,7 @@ export default function CommentsRepliesTab() {
           {isRefreshing ? "Refreshing..." : "Refresh"}
         </Button>
       </div> */}
-      {commentRepliesToReview.length === 0 ? (
+      {!commentRepliesToReview || commentRepliesToReview.length === 0 ? (
         <div className="text-center py-12 max-w-xl mx-auto">
           <IconMessageOff className="size-12 text-muted-foreground mx-auto mb-4 animate-pulse" />
           <h3 className="font-medium text-lg mb-2">No comment replies yet</h3>

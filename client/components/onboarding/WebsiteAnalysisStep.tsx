@@ -26,6 +26,7 @@ export default function WebsiteAnalysisStep() {
     isLoading,
     setWebsiteUrl,
     setWebsiteAnalysis,
+    setTargetSubreddits,
     setLoading,
     setStep,
   } = useOnboardingForm();
@@ -71,6 +72,7 @@ export default function WebsiteAnalysisStep() {
       targetAudience: result.targetAudience,
       expertise: result.expertise,
     });
+    setTargetSubreddits(result.subreddits);
 
     setStep(2);
   };
