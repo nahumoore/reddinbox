@@ -1,6 +1,8 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useRedditUserInteractions } from "@/stores/reddit-user-interactions";
 import { RedditUserInteraction } from "@/types/db-schema";
 import {
   IconChartLine,
@@ -10,8 +12,16 @@ import {
 } from "@tabler/icons-react";
 import { useMemo } from "react";
 
+interface Stats {
+  totalUsers: number;
+  totalInteractions: number;
+  totalSubreddits: number;
+  avgSimilarityScore: string;
+}
+
 interface PipelineStatsProps {
-  interactions: RedditUserInteraction[];
+  interactions?: RedditUserInteraction[];
+  stats?: Stats;
 }
 
 interface StatCardProps {
@@ -22,6 +32,8 @@ interface StatCardProps {
 }
 
 function StatCard({ icon: Icon, label, value, description }: StatCardProps) {
+  const { isLoadingRedditUserInteractions } = useRedditUserInteractions();
+
   return (
     <Card>
       <CardContent className="space-y-2">
@@ -32,7 +44,15 @@ function StatCard({ icon: Icon, label, value, description }: StatCardProps) {
             </div>
             <div>
               <p className="text-sm text-muted-foreground">{label}</p>
-              <p className="text-2xl font-bold font-heading">{value}</p>
+              <div className="text-2xl font-bold font-heading">
+                <>
+                  {isLoadingRedditUserInteractions ? (
+                    <Skeleton className="h-6 w-12" />
+                  ) : (
+                    value
+                  )}
+                </>
+              </div>
             </div>
           </div>
         </div>
@@ -44,10 +64,28 @@ function StatCard({ icon: Icon, label, value, description }: StatCardProps) {
   );
 }
 
-export function PipelineStats({ interactions }: PipelineStatsProps) {
-  const stats = useMemo(() => {
+export function PipelineStats({
+  interactions,
+  stats: providedStats,
+}: PipelineStatsProps) {
+  const calculatedStats = useMemo(() => {
+    if (providedStats) {
+      return providedStats;
+    }
+
+    if (!interactions) {
+      return {
+        totalUsers: 0,
+        totalInteractions: 0,
+        totalSubreddits: 0,
+        avgSimilarityScore: "N/A",
+      };
+    }
+
     // Filter only 'posted' interactions (exclude ignored, new, scheduled)
-    const postedInteractions = interactions.filter((i) => i.status === "posted");
+    const postedInteractions = interactions.filter(
+      (i) => i.status === "posted"
+    );
 
     // Get unique users from posted interactions
     const uniqueUsers = new Set(
@@ -81,7 +119,9 @@ export function PipelineStats({ interactions }: PipelineStatsProps) {
       totalSubreddits: uniqueSubreddits.size,
       avgSimilarityScore: avgScore,
     };
-  }, [interactions]);
+  }, [interactions, providedStats]);
+
+  const stats = calculatedStats;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -89,7 +129,7 @@ export function PipelineStats({ interactions }: PipelineStatsProps) {
         icon={IconUsers}
         label="Total Leads"
         value={stats.totalUsers}
-        description="Users you&apos;ve engaged with"
+        description="Users you've engaged with"
       />
       <StatCard
         icon={IconMessages}

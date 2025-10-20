@@ -3,7 +3,7 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { RedditUserInteraction } from "@/types/db-schema";
 import { IconChevronRight } from "@tabler/icons-react";
@@ -85,7 +85,7 @@ export function UserRelationshipCard({
   return (
     <Link href={`/dashboard/relationship-pipeline/${username}`}>
       <Card className="hover:shadow-md transition-all duration-300 cursor-pointer group">
-        <div className="p-4">
+        <CardContent>
           <div className="flex items-start justify-between gap-4">
             {/* Left: User Info */}
             <div className="flex items-start gap-4 flex-1 min-w-0">
@@ -179,7 +179,7 @@ export function UserRelationshipCard({
               </div>
             </div>
           </div>
-        </div>
+        </CardContent>
       </Card>
     </Link>
   );
