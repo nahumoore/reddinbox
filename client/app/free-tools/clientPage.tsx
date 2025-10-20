@@ -16,7 +16,6 @@ import {
   IconSearch,
   IconSparkles,
   IconTarget,
-  IconUsers,
 } from "@tabler/icons-react";
 import Link from "next/link";
 
@@ -37,6 +36,19 @@ const FREE_TOOLS = [
     ],
   },
   {
+    id: "subreddit-finder",
+    title: "Subreddit Finder",
+    description:
+      "Find the best subreddits for your niche. Analyze community size, engagement rates, and relevance to target the right audiences for your business.",
+    icon: IconTarget,
+    href: "/free-tools/reddit-subreddit-finder",
+    features: [
+      "Niche-based recommendations",
+      "Engagement metrics",
+      "Community activity levels",
+    ],
+  },
+  {
     id: "reddit-profile-optimizer",
     title: "Reddit Profile Optimizer",
     description:
@@ -51,20 +63,6 @@ const FREE_TOOLS = [
     ],
   },
   {
-    id: "subreddit-finder",
-    title: "Subreddit Finder",
-    description:
-      "Find the best subreddits for your niche. Analyze community size, engagement rates, and relevance to target the right audiences for your business.",
-    icon: IconTarget,
-    href: "#",
-    badge: "Coming Soon",
-    features: [
-      "Niche-based recommendations",
-      "Engagement metrics",
-      "Competition analysis",
-    ],
-  },
-  {
     id: "engagement-analyzer",
     title: "Engagement Analyzer",
     description:
@@ -76,20 +74,6 @@ const FREE_TOOLS = [
       "Karma tracking over time",
       "Best performing content",
       "Optimal posting times",
-    ],
-  },
-  {
-    id: "audience-insights",
-    title: "Audience Insights",
-    description:
-      "Deep-dive into your target audience on Reddit. Understand demographics, interests, pain points, and conversation patterns to craft better messages.",
-    icon: IconUsers,
-    href: "#",
-    badge: "Coming Soon",
-    features: [
-      "Demographic analysis",
-      "Common pain points",
-      "Language patterns",
     ],
   },
 ];
@@ -151,6 +135,8 @@ export default function FreeToolsPageClient() {
                               "text-xs font-semibold px-3 py-1 rounded-full",
                               tool.badge === "Most Popular"
                                 ? "bg-primary text-primary-foreground shadow-sm"
+                                : tool.badge === "New"
+                                ? "bg-green-100 text-green-800 border border-green-200"
                                 : "bg-muted text-muted-foreground"
                             )}
                           >

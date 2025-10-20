@@ -14,7 +14,7 @@ const mainFont = Lexend_Deca({
 
 export const metadata: Metadata = {
   // Primary SEO Tags
-  title: "Reddit Marketing Tool - Build Authority & Generate Leads | Reddinbox",
+  title: "Reddinbox - Reddit Marketing. Build Authority & Generate Leads",
   description:
     "Build authentic authority in Reddit communities, then convert trust into qualified leads. The anti-spam approach to Reddit marketing that actually works.",
   keywords: [

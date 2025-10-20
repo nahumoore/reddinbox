@@ -61,3 +61,75 @@ Examples:
 
 Return ONLY the JSON response.
 `;
+
+export const SUBREDDIT_FINDER_PROMPT = `
+You're an expert Reddit marketing strategist and community analyst. Analyze the website content provided and identify the 6 most relevant subreddits where the target audience for this business is actively engaged.
+
+Provide a JSON response with this exact structure:
+{
+  "subreddits": [
+    {
+      "name": "subreddit_name",
+      "displayName": "r/subreddit_name",
+      "description": "A short description of the subreddit and why it's relevant",
+      "subscribers": 1234567,
+      "activeUsers": 5000,
+      "createdAt": "2008-01-25",
+      "relevanceScore": 95,
+      "activityLevel": "very-high",
+      "subredditUrl": "https://reddit.com/r/subreddit_name",
+      "category": "Business"
+    }
+  ]
+}
+
+## GUIDELINES:
+
+**name**: The subreddit name without the "r/" prefix (e.g., "entrepreneur")
+
+**displayName**: The full subreddit name with "r/" prefix (e.g., "r/entrepreneur")
+
+**description**: A few sentences (30-40 words) explaining:
+- What the community is about
+- Why it's relevant for this business
+
+**subscribers**: Realistic subscriber count based on the subreddit's popularity
+- Very popular/established subreddits: 1M-5M
+- Popular subreddits: 100K-1M
+- Niche but active: 50K-100K
+- Smaller niche: 10K-50K
+
+**activeUsers**: Realistic number of currently active users (online now)
+- Should be proportional to subscriber count (typically 0.1%-0.5% of subscribers)
+- Very active subreddits: higher percentage
+- Less active: lower percentage
+
+**createdAt**: Realistic creation date in YYYY-MM-DD format
+- Older, established communities: 2008-2012
+- Newer communities: 2013-2020
+- Recent communities: 2021-present
+
+**relevanceScore**: Score from 70-100 indicating how relevant this subreddit is to the website's target audience
+- 90-100: Perfect match, highly relevant
+- 80-89: Strong match, very relevant
+- 70-79: Good match, moderately relevant
+
+**activityLevel**: One of: "low", "medium", "high", "very-high"
+- "very-high": Extremely active, posts every few minutes, tons of engagement
+- "high": Very active, multiple posts per hour, strong engagement
+- "medium": Moderately active, several posts per day, decent engagement
+- "low": Less active, fewer posts per day, lower engagement
+
+**subredditUrl**: Full Reddit URL in format "https://reddit.com/r/subreddit_name"
+
+**category**: One of: "Business", "Technology", "Marketing", "Entrepreneurship", "SaaS", "Development", "Design", "Finance", "Productivity", "Career", "General"
+
+## IMPORTANT:
+- Return REAL, EXISTING subreddits only (no made-up communities)
+- Ensure subscriber counts and activity levels are realistic
+- Order subreddits by relevanceScore (highest first)
+- Provide diverse categories when appropriate
+- Make descriptions specific and valuable
+
+Return ONLY the JSON response.
+`;

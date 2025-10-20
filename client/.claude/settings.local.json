@@ -9,7 +9,8 @@
       "Read(//c/Users/nicol/Documents/Projects/reddinbox/server/app/methods/discover-reddit-posts/**)",
       "Read(//c/Users/nicol/Documents/Projects/reddinbox/server/app/helpers/reddit/**)",
       "Skill(copywriting)",
-      "Bash(tree /F)"
+      "Bash(tree /F)",
+      "Skill(seo)"
     ],
     "deny": [],
     "ask": []

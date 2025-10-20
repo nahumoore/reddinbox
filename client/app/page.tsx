@@ -8,7 +8,6 @@ import Navbar from "@/components/landing/Navbar";
 import Pricing from "@/components/landing/Pricing";
 import SocialProof from "@/components/landing/SocialProof";
 
-// please work vercel
 export default function Home() {
   return (
     <div className="min-h-screen bg-background">
