@@ -91,7 +91,7 @@ export const collectFeedback = async ({
           const { error: emailError } = await resend.emails.send({
             from: "Nicolas from Reddinbox <nicolas@reddinbox.com>",
             to: user.email,
-            subject: "Quick question about your Reddinbox experience",
+            subject: "Just one minute of your time please",
             text: emailText,
           });
 

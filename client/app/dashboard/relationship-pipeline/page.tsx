@@ -179,9 +179,8 @@ export default function RelationshipPipelinePage() {
             No leads yet
           </h3>
           <p className="text-muted-foreground text-center max-w-md">
-            Start building relationships by posting interactions through the
-            Authority Feed. Once you post interactions, they&apos;ll appear
-            here.
+            Start building relationships by posting comments through the
+            Authority Feed. Once you post comments, they&apos;ll appear here.
           </p>
         </div>
       )}

@@ -95,7 +95,9 @@ export default function TrackingSubredditsPage() {
                     <TableHead className="max-w-sm">Subreddit</TableHead>
                     <TableHead>Description</TableHead>
                     <TableHead className="text-right">Members</TableHead>
-                    <TableHead className="text-right">Posts (24h)</TableHead>
+                    <TableHead className="text-right">
+                      New Posts (Last 24h)
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
