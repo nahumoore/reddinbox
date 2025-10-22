@@ -3,7 +3,6 @@ import express from "express";
 import { createServer } from "http";
 import { authenticateRequest } from "./middleware/auth";
 import { corsMiddleware } from "./middleware/cors";
-import { checkNewComments } from "./routes/reddit/check-new-comments";
 import { generateFirstInteractions } from "./routes/reddit/generate-first-interactions";
 
 dotenv.config();
@@ -18,8 +17,11 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
 // API ROUTES SETUP
-app.post("/api/reddit/check-new-comments", authenticateRequest, checkNewComments);
-app.post("/api/reddit/generate-first-interactions", authenticateRequest, generateFirstInteractions);
+app.post(
+  "/api/reddit/generate-first-interactions",
+  authenticateRequest,
+  generateFirstInteractions
+);
 
 // START SERVER
 const PORT = process.env.PORT || 4001;

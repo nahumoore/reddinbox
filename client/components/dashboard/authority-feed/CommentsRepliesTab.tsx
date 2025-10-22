@@ -1,8 +1,8 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
 import { useRedditAccounts } from "@/stores/reddit-accounts";
 import { useRedditUserInteractions } from "@/stores/reddit-user-interactions";
 import { useUserWebsites } from "@/stores/user-wesbites";
@@ -23,30 +23,6 @@ export default function CommentsRepliesTab() {
       interaction.interaction_type === "comment_reply"
   );
 
-  // const handleRefresh = async () => {
-  //   setIsRefreshing(true);
-  //   try {
-  //     const response = await fetch("/api/reddit/comments/fetch-new", {
-  //       method: "POST",
-  //     });
-  //     const result = await response.json();
-  //     if (result.error) {
-  //       throw new Error(result.error);
-  //     }
-
-  //     setRedditUserInteractions(result.interactions);
-  //     toast.success("Comments refreshed successfully");
-  //   } catch (error) {
-  //     console.error("Failed to refresh comments:", error);
-  //     toast.error("Failed to refresh comments", {
-  //       description:
-  //         error instanceof Error ? error.message : "Please try again",
-  //     });
-  //   } finally {
-  //     setIsRefreshing(false);
-  //   }
-  // };
-
   if (isLoadingRedditUserInteractions) {
     return (
       <div className="space-y-4">
@@ -61,15 +37,16 @@ export default function CommentsRepliesTab() {
     return (
       <div className="text-center py-12 max-w-xl mx-auto">
         <IconUserOff className="size-12 text-muted-foreground mx-auto mb-4" />
-        <h3 className="font-medium text-lg mb-2">No Reddit Account Connected</h3>
+        <h3 className="font-medium text-lg mb-2">
+          No Reddit Account Connected
+        </h3>
         <p className="text-muted-foreground mb-6">
-          We cannot track the comments you receive without an active Reddit account.
-          Connect your account to monitor replies and generate helpful responses.
+          We cannot track the comments you receive without an active Reddit
+          account. Connect your account to monitor replies and generate helpful
+          responses.
         </p>
         <Button asChild>
-          <Link href="/dashboard/reddit-profile">
-            Connect Reddit Account
-          </Link>
+          <Link href="/dashboard/reddit-profile">Connect Reddit Account</Link>
         </Button>
       </div>
     );
@@ -77,20 +54,6 @@ export default function CommentsRepliesTab() {
 
   return (
     <div className="space-y-4">
-      {/* <div className="flex justify-end">
-        <Button
-          variant="outline"
-          size="sm"
-          className="bg-white hover:shadow-md transition-all"
-          onClick={handleRefresh}
-          disabled={isRefreshing}
-        >
-          <IconRefresh
-            className={`size-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`}
-          />
-          {isRefreshing ? "Refreshing..." : "Refresh"}
-        </Button>
-      </div> */}
       {!commentRepliesToReview || commentRepliesToReview.length === 0 ? (
         <div className="text-center py-12 max-w-xl mx-auto">
           <IconMessageOff className="size-12 text-muted-foreground mx-auto mb-4 animate-pulse" />
