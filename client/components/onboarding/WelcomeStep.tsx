@@ -11,7 +11,7 @@ import { Input } from "../ui/input";
 
 export default function WelcomeStep() {
   const { setStep, setUserName } = useOnboardingForm();
-  const { userInfo } = useUserInfo();
+  const { userInfo, setUserInfo } = useUserInfo();
 
   const [localName, setLocalName] = useState(
     userInfo?.name?.split(" ")[0] || ""
@@ -23,6 +23,7 @@ export default function WelcomeStep() {
 
   const handleContinue = () => {
     setUserName(localName);
+    setUserInfo({ ...userInfo!, name: localName });
     setStep(1);
   };
 
