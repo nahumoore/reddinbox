@@ -133,6 +133,7 @@ export default async function DashboardLayoutServer({
         )
         .eq("user_id", user.id)
         .eq("website_id", activeWebsite.id)
+        .eq("status", "new")
         .order("created_at", { ascending: false }),
       supabase
         .from("reddit_subreddits")

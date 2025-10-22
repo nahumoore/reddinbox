@@ -10,35 +10,63 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useRedditUserInteractions } from "@/stores/reddit-user-interactions";
 import { RedditUserInteraction } from "@/types/db-schema";
+import { calculateLeadScore, LeadScore } from "@/utils/relationship-pipeline/lead-scoring";
 import { IconHeartHandshake, IconSearch, IconUsers } from "@tabler/icons-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 interface UserGroup {
   username: string;
   interactions: RedditUserInteraction[];
+  leadScore: LeadScore;
 }
 
 export default function RelationshipPipelinePage() {
-  const { redditUserInteractions, isLoadingRedditUserInteractions } =
-    useRedditUserInteractions();
+  const [redditUserInteractions, setRedditUserInteractions] = useState<
+    RedditUserInteraction[]
+  >([]);
+  const [isLoadingRedditUserInteractions, setIsLoadingRedditUserInteractions] =
+    useState(true);
 
   // Filter and sort state
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState("recent");
+  const [sortBy, setSortBy] = useState("lead_score");
   const [engagementFilter, setEngagementFilter] = useState("all");
 
-  // Group interactions by user (only 'posted' interactions)
+  // Fetch interactions from API
+  useEffect(() => {
+    const fetchInteractions = async () => {
+      setIsLoadingRedditUserInteractions(true);
+      try {
+        const response = await fetch(
+          "/api/relationship-pipeline/fetch-interactions",
+          {
+            method: "POST",
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch interactions");
+        }
+
+        const data = await response.json();
+        setRedditUserInteractions(data.interactions || []);
+      } catch (error) {
+        console.error("Error fetching interactions:", error);
+      } finally {
+        setIsLoadingRedditUserInteractions(false);
+      }
+    };
+
+    fetchInteractions();
+  }, []);
+
+  // Group interactions by user and calculate lead scores
   const processedUsers = useMemo(() => {
-    // Filter only 'posted' interactions (exclude ignored, new, scheduled)
-    const postedInteractions = redditUserInteractions?.filter(
-      (interaction) => interaction.status === "posted"
-    );
-    if (!postedInteractions) return [];
+    if (!redditUserInteractions || redditUserInteractions.length === 0) return [];
 
     // Group by username
-    const groupedByUser = postedInteractions.reduce((acc, interaction) => {
+    const groupedByUser = redditUserInteractions.reduce((acc, interaction) => {
       const username = interaction.interacted_with_reddit_username;
       if (!acc[username]) {
         acc[username] = [];
@@ -47,13 +75,14 @@ export default function RelationshipPipelinePage() {
       return acc;
     }, {} as Record<string, RedditUserInteraction[]>);
 
-    // Convert to array
-    let userGroups: UserGroup[] = Object.entries(groupedByUser).map(
-      ([username, interactions]) => ({
+    // Convert to array with lead scores, filtering out users with less than 2 interactions
+    let userGroups: UserGroup[] = Object.entries(groupedByUser)
+      .filter(([, interactions]) => interactions.length >= 2) // Minimum 2 interactions
+      .map(([username, interactions]) => ({
         username,
         interactions,
-      })
-    );
+        leadScore: calculateLeadScore(interactions),
+      }));
 
     // Apply search filter
     if (searchQuery.trim()) {
@@ -66,16 +95,24 @@ export default function RelationshipPipelinePage() {
     if (engagementFilter !== "all") {
       userGroups = userGroups.filter((group) => {
         const count = group.interactions.length;
-        if (engagementFilter === "high") return count >= 5;
-        if (engagementFilter === "medium") return count >= 2 && count <= 4;
-        if (engagementFilter === "new") return count === 1;
+        const { temperature } = group.leadScore;
+
+        if (engagementFilter === "high_value") return count >= 5;
+        if (engagementFilter === "growing") return count >= 2 && count <= 4;
+        if (engagementFilter === "hot")
+          return temperature === "hot" || temperature === "warm";
+        if (engagementFilter === "needs_attention")
+          return temperature === "cooling" || temperature === "cold" || temperature === "dormant";
+
         return true;
       });
     }
 
     // Apply sorting
     userGroups.sort((a, b) => {
-      if (sortBy === "recent") {
+      if (sortBy === "lead_score") {
+        return b.leadScore.compositeScore - a.leadScore.compositeScore;
+      } else if (sortBy === "recent") {
         const aLatest = Math.max(
           ...a.interactions.map((i) => new Date(i.created_at || 0).getTime())
         );
@@ -111,7 +148,10 @@ export default function RelationshipPipelinePage() {
       </div>
 
       {/* Stats Overview */}
-      <PipelineStats interactions={redditUserInteractions} />
+      <PipelineStats
+        interactions={redditUserInteractions}
+        isLoading={isLoadingRedditUserInteractions}
+      />
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
@@ -129,14 +169,15 @@ export default function RelationshipPipelinePage() {
 
         {/* Engagement Filter */}
         <Select value={engagementFilter} onValueChange={setEngagementFilter}>
-          <SelectTrigger className="w-full sm:w-[180px] bg-white">
+          <SelectTrigger className="w-full sm:w-[200px] bg-white">
             <SelectValue placeholder="Engagement" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Leads</SelectItem>
-            <SelectItem value="high">High Engagement (5+)</SelectItem>
-            <SelectItem value="medium">Medium (2-4)</SelectItem>
-            <SelectItem value="new">New Contact (1)</SelectItem>
+            <SelectItem value="high_value">High Value (5+)</SelectItem>
+            <SelectItem value="growing">Growing (2-4)</SelectItem>
+            <SelectItem value="hot">Hot Leads (0-7 days)</SelectItem>
+            <SelectItem value="needs_attention">Needs Attention (8+ days)</SelectItem>
           </SelectContent>
         </Select>
 
@@ -146,6 +187,7 @@ export default function RelationshipPipelinePage() {
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="lead_score">Lead Score</SelectItem>
             <SelectItem value="recent">Most Recent</SelectItem>
             <SelectItem value="interactions">Most Interactions</SelectItem>
             <SelectItem value="username">Username A-Z</SelectItem>
@@ -166,6 +208,7 @@ export default function RelationshipPipelinePage() {
               key={userGroup.username}
               username={userGroup.username}
               interactions={userGroup.interactions}
+              leadScore={userGroup.leadScore}
             />
           ))}
         </div>
@@ -176,11 +219,11 @@ export default function RelationshipPipelinePage() {
             <IconUsers className="size-12 text-muted-foreground" />
           </div>
           <h3 className="font-heading font-semibold text-lg mb-2">
-            No leads yet
+            No qualified leads yet
           </h3>
           <p className="text-muted-foreground text-center max-w-md">
-            Start building relationships by posting comments through the
-            Authority Feed. Once you post comments, they&apos;ll appear here.
+            Build relationships by engaging through the Authority Feed. Leads
+            appear here after 2+ meaningful interactions with the same user.
           </p>
         </div>
       )}

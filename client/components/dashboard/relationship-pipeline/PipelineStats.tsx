@@ -2,7 +2,6 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useRedditUserInteractions } from "@/stores/reddit-user-interactions";
 import { RedditUserInteraction } from "@/types/db-schema";
 import {
   IconChartLine,
@@ -22,6 +21,7 @@ interface Stats {
 interface PipelineStatsProps {
   interactions?: RedditUserInteraction[];
   stats?: Stats;
+  isLoading?: boolean;
 }
 
 interface StatCardProps {
@@ -29,10 +29,10 @@ interface StatCardProps {
   label: string;
   value: string | number;
   description?: string;
+  isLoading?: boolean;
 }
 
-function StatCard({ icon: Icon, label, value, description }: StatCardProps) {
-  const { isLoadingRedditUserInteractions } = useRedditUserInteractions();
+function StatCard({ icon: Icon, label, value, description, isLoading }: StatCardProps) {
 
   return (
     <Card>
@@ -45,13 +45,11 @@ function StatCard({ icon: Icon, label, value, description }: StatCardProps) {
             <div>
               <p className="text-sm text-muted-foreground">{label}</p>
               <div className="text-2xl font-bold font-heading">
-                <>
-                  {isLoadingRedditUserInteractions ? (
-                    <Skeleton className="h-6 w-12" />
-                  ) : (
-                    value
-                  )}
-                </>
+                {isLoading ? (
+                  <Skeleton className="h-6 w-12" />
+                ) : (
+                  value
+                )}
               </div>
             </div>
           </div>
@@ -67,6 +65,7 @@ function StatCard({ icon: Icon, label, value, description }: StatCardProps) {
 export function PipelineStats({
   interactions,
   stats: providedStats,
+  isLoading = false,
 }: PipelineStatsProps) {
   const calculatedStats = useMemo(() => {
     if (providedStats) {
@@ -82,18 +81,20 @@ export function PipelineStats({
       };
     }
 
-    // Filter only 'posted' interactions (exclude ignored, new, scheduled)
-    const postedInteractions = interactions.filter(
-      (i) => i.status === "posted"
-    );
+    // Group by user and count interactions per user
+    const userInteractionCounts = interactions.reduce((acc, interaction) => {
+      const username = interaction.interacted_with_reddit_username;
+      acc[username] = (acc[username] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
 
-    // Get unique users from posted interactions
-    const uniqueUsers = new Set(
-      postedInteractions.map((i) => i.interacted_with_reddit_username)
-    );
+    // Only count users with 2+ interactions as qualified leads
+    const qualifiedLeads = Object.values(userInteractionCounts).filter(
+      (count) => count >= 2
+    ).length;
 
-    // Calculate average similarity score from posted interactions
-    const scoresWithValue = postedInteractions.filter(
+    // Calculate average similarity score from all interactions
+    const scoresWithValue = interactions.filter(
       (i) => i.similarity_score !== null && i.similarity_score !== undefined
     );
     const avgScore =
@@ -106,16 +107,16 @@ export function PipelineStats({
           ).toFixed(2)
         : "N/A";
 
-    // Count subreddits from posted interactions
+    // Count unique subreddits
     const uniqueSubreddits = new Set(
-      postedInteractions
+      interactions
         .map((i) => i.reddit_content_discovered?.subreddit.id)
         .filter(Boolean)
     );
 
     return {
-      totalUsers: uniqueUsers.size,
-      totalInteractions: postedInteractions.length,
+      totalUsers: qualifiedLeads,
+      totalInteractions: interactions.length,
       totalSubreddits: uniqueSubreddits.size,
       avgSimilarityScore: avgScore,
     };
@@ -127,27 +128,31 @@ export function PipelineStats({
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
       <StatCard
         icon={IconUsers}
-        label="Total Leads"
+        label="Qualified Leads"
         value={stats.totalUsers}
-        description="Users you've engaged with"
+        description="Users with 2+ interactions"
+        isLoading={isLoading}
       />
       <StatCard
         icon={IconMessages}
         label="Total Interactions"
         value={stats.totalInteractions}
         description="Posted interactions"
+        isLoading={isLoading}
       />
       <StatCard
         icon={IconUserCheck}
         label="Subreddits"
         value={stats.totalSubreddits}
         description="Communities engaged in"
+        isLoading={isLoading}
       />
       <StatCard
         icon={IconChartLine}
         label="Avg Match Score"
         value={stats.avgSimilarityScore}
         description="Average relevance"
+        isLoading={isLoading}
       />
     </div>
   );

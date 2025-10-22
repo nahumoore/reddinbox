@@ -183,18 +183,23 @@ export const checkNewComments = async ({
               continue;
             }
 
-            const { validResults } = aiResult.data;
+            const { allResults } = aiResult.data;
 
-            if (validResults.length === 0) {
+            if (allResults.length === 0) {
               console.log(`  ⚠️  No valid AI results generated`);
               continue;
             }
 
-            console.log(`  🤖 Generated ${validResults.length} AI replies`);
+            const toRespondCount = allResults.filter((r) => r.shouldRespond).length;
+            const ignoredCount = allResults.filter((r) => !r.shouldRespond).length;
+
+            console.log(
+              `  🤖 Processed ${allResults.length} comments: ${toRespondCount} to respond, ${ignoredCount} ignored`
+            );
 
             // PHASE 6: BUILD THREAD CONTEXT AND INSERT INTERACTIONS
             const saveResult = await saveInteractions({
-              validResults,
+              validResults: allResults,
               validContexts,
               userId: userInfo.auth_user_id,
               websiteId: fetchedWebsite.id,

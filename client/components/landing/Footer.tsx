@@ -32,6 +32,22 @@ export default function Footer() {
                 <IconBrandX className="size-6" />
               </Link>
             </div>
+            <div className="mt-6">
+              <p className="text-xs text-muted-foreground mb-2">Featured by:</p>
+              <Link
+                href="https://www.toolpilot.ai"
+                rel="noopener noreferrer"
+                target="_blank"
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <img
+                  src="https://www.google.com/s2/favicons?domain=www.toolpilot.ai&sz=64"
+                  alt="ToolPilot"
+                  className="rounded w-6 h-6"
+                />
+                <span>ToolPilot</span>
+              </Link>
+            </div>
           </div>
 
           <div>

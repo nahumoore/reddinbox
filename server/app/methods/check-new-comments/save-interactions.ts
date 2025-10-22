@@ -82,6 +82,9 @@ export async function saveInteractions({
     const discoveredContentId =
       discoveredContentMap.get(result.originalPost.name) || null;
 
+    // SET STATUS BASED ON WHETHER AI DETERMINED TO RESPOND
+    const status = result.shouldRespond ? "new" : "ignored";
+
     return {
       user_id: userId,
       website_id: websiteId,
@@ -92,7 +95,7 @@ export async function saveInteractions({
       our_interaction_reddit_id: null,
       reddit_content_discovered_id: discoveredContentId,
       reddit_account_id: redditAccountId,
-      status: "new",
+      status: status,
       thread_context: threadContext,
       discovered_reddit_id: `t1_${result.comment.data.id}`, // t1_xxxxx format
     };

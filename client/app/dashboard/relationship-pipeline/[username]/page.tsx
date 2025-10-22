@@ -2,15 +2,17 @@
 
 import { InteractionTimeline } from "@/components/dashboard/relationship-pipeline/InteractionTimeline";
 import InteractionDialog from "@/components/dashboard/relationship-pipeline/username/InteractionDialog";
-import { getLeadTemperature } from "@/components/dashboard/relationship-pipeline/UserRelationshipCard";
 import { IconBrandRedditNew } from "@/components/icons/BrandRedditNew";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { useRedditUserInteractions } from "@/stores/reddit-user-interactions";
 import { RedditUserInteraction } from "@/types/db-schema";
+import {
+  calculateLeadScore,
+  getTemperatureConfig,
+} from "@/utils/relationship-pipeline/lead-scoring";
 import {
   IconArrowLeft,
   IconCalendar,
@@ -21,7 +23,7 @@ import {
 } from "@tabler/icons-react";
 import { format, formatDistanceToNow } from "date-fns";
 import Link from "next/link";
-import { use, useMemo, useState } from "react";
+import { use, useEffect, useMemo, useState } from "react";
 
 export default function RelationshipPipelineUserPage({
   params,
@@ -29,8 +31,11 @@ export default function RelationshipPipelineUserPage({
   params: Promise<{ username: string }>;
 }) {
   const { username } = use(params);
-  const { redditUserInteractions, isLoadingRedditUserInteractions } =
-    useRedditUserInteractions();
+  const [redditUserInteractions, setRedditUserInteractions] = useState<
+    RedditUserInteraction[]
+  >([]);
+  const [isLoadingRedditUserInteractions, setIsLoadingRedditUserInteractions] =
+    useState(true);
 
   // Dialog state
   const [selectedInteraction, setSelectedInteraction] =
@@ -42,16 +47,43 @@ export default function RelationshipPipelineUserPage({
     setIsDialogOpen(true);
   };
 
-  // Filter interactions for this specific user (only posted status)
+  // Fetch interactions from API
+  useEffect(() => {
+    const fetchInteractions = async () => {
+      setIsLoadingRedditUserInteractions(true);
+      try {
+        const response = await fetch(
+          "/api/relationship-pipeline/fetch-interactions",
+          {
+            method: "POST",
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch interactions");
+        }
+
+        const data = await response.json();
+        setRedditUserInteractions(data.interactions || []);
+      } catch (error) {
+        console.error("Error fetching interactions:", error);
+      } finally {
+        setIsLoadingRedditUserInteractions(false);
+      }
+    };
+
+    fetchInteractions();
+  }, []);
+
+  // Filter interactions for this specific user
   const userInteractions = useMemo(() => {
     return redditUserInteractions.filter(
       (interaction) =>
-        interaction.interacted_with_reddit_username === username &&
-        interaction.status === "posted"
+        interaction.interacted_with_reddit_username === username
     );
   }, [redditUserInteractions, username]);
 
-  // Calculate stats
+  // Calculate stats and lead score
   const stats = useMemo(() => {
     if (userInteractions.length === 0) {
       return null;
@@ -95,6 +127,9 @@ export default function RelationshipPipelineUserPage({
       return acc;
     }, {} as Record<string, number>);
 
+    // Calculate lead score
+    const leadScore = calculateLeadScore(userInteractions);
+
     return {
       totalInteractions,
       latestInteraction,
@@ -103,6 +138,7 @@ export default function RelationshipPipelineUserPage({
       mostActiveSubreddit,
       uniqueSubreddits,
       interactionTypes,
+      leadScore,
     };
   }, [userInteractions]);
 
@@ -147,7 +183,7 @@ export default function RelationshipPipelineUserPage({
   }
 
   const avatarFallback = username.substring(0, 2).toUpperCase();
-  const leadTemp = getLeadTemperature(stats.totalInteractions);
+  const tempConfig = getTemperatureConfig(stats.leadScore.temperature);
 
   // Time calculations
   const timeSinceLastInteraction = stats.latestInteraction.created_at
@@ -190,9 +226,15 @@ export default function RelationshipPipelineUserPage({
               </h1>
               <Badge
                 variant="outline"
-                className={cn("text-sm w-fit", leadTemp.className)}
+                className={cn(
+                  "text-sm w-fit",
+                  tempConfig.color,
+                  tempConfig.bgColor,
+                  tempConfig.borderColor
+                )}
               >
-                {leadTemp.label}
+                <span className="mr-1">{tempConfig.emoji}</span>
+                {tempConfig.label}
               </Badge>
             </div>
             <p className="text-muted-foreground">

@@ -6,6 +6,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { RedditUserInteraction } from "@/types/db-schema";
+import { getTemperatureConfig, LeadScore } from "@/utils/relationship-pipeline/lead-scoring";
 import { IconChevronRight } from "@tabler/icons-react";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
@@ -13,11 +14,13 @@ import Link from "next/link";
 interface UserRelationshipCardProps {
   username: string;
   interactions: RedditUserInteraction[];
+  leadScore: LeadScore;
 }
 
 export function UserRelationshipCard({
   username,
   interactions,
+  leadScore,
 }: UserRelationshipCardProps) {
   // Calculate stats
   const totalInteractions = interactions.length;
@@ -56,12 +59,6 @@ export function UserRelationshipCard({
     return acc;
   }, {} as Record<string, number>);
 
-  // Calculate interaction status breakdown
-  const statusCounts = interactions.reduce((acc, interaction) => {
-    acc[interaction.status] = (acc[interaction.status] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-
   // Get avatar fallback
   const avatarFallback = username.substring(0, 2).toUpperCase();
 
@@ -79,8 +76,8 @@ export function UserRelationshipCard({
       })
     : "Unknown";
 
-  // Get lead temperature
-  const leadTemp = getLeadTemperature(totalInteractions);
+  // Get temperature configuration
+  const tempConfig = getTemperatureConfig(leadScore.temperature);
 
   return (
     <Link href={`/dashboard/relationship-pipeline/${username}`}>
@@ -102,9 +99,15 @@ export function UserRelationshipCard({
                   </h3>
                   <Badge
                     variant="outline"
-                    className={cn("text-xs shrink-0", leadTemp.className)}
+                    className={cn(
+                      "text-xs shrink-0",
+                      tempConfig.color,
+                      tempConfig.bgColor,
+                      tempConfig.borderColor
+                    )}
                   >
-                    {leadTemp.label}
+                    <span className="mr-1">{tempConfig.emoji}</span>
+                    {tempConfig.label}
                   </Badge>
                 </div>
 
@@ -114,6 +117,12 @@ export function UserRelationshipCard({
                   <span className="hidden sm:inline">•</span>
                   <span className="hidden sm:inline">
                     Last active {timeSinceLastInteraction}
+                    {leadScore.daysSinceLastInteraction > 0 && (
+                      <span className="text-muted-foreground/70">
+                        {" "}
+                        ({leadScore.daysSinceLastInteraction}d ago)
+                      </span>
+                    )}
                   </span>
                   {mostActiveSubreddit && (
                     <>
@@ -183,26 +192,4 @@ export function UserRelationshipCard({
       </Card>
     </Link>
   );
-}
-
-export function getLeadTemperature(interactionCount: number) {
-  if (interactionCount === 1) {
-    return {
-      label: "New Lead",
-      className:
-        "bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700",
-    };
-  } else if (interactionCount <= 3) {
-    return {
-      label: "Warm Lead",
-      className:
-        "bg-yellow-100 text-yellow-800 border-yellow-300 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-700",
-    };
-  } else {
-    return {
-      label: "Hot Lead",
-      className:
-        "bg-red-100 text-red-800 border-red-300 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700",
-    };
-  }
 }

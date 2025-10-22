@@ -10,7 +10,8 @@
       "Read(//c/Users/nicol/Documents/Projects/reddinbox/server/app/helpers/reddit/**)",
       "Skill(copywriting)",
       "Bash(tree /F)",
-      "Skill(seo)"
+      "Skill(seo)",
+      "Bash(cat \"app/api/relationship-pipeline/fetch-interactions/route.ts\")"
     ],
     "deny": [],
     "ask": []

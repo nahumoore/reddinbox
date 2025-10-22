@@ -62,6 +62,7 @@ export async function fetchUsersToProcess(
     )
     .in("subscription_status", ["active", "free-trial"])
     .eq("websites.is_active", true)
+    // .eq("email", "nahuelmoreno2904@gmail.com") //testing
     .eq("reddit_accounts.is_active", true);
 
   if (usersError) {

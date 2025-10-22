@@ -38,7 +38,8 @@ export default function Hero() {
 
         <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed">
           Join the right conversations, provide real value, and let your ideal
-          customers come to you with <b>authentic replies!</b>
+          customers come to you with <b>authentic replies</b> and{" "}
+          <b>lead tracking</b>!
         </p>
 
         <div className="flex flex-col gap-6 justify-center items-center mb-16">

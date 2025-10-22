@@ -207,6 +207,8 @@ export default function ThreadComments({
   }
 
   const { original_post, comments } = threadContext;
+  console.log("original_post", original_post);
+  console.log("comments", comments);
 
   return (
     <>
