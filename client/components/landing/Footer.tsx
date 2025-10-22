@@ -34,19 +34,34 @@ export default function Footer() {
             </div>
             <div className="mt-6">
               <p className="text-xs text-muted-foreground mb-2">Featured by:</p>
-              <Link
-                href="https://www.toolpilot.ai"
-                rel="noopener noreferrer"
-                target="_blank"
-                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <img
-                  src="https://www.google.com/s2/favicons?domain=www.toolpilot.ai&sz=64"
-                  alt="ToolPilot"
-                  className="rounded w-6 h-6"
-                />
-                <span>ToolPilot</span>
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link
+                  href="https://www.toolpilot.ai"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                  className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <img
+                    src="https://www.google.com/s2/favicons?domain=www.toolpilot.ai&sz=64"
+                    alt="ToolPilot"
+                    className="rounded w-6 h-6"
+                  />
+                  <span>ToolPilot</span>
+                </Link>
+                <Link
+                  href="https://dang.ai/"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                  className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <img
+                    src="https://www.google.com/s2/favicons?domain=dang.ai&sz=64"
+                    alt="Dang.ai"
+                    className="rounded w-6 h-6"
+                  />
+                  <span>Dang.ai</span>
+                </Link>
+              </div>
             </div>
           </div>
 
