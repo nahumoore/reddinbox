@@ -6,11 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabaseClient } from "@/lib/supabase/client";
-import { IconLoader2 } from "@tabler/icons-react";
+import { IconLoader2, IconMail, IconCircleCheck } from "@tabler/icons-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, FormEvent } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { motion, AnimatePresence } from "framer-motion";
 
 // EMAIL VALIDATION SCHEMA
 const emailSchema = z.string().email("Please enter a valid email");
@@ -22,7 +23,9 @@ export default function RegisterPage() {
   const [otpSent, setOtpSent] = useState(false);
   const supabase = supabaseClient();
 
-  const handleEmailSubmit = async (email: string) => {
+  const handleEmailSubmit = async (e?: FormEvent) => {
+    e?.preventDefault();
+
     if (!emailSchema.safeParse(email).success) {
       return toast.error("Please enter a valid email");
     }
@@ -58,95 +61,173 @@ export default function RegisterPage() {
     if (error) {
       console.error(error);
       setIsGoogleLoading(false);
-      return toast.error("Failed to sign izn with Google");
+      return toast.error("Failed to sign in with Google");
     }
   };
 
   return (
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm md:max-w-lg">
-        <div className="flex flex-col gap-6">
-          <div className="flex flex-col gap-6">
+      <motion.div
+        className="w-full max-w-sm md:max-w-lg"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <div className="flex flex-col gap-8">
+          {/* Header Section */}
+          <div className="flex flex-col items-center gap-4">
             <div className="flex flex-col items-center gap-2">
-              <h2 className="text-xl font-bold">Welcome to</h2>
+              <h2 className="font-body text-lg text-muted-foreground">Welcome to</h2>
               <Link
                 href="/"
-                className="flex items-center gap-2 font-medium hover:scale-105 transition-all"
+                className="flex items-center gap-2 font-heading hover:scale-105 transition-transform"
               >
-                <h1 className="text-2xl font-bold text-primary">Reddinbox</h1>
-                <BrandReddinbox className="size-6 text-primary" />
+                <h1 className="text-3xl font-bold text-primary">Reddinbox</h1>
+                <BrandReddinbox className="size-7 text-primary" />
                 <span className="sr-only">Reddinbox</span>
               </Link>
-              <div className="text-center text-sm">
-                Already have an account?{" "}
-                <Link
-                  href="/auth/login"
-                  className="underline underline-offset-4 hover:text-primary transition-colors"
-                >
-                  Login
-                </Link>
-              </div>
+              <p className="font-body text-center text-sm text-muted-foreground mt-1 max-w-md">
+                Build authority on Reddit and generate leads through authentic community engagement
+              </p>
             </div>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-3">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  value={email}
-                  disabled={isEmailLoading || isGoogleLoading || otpSent}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <Button
-                className="w-full"
-                onClick={() => handleEmailSubmit(email)}
-                disabled={isEmailLoading || isGoogleLoading || otpSent}
+            <div className="text-center text-sm font-body">
+              Already have an account?{" "}
+              <Link
+                href="/auth/login"
+                className="font-medium text-primary underline underline-offset-4 hover:text-primary/80 transition-colors"
               >
-                {isEmailLoading ? (
-                  <>
-                    <IconLoader2 className="size-5 animate-spin mr-2" />
-                    Sending magic link...
-                  </>
-                ) : (
-                  "Sign up with Email"
-                )}
-              </Button>
+                Login
+              </Link>
             </div>
-            <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-              <span className="bg-muted text-muted-foreground relative z-10 px-2">
-                Or
-              </span>
-            </div>
-            <Button
-              variant="outline"
-              type="button"
-              className="w-full"
-              onClick={handleGoogleLogin}
-              disabled={isEmailLoading || isGoogleLoading || otpSent}
-            >
-              {isGoogleLoading ? (
-                <>
-                  <IconLoader2 className="size-5 animate-spin mr-2" />
-                  Connecting to Google...
-                </>
-              ) : (
-                <>
-                  <IconBrandGoogle className="size-4" />
-                  Continue with Google
-                </>
-              )}
-            </Button>
           </div>
-          <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-            By clicking continue, you agree to our{" "}
-            <Link href="/terms-of-service">Terms of Service</Link> and{" "}
-            <Link href="/privacy-policy">Privacy Policy</Link>.
+
+          {/* Auth Form */}
+          <AnimatePresence mode="wait">
+            {!otpSent ? (
+              <motion.div
+                key="auth-form"
+                initial={{ opacity: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                className="flex flex-col gap-6"
+              >
+                {/* Email Form */}
+                <form onSubmit={handleEmailSubmit} className="flex flex-col gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="email" className="font-body text-sm font-medium">
+                      Email address
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="you@example.com"
+                      required
+                      value={email}
+                      disabled={isEmailLoading || isGoogleLoading}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="font-body"
+                      autoComplete="email"
+                      autoFocus
+                    />
+                  </div>
+                  <Button
+                    type="submit"
+                    className="w-full font-body"
+                    disabled={isEmailLoading || isGoogleLoading}
+                  >
+                    {isEmailLoading ? (
+                      <>
+                        <IconLoader2 className="size-4 animate-spin mr-2" />
+                        Sending magic link...
+                      </>
+                    ) : (
+                      <>
+                        <IconMail className="size-4 mr-2" />
+                        Sign up with Email
+                      </>
+                    )}
+                  </Button>
+                </form>
+
+                {/* Divider */}
+                <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
+                  <span className="bg-muted text-muted-foreground relative z-10 px-3 font-body">
+                    Or continue with
+                  </span>
+                </div>
+
+                {/* Google Sign In */}
+                <Button
+                  variant="outline"
+                  type="button"
+                  className="w-full font-body"
+                  onClick={handleGoogleLogin}
+                  disabled={isEmailLoading || isGoogleLoading}
+                >
+                  {isGoogleLoading ? (
+                    <>
+                      <IconLoader2 className="size-4 animate-spin mr-2" />
+                      Connecting to Google...
+                    </>
+                  ) : (
+                    <>
+                      <IconBrandGoogle className="size-4 mr-2" />
+                      Continue with Google
+                    </>
+                  )}
+                </Button>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="success-state"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3 }}
+                className="flex flex-col items-center gap-4 py-8"
+              >
+                <div className="bg-primary/10 rounded-full p-3">
+                  <IconCircleCheck className="size-12 text-primary" />
+                </div>
+                <div className="text-center space-y-2">
+                  <h3 className="font-heading text-xl font-semibold">Check your email</h3>
+                  <p className="font-body text-sm text-muted-foreground max-w-sm">
+                    We&apos;ve sent a magic link to <span className="font-medium text-foreground">{email}</span>
+                  </p>
+                  <p className="font-body text-xs text-muted-foreground pt-2">
+                    Click the link in the email to complete your registration
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => setOtpSent(false)}
+                  className="font-body mt-4"
+                >
+                  Use a different email
+                </Button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Terms & Privacy */}
+          <div className="text-muted-foreground text-center text-xs text-balance font-body">
+            By continuing, you agree to our{" "}
+            <Link
+              href="/terms-of-service"
+              className="underline underline-offset-4 hover:text-primary transition-colors"
+            >
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link
+              href="/privacy-policy"
+              className="underline underline-offset-4 hover:text-primary transition-colors"
+            >
+              Privacy Policy
+            </Link>
+            .
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
