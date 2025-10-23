@@ -65,7 +65,7 @@ export default async function DashboardLayoutServer({
       supabase
         .from("websites")
         .select(
-          "id, name, url, description, keywords, is_active, subreddit_reddit_ids, authority_feed_options"
+          "id, name, url, description, keywords, is_active, subreddit_reddit_ids, authority_feed_options, expertise, target_audience"
         )
         .eq("user_id", user.id),
     ]);
@@ -84,11 +84,6 @@ export default async function DashboardLayoutServer({
   if (!activeWebsite) {
     redirect("/");
   }
-
-  // GET ACTIVE REDDIT ACCOUNT
-  const activeRedditAccount = redditAccounts?.find(
-    (account) => account.is_active
-  ) as RedditAccount;
 
   const [{ data: redditUserInteractions }, { data: subreddits }] =
     await Promise.all([

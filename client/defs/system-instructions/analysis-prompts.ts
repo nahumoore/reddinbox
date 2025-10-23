@@ -19,7 +19,7 @@ Provide a JSON response with this exact structure:
 
 **targetAudience**: Identify the specific groups of people who would be ideal customers for this business. Describe them in terms of their roles, company types, or professional situations. 4 roles max - ~25 words estimated.
 
-**expertise**: 7-10 business expertise areas that potential customers would seek advice on. Focus on:
+**expertise**: 5 business expertise areas that potential customers would seek advice on. Focus on:
 - Business problems the company solves (NOT product features)
 - Strategic knowledge domains where the company has mastery
 - Challenges the company helps customers overcome

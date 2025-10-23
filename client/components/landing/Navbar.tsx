@@ -116,7 +116,6 @@ export default function Navbar() {
             <div className="hidden lg:flex items-center gap-6">
               <NavLink href="/#benefits">Benefits</NavLink>
               <NavLink href="/#how-it-works">How It Works</NavLink>
-              <NavLink href="/free-tools">Free Tools</NavLink>
               <NavLink href="/about">About</NavLink>
             </div>
           </div>

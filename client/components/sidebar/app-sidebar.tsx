@@ -18,6 +18,7 @@ import {
   IconUser,
   IconUsersGroup,
   IconUserUp,
+  IconWorld,
 } from "@tabler/icons-react";
 import { BrandReddinbox } from "../icons/BrandReddinbox";
 import { NavFooter } from "./nav-footer";
@@ -56,6 +57,11 @@ const data = {
       title: "Reddit Profile",
       icon: IconUser,
       url: "/dashboard/reddit-profile",
+    },
+    {
+      title: "Manage Website",
+      icon: IconWorld,
+      url: "/dashboard/manage-website",
     },
   ],
 };

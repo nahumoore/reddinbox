@@ -59,13 +59,13 @@ export async function analyzeWebsiteContent(
               expertise: {
                 type: "array",
                 description:
-                  "Keywords describing what the business is expert in",
+                  "5 keywords describing what the business is expert in",
                 items: {
                   type: "string",
                   minLength: 1,
                 },
                 minItems: 1,
-                maxItems: 10,
+                maxItems: 5,
               },
               keywords: {
                 type: "array",
@@ -76,7 +76,7 @@ export async function analyzeWebsiteContent(
                   minLength: 1,
                 },
                 minItems: 1,
-                maxItems: 10,
+                maxItems: 5,
               },
               recommendedSubreddits: {
                 type: "array",

@@ -14,6 +14,12 @@ export function cleanUpGeneratedComment(content: string): string {
   // CLEAN UP COMMA FOLLOWED BY MULTIPLE SPACES
   cleaned = cleaned.replace(/,\s+/g, ", ");
 
+  // CLEAN UP 'Short answer:'
+  cleaned = cleaned.replace(/^short answer:\s*/i, "");
+
+  // CLEAN UP 'Tip:'
+  cleaned = cleaned.replace(/^tip:\s*/i, "");
+
   // REMOVE LEADING AND TRAILING WHITESPACE
   return cleaned;
 }

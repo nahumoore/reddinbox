@@ -228,7 +228,12 @@ export default function WebsiteInformation() {
 
         {/* Keywords to Monitor */}
         <div className="space-y-4">
-          <Label htmlFor="keywordInput">Relevant Keywords *</Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="keywordInput">Relevant Keywords *</Label>
+            <span className="text-sm text-muted-foreground">
+              {formData.keywordsToMonitor.length}/5
+            </span>
+          </div>
 
           {/* Add New Keyword Input */}
           <div className="flex gap-2">
@@ -239,6 +244,7 @@ export default function WebsiteInformation() {
               value={newKeyword}
               onChange={(e) => setNewKeyword(e.target.value)}
               onKeyPress={handleKeywordInputKeyPress}
+              disabled={formData.keywordsToMonitor.length >= 5}
               className={`flex-1 ${
                 errors.keywordsToMonitor ? "border-destructive" : ""
               }`}
@@ -256,6 +262,11 @@ export default function WebsiteInformation() {
               <IconPlus className="h-4 w-4" />
             </Button>
           </div>
+          {formData.keywordsToMonitor.length >= 5 && (
+            <p className="text-sm text-muted-foreground">
+              Maximum of 5 keywords reached
+            </p>
+          )}
 
           {/* Existing Keywords Display */}
           {formData.keywordsToMonitor.length > 0 && (
@@ -288,7 +299,12 @@ export default function WebsiteInformation() {
 
         {/* Areas of Expertise */}
         <div className="space-y-4">
-          <Label htmlFor="expertiseInput">Areas of expertise *</Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="expertiseInput">Areas of expertise *</Label>
+            <span className="text-sm text-muted-foreground">
+              {formData.expertise.length}/5
+            </span>
+          </div>
 
           {/* Add New Expertise Input */}
           <div className="flex gap-2">
@@ -299,6 +315,7 @@ export default function WebsiteInformation() {
               value={newExpertise}
               onChange={(e) => setNewExpertise(e.target.value)}
               onKeyPress={handleExpertiseInputKeyPress}
+              disabled={formData.expertise.length >= 5}
               className={`flex-1 ${
                 errors.expertise ? "border-destructive" : ""
               }`}
@@ -316,6 +333,11 @@ export default function WebsiteInformation() {
               <IconPlus className="h-4 w-4" />
             </Button>
           </div>
+          {formData.expertise.length >= 5 && (
+            <p className="text-sm text-muted-foreground">
+              Maximum of 5 areas of expertise reached
+            </p>
+          )}
 
           {/* Existing Expertise Display */}
           {formData.expertise.length > 0 && (
