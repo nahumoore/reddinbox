@@ -32,9 +32,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const title = `${post.meta.title} | Reddinbox Playbooks`;
+  const title = post.meta.title;
   const description = post.meta.description;
   const url = `https://reddinbox.com/playbooks/${slug}`;
+  const image = post.meta.image!;
 
   return {
     title,
@@ -49,7 +50,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       authors: ["Nicolas More"],
       images: [
         {
-          url: "/og-image.png",
+          url: image,
           width: 1200,
           height: 630,
           alt: post.meta.title,
@@ -60,7 +61,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: "summary_large_image",
       title,
       description,
-      images: ["/og-image.png"],
+      images: [image],
       creator: "@reddinbox",
     },
     alternates: {
