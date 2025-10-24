@@ -12,6 +12,15 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
+export async function generateStaticParams() {
+  const { getPostSlugs } = await import("@/utils/mdx");
+  const slugs = getPostSlugs("playbooks");
+
+  return slugs.map((slug) => ({
+    slug: slug,
+  }));
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = getPostBySlug(slug, "playbooks");
@@ -61,8 +70,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function PlaybookPost({ params }: Props) {
-  const { slug } = await params;
-  const post = getPostBySlug(slug, "playbooks");
+  const p = await params;
+  const slug = (await p.slug) as string;
+  const post = await getPostBySlug(slug, "playbooks");
 
   if (!post) {
     notFound();
