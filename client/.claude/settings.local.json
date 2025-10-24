@@ -11,7 +11,8 @@
       "Skill(copywriting)",
       "Bash(tree /F)",
       "Skill(seo)",
-      "Bash(cat \"app/api/relationship-pipeline/fetch-interactions/route.ts\")"
+      "Bash(cat \"app/api/relationship-pipeline/fetch-interactions/route.ts\")",
+      "Skill(design)"
     ],
     "deny": [],
     "ask": []

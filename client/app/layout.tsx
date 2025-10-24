@@ -90,65 +90,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const organizationSchema = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: "Reddinbox",
-    url: "https://reddinbox.com",
-    logo: "https://reddinbox.com/icon.svg",
-    description:
-      "Reddit marketing platform for building authority and generating leads through authentic community engagement",
-    sameAs: [
-      "https://twitter.com/reddinbox",
-      "https://www.linkedin.com/company/reddinbox",
-    ],
-    contactPoint: {
-      "@type": "ContactPoint",
-      contactType: "Customer Support",
-      url: "https://reddinbox.com/contact",
-    },
-  };
-
-  const softwareApplicationSchema = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: "Reddinbox",
-    applicationCategory: "BusinessApplication",
-    description:
-      "Reddit marketing and lead generation platform that helps businesses build authentic authority in communities and convert trust into qualified leads",
-    operatingSystem: "Web",
-    offers: {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "USD",
-      url: "https://reddinbox.com/pricing",
-    },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: "4.8",
-      ratingCount: "150",
-    },
-  };
-
   return (
     <html lang="en">
       <body className={`${mainFont.variable} font-main antialiased`}>
-        {/* Structured Data for SEO */}
-        <Script
-          id="organization-schema"
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(organizationSchema),
-          }}
-        />
-        <Script
-          id="software-application-schema"
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(softwareApplicationSchema),
-          }}
-        />
-
         {children}
         <Toaster richColors />
         {process.env.NODE_ENV === "production" && (

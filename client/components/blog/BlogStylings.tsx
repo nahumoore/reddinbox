@@ -1,6 +1,9 @@
 import { cn } from "@/lib/utils";
 import { MDXComponents } from "mdx/types";
 import Link from "next/link";
+import { RedditChatPreview } from "./RedditChatPreview";
+import { RedditPostCard } from "./RedditPostCard";
+import { RedditReplyCard } from "./RedditReplyCard";
 
 export default function BlogStylings(): MDXComponents {
   return {
@@ -170,5 +173,9 @@ export default function BlogStylings(): MDXComponents {
         )}
       />
     ),
+    // --- Custom Interactive Components for Articles ---
+    RedditPostCard: (props) => <RedditPostCard {...props} />, // Used when a post is shared
+    RedditReplyCard: (props) => <RedditReplyCard {...props} />, // Used when a reply is shared
+    RedditChatPreview: (props) => <RedditChatPreview {...props} />, // Used when a chat preview is shared
   };
 }

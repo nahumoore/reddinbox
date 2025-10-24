@@ -64,12 +64,20 @@ export default function CommentsRepliesTab() {
           </p>
         </div>
       ) : (
-        <>
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            You have{" "}
+            <b className="text-primary">{commentRepliesToReview.length}</b>{" "}
+            {commentRepliesToReview.length === 1
+              ? "new comment"
+              : "new comments"}{" "}
+            to review.
+          </p>
           {commentRepliesToReview.map((comment) => (
             <ThreadComments key={comment.id} interaction={comment} />
           ))}
           <InteractionRemoveAll interactionType="comment_reply" />
-        </>
+        </div>
       )}
     </div>
   );

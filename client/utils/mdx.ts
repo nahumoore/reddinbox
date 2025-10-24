@@ -21,8 +21,12 @@ export type BlogPostMeta = {
   featured?: boolean;
 };
 
-// Path to our content directory
-const contentDirectory = path.join(process.cwd(), "posts");
+export type ContentType = "posts" | "playbooks";
+
+// GET CONTENT DIRECTORY PATH
+function getContentDirectory(contentType: ContentType = "posts"): string {
+  return path.join(process.cwd(), contentType);
+}
 
 // CALCULATE READ TIME FROM CONTENT
 function calculateReadTime(content: string): string {
@@ -33,20 +37,25 @@ function calculateReadTime(content: string): string {
 }
 
 // GET ALL POST SLUGS
-export function getPostSlugs(): string[] {
+export function getPostSlugs(contentType: ContentType = "posts"): string[] {
+  const contentDirectory = getContentDirectory(contentType);
   try {
     const files = fs.readdirSync(contentDirectory);
     return files
       .filter((file) => file.endsWith(".mdx"))
       .map((file) => file.replace(/\.mdx$/, ""));
   } catch (error) {
-    console.error("Error reading blog directory:", error);
+    console.error(`Error reading ${contentType} directory:`, error);
     return [];
   }
 }
 
 // GET POST BY SLUG
-export function getPostBySlug(slug: string): BlogPost | null {
+export function getPostBySlug(
+  slug: string,
+  contentType: ContentType = "posts"
+): BlogPost | null {
+  const contentDirectory = getContentDirectory(contentType);
   const filePath = path.join(contentDirectory, `${slug}.mdx`);
 
   try {
@@ -86,10 +95,10 @@ export function getPostBySlug(slug: string): BlogPost | null {
 }
 
 // GET ALL POSTS WITH METADATA
-export function getAllPosts(): BlogPostMeta[] {
-  const slugs = getPostSlugs();
+export function getAllPosts(contentType: ContentType = "posts"): BlogPostMeta[] {
+  const slugs = getPostSlugs(contentType);
   const posts = slugs.map((slug) => {
-    const post = getPostBySlug(slug);
+    const post = getPostBySlug(slug, contentType);
     return post?.meta;
   });
 
@@ -100,12 +109,15 @@ export function getAllPosts(): BlogPostMeta[] {
 }
 
 // GET RELATED POSTS
-export function getRelatedPosts(inputSlug: string): BlogPostMeta[] {
-  const slugs = getPostSlugs();
+export function getRelatedPosts(
+  inputSlug: string,
+  contentType: ContentType = "posts"
+): BlogPostMeta[] {
+  const slugs = getPostSlugs(contentType);
   const relatedPosts = slugs.filter((slug) => slug !== inputSlug);
 
   return relatedPosts
-    .map((slug) => getPostBySlug(slug)?.meta)
+    .map((slug) => getPostBySlug(slug, contentType)?.meta)
     .filter(
       (post): post is BlogPostMeta =>
         post?.tags?.some((tag) => post.tags?.includes(tag)) ?? false
