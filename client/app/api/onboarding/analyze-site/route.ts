@@ -9,6 +9,9 @@ interface AnalyzeSiteResponse {
   subreddits?: SubredditData[];
   keywordsToMonitor?: string[];
   companyDescription?: string;
+  targetAudience?: string;
+  expertise?: string[];
+  typeOfService?: "saas" | "agency";
 }
 
 export async function POST(
@@ -54,6 +57,7 @@ export async function POST(
       companyDescription: analysis.companyDescription,
       targetAudience: analysis.targetAudience,
       expertise: analysis.expertise,
+      typeOfService: analysis.typeOfService,
       subreddits: subreddits,
     });
   } catch (error) {

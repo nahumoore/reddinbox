@@ -10,6 +10,7 @@ export interface ActiveUser {
         name: string;
         description: string | null;
         keywords: string[] | null;
+        type_of_service: "saas" | "agency";
         subreddit_reddit_ids: string[];
         authority_feed_options: unknown;
       }
@@ -18,6 +19,7 @@ export interface ActiveUser {
         name: string;
         description: string | null;
         keywords: string[] | null;
+        type_of_service: "saas" | "agency";
         subreddit_reddit_ids: string[];
         authority_feed_options: unknown;
       }[];
@@ -50,6 +52,7 @@ export async function fetchActiveUsers(
         description,
         keywords,
         subreddit_reddit_ids,
+        type_of_service,
         authority_feed_options
       ),
       reddit_accounts (

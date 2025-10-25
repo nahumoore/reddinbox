@@ -18,7 +18,7 @@ import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 
 export default function RedditAuthStep() {
-  const { websiteAnalysis, websiteUrl, userName, targetSubreddits, setStep } =
+  const { websiteAnalysis, websiteUrl, userName, targetSubreddits } =
     useOnboardingForm();
   const [isConnecting, setIsConnecting] = useState(false);
   const [isSkipping, setIsSkipping] = useState(false);
@@ -195,7 +195,7 @@ export default function RedditAuthStep() {
               onClick={handleSkip}
               disabled={isConnecting || isSkipping}
               size="lg"
-              variant="outline"
+              variant="ghost"
               className="w-full sm:w-auto px-10 py-6 text-lg font-semibold"
             >
               {isSkipping ? (

@@ -104,10 +104,7 @@ export default function WebsiteInformation() {
       !formData.expertise.includes(expertise) &&
       formData.expertise.length < 5
     ) {
-      handleFieldChange("expertise", [
-        ...formData.expertise,
-        expertise,
-      ]);
+      handleFieldChange("expertise", [...formData.expertise, expertise]);
       setNewExpertise("");
     }
   };
@@ -138,6 +135,7 @@ export default function WebsiteInformation() {
 
     // Update the onboarding store with the edited data
     setWebsiteAnalysis({
+      ...websiteAnalysis,
       websiteName: formData.websiteName,
       companyDescription: formData.companyDescription,
       keywordsToMonitor: formData.keywordsToMonitor,
@@ -325,9 +323,7 @@ export default function WebsiteInformation() {
               variant="outline"
               size="sm"
               onClick={addExpertise}
-              disabled={
-                !newExpertise.trim() || formData.expertise.length >= 5
-              }
+              disabled={!newExpertise.trim() || formData.expertise.length >= 5}
               className="px-3"
             >
               <IconPlus className="h-4 w-4" />
@@ -362,9 +358,7 @@ export default function WebsiteInformation() {
           )}
 
           {errors.expertise && (
-            <p className="text-sm text-destructive">
-              {errors.expertise}
-            </p>
+            <p className="text-sm text-destructive">{errors.expertise}</p>
           )}
         </div>
       </div>

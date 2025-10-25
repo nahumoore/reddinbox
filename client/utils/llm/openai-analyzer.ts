@@ -8,6 +8,7 @@ interface AnalysisResult {
   targetAudience: string;
   expertise: string[];
   recommendedSubreddits: string[];
+  typeOfService: "saas" | "agency";
   error?: string;
 }
 
@@ -89,6 +90,12 @@ export async function analyzeWebsiteContent(
                 minItems: 1,
                 maxItems: 10,
               },
+              typeOfService: {
+                type: "string",
+                description:
+                  "The type of service the business provides",
+                enum: ["saas", "agency"],
+              },
             },
             required: [
               "websiteName",
@@ -97,6 +104,7 @@ export async function analyzeWebsiteContent(
               "expertise",
               "keywords",
               "recommendedSubreddits",
+              "typeOfService",
             ],
             additionalProperties: false,
           },
@@ -123,7 +131,9 @@ export async function analyzeWebsiteContent(
       !analysisData.keywords ||
       !Array.isArray(analysisData.keywords) ||
       !analysisData.recommendedSubreddits ||
-      !Array.isArray(analysisData.recommendedSubreddits)
+      !Array.isArray(analysisData.recommendedSubreddits) ||
+      !analysisData.typeOfService ||
+      (analysisData.typeOfService !== "saas" && analysisData.typeOfService !== "agency")
     ) {
       throw new Error("Invalid analysis response structure");
     }
@@ -135,6 +145,7 @@ export async function analyzeWebsiteContent(
       targetAudience: analysisData.targetAudience,
       expertise: analysisData.expertise,
       recommendedSubreddits: analysisData.recommendedSubreddits,
+      typeOfService: analysisData.typeOfService,
     };
   } catch (error) {
     console.error("OpenAI analysis error:", error);
@@ -145,6 +156,7 @@ export async function analyzeWebsiteContent(
       targetAudience: "",
       expertise: [],
       recommendedSubreddits: [],
+      typeOfService: "saas",
       error:
         error instanceof Error
           ? error.message

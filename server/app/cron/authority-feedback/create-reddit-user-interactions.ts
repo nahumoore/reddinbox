@@ -165,6 +165,7 @@ export const createRedditUserInteractionsJob = async ({
                   userProductName: website.name,
                   userProductDescription: website.description || "",
                   userProductKeywords: website.keywords || [],
+                  userProductType: website.type_of_service,
                   postTitle: post.title,
                   postContent: post.content,
                 });

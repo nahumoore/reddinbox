@@ -80,6 +80,7 @@ export const POST = async (req: NextRequest) => {
     keywords: websiteAnalysis.keywordsToMonitor,
     target_audience: websiteAnalysis.targetAudience,
     expertise: websiteAnalysis.expertise,
+    type_of_service: websiteAnalysis.typeOfService,
     vector_ai_searcher: websiteInfoEmbedding as any,
     url: websiteUrl,
     subreddit_reddit_ids: targetSubreddits.map(

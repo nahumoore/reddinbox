@@ -65,13 +65,20 @@ export default function WebsiteAnalysisStep() {
       return;
     }
 
-    setWebsiteAnalysis({
+    console.log("[WebsiteAnalysisStep] Raw API result:", result);
+    console.log("[WebsiteAnalysisStep] typeOfService value:", result.typeOfService);
+
+    const analysisData = {
       websiteName: result.websiteName,
       companyDescription: result.companyDescription,
       keywordsToMonitor: result.keywordsToMonitor,
       targetAudience: result.targetAudience,
       expertise: result.expertise,
-    });
+      typeOfService: result.typeOfService,
+    };
+
+    console.log("[WebsiteAnalysisStep] Setting in store:", analysisData);
+    setWebsiteAnalysis(analysisData);
     setTargetSubreddits(result.subreddits);
 
     setStep(2);

@@ -6,6 +6,7 @@ export interface WebsiteAnalysis {
   targetAudience: string;
   keywordsToMonitor: string[];
   expertise: string[];
+  typeOfService?: "saas" | "agency";
 }
 
 interface OnboardingFormState {

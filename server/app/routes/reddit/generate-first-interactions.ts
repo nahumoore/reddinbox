@@ -30,6 +30,7 @@ export const generateFirstInteractions = async (
           name,
           description,
           keywords,
+          type_of_service,
           authority_feed_options
         ),
         reddit_accounts:reddit_accounts(
@@ -140,6 +141,7 @@ export const generateFirstInteractions = async (
             userProductName: website.name,
             userProductDescription: website.description || "",
             userProductKeywords: website.keywords || [],
+            userProductType: website.type_of_service,
             postTitle: post.title,
             postContent: post.content,
           });

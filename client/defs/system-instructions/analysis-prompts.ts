@@ -8,7 +8,8 @@ Provide a JSON response with this exact structure:
   "targetAudience": "Who the business serves",
   "expertise": ["keyword1", "keyword2", "keyword3"],
   "keywords": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"],
-  "recommendedSubreddits": ["r/example1", "r/example2", "r/example3", "r/example4", "r/example5", "r/example6"]
+  "recommendedSubreddits": ["r/example1", "r/example2", "r/example3", "r/example4", "r/example5", "r/example6"],
+  "typeOfService": "saas"
 }
 
 ## DETAILED GUIDELINES:
@@ -35,6 +36,11 @@ Examples: "customer acquisition", "lead generation", "community building", etc.
 - Example: "email deliverability" not "advanced email optimization"
 
 **recommendedSubreddits**: 6 recommended subreddits where the target audience for this website hangs out
+
+**typeOfService**: Classify the business model as either "saas" or "agency":
+- Use "saas" for: Software as a Service products, subscription-based platforms, software tools, web applications, SaaS platforms
+- Use "agency" for: Service-based businesses, consulting firms, marketing agencies, freelance services, professional services, done-for-you solutions
+- If unclear, default to "saas" for product-based offerings or "agency" for service-based offerings
 
 Return ONLY the JSON response.
 `;

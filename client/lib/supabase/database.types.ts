@@ -436,6 +436,7 @@ export type Database = {
           name: string
           subreddit_reddit_ids: string[] | null
           target_audience: string | null
+          type_of_service: Database["public"]["Enums"]["website_type_of_service"]
           updated_at: string
           url: string
           user_id: string
@@ -452,6 +453,7 @@ export type Database = {
           name: string
           subreddit_reddit_ids?: string[] | null
           target_audience?: string | null
+          type_of_service?: Database["public"]["Enums"]["website_type_of_service"]
           updated_at?: string
           url: string
           user_id: string
@@ -468,6 +470,7 @@ export type Database = {
           name?: string
           subreddit_reddit_ids?: string[] | null
           target_audience?: string | null
+          type_of_service?: Database["public"]["Enums"]["website_type_of_service"]
           updated_at?: string
           url?: string
           user_id?: string
@@ -563,6 +566,7 @@ export type Database = {
         | "resource_compilation"
         | "other"
       subscription_statuses: "free-trial" | "active" | "stopped"
+      website_type_of_service: "saas" | "agency"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -714,6 +718,7 @@ export const Constants = {
         "other",
       ],
       subscription_statuses: ["free-trial", "active", "stopped"],
+      website_type_of_service: ["saas", "agency"],
     },
   },
 } as const

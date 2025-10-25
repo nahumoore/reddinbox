@@ -1,6 +1,54 @@
+const KEYWORDS_TO_REPLACE = [
+  {
+    keyword: "in my experience",
+    replacement: [
+      "I think",
+      "when I was dealing with this",
+      "this is what I did",
+      "I've dealt with this",
+      "in my experience",
+    ],
+  },
+  {
+    keyword: "I've been there",
+    replacement: [
+      "I know what it feels like",
+      "I remember this",
+      "I know how it feels",
+      "I got you",
+      "I've been there",
+    ],
+  },
+  {
+    keyword: "moved the needle",
+    replacement: [
+      "moved the needle",
+      "improved the results",
+      "improved the outcome",
+      "enhanced the results",
+      "enhanced the performance",
+      "helps us a lot",
+    ],
+  },
+];
+
 export function cleanUpGeneratedComment(content: string): string {
+  let cleaned = content;
+
+  // REPLACE KEYWORDS WITH RANDOM ALTERNATIVES
+  KEYWORDS_TO_REPLACE.forEach(({ keyword, replacement }) => {
+    // CREATE CASE-INSENSITIVE REGEX FOR THE KEYWORD
+    const regex = new RegExp(keyword, "gi");
+
+    // REPLACE EACH OCCURRENCE WITH A RANDOM OPTION
+    cleaned = cleaned.replace(regex, () => {
+      const randomIndex = Math.floor(Math.random() * replacement.length);
+      return replacement[randomIndex];
+    });
+  });
+
   // REPLACE EM-DASHES WITH COMMA AND SPACE
-  let cleaned = content.replace(/—/g, ", ");
+  cleaned = cleaned.replace(/—/g, ", ");
 
   // REPLACE SPACED HYPHENS WITH COMMA AND SPACE
   cleaned = cleaned.replace(/\s+-\s+/g, ", ");
@@ -20,6 +68,6 @@ export function cleanUpGeneratedComment(content: string): string {
   // CLEAN UP 'Tip:'
   cleaned = cleaned.replace(/^tip:\s*/i, "");
 
-  // REMOVE LEADING AND TRAILING WHITESPACE
+  // DON'T ADD TRIM TO MAINTAIN SPACE BETWEEN PARAGRAPHS
   return cleaned;
 }
