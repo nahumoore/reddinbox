@@ -111,3 +111,5 @@ Return the complete, production-ready MDX file with:
 
 - You must make each playbook more interactive, for that, start analyzing @BlogStylings.tsx to see the options of components you have available.
 - Never use em dash (—) on the content, use commas instead.
+- When there're text as [text], it means they're variables or content you need to re-write
+- NEVER modify Reddit content such as posts, comments or messages
