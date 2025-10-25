@@ -112,6 +112,14 @@ export default function RootLayout({
 
             {/* HEYO - CHATBOT */}
             <Script src="https://heyo.so/embed/script?projectId=68f183027d28bb99332c2e2c"></Script>
+
+            {/* DATAFAST */}
+            <Script
+              defer
+              data-website-id="dfid_FK1KTY8CH47iSV4UhJDpl"
+              data-domain="reddinbox.com"
+              src="https://datafa.st/js/script.js"
+            />
           </>
         )}
       </body>
