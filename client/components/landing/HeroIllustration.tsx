@@ -187,8 +187,7 @@ export default function HeroIllustration() {
 
               {/* Description */}
               <p className="text-sm text-foreground leading-relaxed">
-                The best marketing is the one that doesn&apos;t look like
-                marketing ✨
+                The best marketing doesn&apos;t feel like marketing ✨
               </p>
 
               {/* Product Link */}

@@ -30,6 +30,17 @@ const KEYWORDS_TO_REPLACE = [
       "helps us a lot",
     ],
   },
+  {
+    keyword: "tip:",
+    replacement: [
+      "I'd suggest",
+      "I'd recommend",
+      "in my opinion",
+      "if I were you",
+      "what worked for me was",
+      "I'd try",
+    ],
+  },
 ];
 
 export function cleanUpGeneratedComment(content: string): string {
