@@ -1,18 +1,25 @@
 import { redditGenerateCommentPrompt } from "@/defs/comments/generate-comment";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { supabaseServer } from "@/lib/supabase/server";
+import { cleanUpGeneratedComment } from "@/utils/llm/clean-up-generated-comment";
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+
+const MAX_REGENERATIONS_PER_HOUR = 10;
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export const POST = async (req: NextRequest) => {
-  const { interactionId, userName } = await req.json();
+interface GenerationHistory {
+  comment: string;
+  instructions?: string;
+  timestamp: string;
+}
 
-  console.log("userName", userName);
-  console.log("interactionId", interactionId);
+export const POST = async (req: NextRequest) => {
+  const { interactionId, userName, customInstructions, generationHistory } =
+    await req.json();
 
   // CHECK INTERACTION
   if (!interactionId) {
@@ -29,6 +36,55 @@ export const POST = async (req: NextRequest) => {
   } = await supabaseAuth.auth.getUser();
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // CHECK RATE LIMIT
+  const rateLimitCookie = req.cookies.get("regeneration-limit");
+  const now = Date.now();
+  const oneHourMs = 60 * 60 * 1000;
+
+  let rateLimitData = {
+    count: 0,
+    windowStart: now,
+  };
+
+  if (rateLimitCookie) {
+    try {
+      const parsed = JSON.parse(rateLimitCookie.value);
+      const timeSinceWindowStart = now - parsed.windowStart;
+
+      // IF WE'RE STILL WITHIN THE SAME HOUR WINDOW
+      if (timeSinceWindowStart < oneHourMs) {
+        rateLimitData = parsed;
+
+        // CHECK IF LIMIT IS EXCEEDED
+        if (rateLimitData.count >= MAX_REGENERATIONS_PER_HOUR) {
+          const timeUntilReset = oneHourMs - timeSinceWindowStart;
+          const minutesUntilReset = Math.ceil(timeUntilReset / 60000);
+
+          return NextResponse.json(
+            {
+              error: `Rate limit exceeded. You can generate ${MAX_REGENERATIONS_PER_HOUR} comments per hour. Try again in ${minutesUntilReset} minute${
+                minutesUntilReset !== 1 ? "s" : ""
+              }.`,
+            },
+            { status: 429 }
+          );
+        }
+      } else {
+        // RESET THE WINDOW IF MORE THAN AN HOUR HAS PASSED
+        rateLimitData = {
+          count: 0,
+          windowStart: now,
+        };
+      }
+    } catch (error) {
+      // IF COOKIE IS CORRUPTED, RESET IT
+      rateLimitData = {
+        count: 0,
+        windowStart: now,
+      };
+    }
   }
 
   // GET INTERACTION WITH RELATED DATA
@@ -48,6 +104,7 @@ export const POST = async (req: NextRequest) => {
         name,
         description,
         keywords,
+        type_of_service,
         user_info(name)
       )
     `
@@ -81,22 +138,57 @@ export const POST = async (req: NextRequest) => {
     userProductName: website.name,
     userProductDescription: website.description || "",
     userProductKeywords: website.keywords || [],
+    userProductType: website.type_of_service || "saas",
   });
+
+  // BUILD CONVERSATION HISTORY FROM CLIENT-SIDE GENERATION HISTORY
+  const previousGenerations: GenerationHistory[] = generationHistory || [];
+
+  const messages: Array<{
+    role: "developer" | "user" | "assistant";
+    content: string;
+  }> = [
+    {
+      role: "developer",
+      content: prompt,
+    },
+    {
+      role: "user",
+      content: `<post_title>${interaction.reddit_content_discovered.title}</post_title>\n\n<post_content>${interaction.reddit_content_discovered.content}</post_content>`,
+    },
+  ];
+
+  // ADD PREVIOUS GENERATIONS TO THE CONVERSATION
+  previousGenerations.forEach((generation) => {
+    // IF THERE WERE INSTRUCTIONS, ADD THEM AS USER MESSAGE FIRST
+    if (generation.instructions) {
+      messages.push({
+        role: "user",
+        content: `Regenerate that comment with the following instructions:\n\n${generation.instructions}`,
+      });
+    }
+
+    // THEN ADD ASSISTANT MESSAGE WITH THE GENERATED COMMENT (RESULT OF INSTRUCTIONS)
+    messages.push({
+      role: "assistant",
+      content: generation.comment,
+    });
+  });
+
+  // ADD CURRENT CUSTOM INSTRUCTIONS IF PROVIDED
+  if (customInstructions) {
+    messages.push({
+      role: "user",
+      content: `Regenerate that comment with the following instructions:\n\n${customInstructions}`,
+    });
+  }
 
   let response;
   try {
     response = await openai.chat.completions.create({
       model: "gpt-5-mini",
-      messages: [
-        {
-          role: "developer",
-          content: prompt,
-        },
-        {
-          role: "user",
-          content: `<post_title>${interaction.reddit_content_discovered.title}</post_title>\n\n<post_content>${interaction.reddit_content_discovered.content}</post_content>`,
-        },
-      ],
+      reasoning_effort: "medium",
+      messages,
       store: true,
     });
   } catch (error) {
@@ -111,23 +203,17 @@ export const POST = async (req: NextRequest) => {
     response.choices[0].message.content || ""
   );
 
-  return NextResponse.json({ comment: cleanedComment }, { status: 200 });
+  // UPDATE RATE LIMIT COOKIE
+  rateLimitData.count += 1;
+  const updatedCookie = JSON.stringify(rateLimitData);
+
+  const res = NextResponse.json({ comment: cleanedComment }, { status: 200 });
+  res.cookies.set("regeneration-limit", updatedCookie, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: oneHourMs / 1000, // COOKIE EXPIRES IN 1 HOUR
+  });
+
+  return res;
 };
-
-// HELPER FUNCTION TO PROCESS GENERATED COMMENTS
-function cleanUpGeneratedComment(content: string): string {
-  // REPLACE EM-DASHES WITH COMMA AND SPACE
-  let cleaned = content.replace(/—/g, ", ");
-
-  // REPLACE SPACED HYPHENS WITH COMMA AND SPACE
-  cleaned = cleaned.replace(/\s+-\s+/g, ", ");
-
-  // CLEAN UP MULTIPLE CONSECUTIVE SPACES BUT PRESERVE NEWLINES
-  cleaned = cleaned.replace(/[ \t]+/g, " ");
-
-  // CLEAN UP COMMA FOLLOWED BY MULTIPLE SPACES
-  cleaned = cleaned.replace(/,\s+/g, ", ");
-
-  // REMOVE LEADING AND TRAILING WHITESPACE
-  return cleaned;
-}

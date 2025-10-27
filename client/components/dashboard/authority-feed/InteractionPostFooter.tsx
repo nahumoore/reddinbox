@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useRedditAccounts } from "@/stores/reddit-accounts";
 import { useRedditUserInteractions } from "@/stores/reddit-user-interactions";
-import { useUserInfo } from "@/stores/user-info";
 import { RedditUserInteraction } from "@/types/db-schema";
 import { IconCheck, IconX } from "@tabler/icons-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import LessThan30DaysAccountAgeDialog from "./LessThan30DaysAccountAgeDialog";
+import { RegeneratePromptPopover } from "./RegeneratePromptPopover";
 
 interface CommentSectionProps {
   interaction: RedditUserInteraction;
@@ -24,14 +24,15 @@ export function InteractionPostFooter({
   const { activeRedditAccount } = useRedditAccounts();
   const { redditUserInteractions, setRedditUserInteractions } =
     useRedditUserInteractions();
-  const { userInfo } = useUserInfo();
 
   const [comment, setComment] = useState(
     interaction.our_interaction_content?.replace(/\\n/g, "\n") || ""
   );
   const [isPosting, setIsPosting] = useState(false);
+  const [isRegenerating, setIsRegenerating] = useState(false);
   const [showWarningDialog, setShowWarningDialog] = useState(false);
 
+  const isDisabled = isPosting || isRegenerating;
   const userAvatar =
     activeRedditAccount?.icon_img || activeRedditAccount?.snoovatar_img;
 
@@ -134,25 +135,6 @@ export function InteractionPostFooter({
     }
   };
 
-  const handleGenerateComment = async () => {
-    setIsPosting(true);
-    const response = await fetchGenerateComment({
-      interaction_id: interaction.id,
-      user_name: userInfo?.name || "",
-    });
-    setIsPosting(false);
-
-    if (response.error) {
-      console.error("Error generating comment:", response.error);
-      toast.error("Failed to generate comment", {
-        description: response.error,
-      });
-      return;
-    }
-
-    setComment(response.comment);
-  };
-
   const handleMarkAsReplied = async () => {
     setIsPosting(true);
 
@@ -216,17 +198,15 @@ export function InteractionPostFooter({
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder={`Write a comment replying to u/${interaction.interacted_with_reddit_username}...`}
-                className="min-h-24 resize-none rounded-r-none border-r-0 pr-2 border border-muted bg-white"
-                disabled={isPosting}
+                className="min-h-24 resize-none rounded-r-none border-r-0 pr-2 border border-muted bg-white focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0 focus-visible:border-ring"
+                disabled={isDisabled}
               />
-              {/* <Button
-                onClick={handleGenerateComment}
-                variant="outline"
-                disabled={isPosting}
-                className="rounded-l-none border border-muted border-l-0 px-8 h-auto self-stretch bg-white"
-              >
-                <IconSparkles className="size-5 text-primary fill-primary" />
-              </Button> */}
+              <RegeneratePromptPopover
+                interaction={interaction}
+                onCommentGenerated={setComment}
+                onRegeneratingChange={setIsRegenerating}
+                disabled={isDisabled}
+              />
             </div>
 
             <div className="flex items-center justify-between">
@@ -236,7 +216,7 @@ export function InteractionPostFooter({
                   variant="outline"
                   size="sm"
                   className="gap-2"
-                  disabled={isPosting}
+                  disabled={isDisabled}
                 >
                   <IconX className="size-4" />
                   Skip
@@ -244,7 +224,7 @@ export function InteractionPostFooter({
                 <div className="flex gap-2">
                   <Button
                     onClick={handleMarkAsReplied}
-                    disabled={!comment.trim() || isPosting}
+                    disabled={!comment.trim() || isDisabled}
                     size="sm"
                     className="gap-1"
                   >
@@ -317,31 +297,6 @@ const fetchSkipComment = async ({
     console.error("Error skipping comment:", error);
     return {
       error: "Failed to skip comment",
-    };
-  }
-};
-
-const fetchGenerateComment = async ({
-  interaction_id,
-  user_name,
-}: {
-  interaction_id: string;
-  user_name: string;
-}) => {
-  try {
-    const response = await fetch("/api/ai/generate-comment", {
-      method: "POST",
-      body: JSON.stringify({
-        interactionId: interaction_id,
-        userName: user_name,
-      }),
-    });
-
-    return response.json();
-  } catch (error) {
-    console.error("Error generating comment:", error);
-    return {
-      error: "Failed to generate comment",
     };
   }
 };
