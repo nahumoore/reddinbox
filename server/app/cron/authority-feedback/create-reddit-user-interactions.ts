@@ -59,7 +59,7 @@ export const createRedditUserInteractionsJob = async ({
     // PROCESS EACH ACTIVE USER
     for (const user of activeUsers) {
       try {
-        // CHECK IF USER ALREADY HAS MAX_INTERACTIONS+ NEW INTERACTIONS
+        // CHECK IF USER ALREADY HAS MAX_INTERACTIONS + NEW INTERACTIONS
         const newCount = newInteractionCountMap.get(user.auth_user_id) || 0;
         if (newCount >= MAX_INTERACTIONS) {
           console.log(
