@@ -11,7 +11,8 @@ const openai = new OpenAI({
 export const POST = async (req: NextRequest) => {
   // PARSE REQUEST BODY
   const body = await req.json();
-  const { website_id, target_audience, keywords, expertise } = body;
+  const { website_id, target_audience, keywords, expertise, description } =
+    body;
 
   // VALIDATE INPUT
   if (!website_id) {
@@ -67,6 +68,7 @@ export const POST = async (req: NextRequest) => {
     target_audience,
     keywords,
     expertise,
+    description,
   };
   if (expertise && expertise !== currentExpertise.expertise) {
     const embedding = await generateWebsiteInfoEmbedding(expertise);

@@ -41,6 +41,10 @@ const KEYWORDS_TO_REPLACE = [
       "I'd try",
     ],
   },
+  {
+    keyword: "absolutely",
+    replacement: ["definitely", "certainly", "for sure"],
+  },
 ];
 
 export function cleanUpGeneratedComment(content: string): string {

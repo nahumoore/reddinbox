@@ -102,14 +102,15 @@ export const createRedditUserInteractionsJob = async ({
             `⚙️ Authority feed settings: ${postsPerHour} posts/hour, ${postCategoriesActive.length} active categories`
           );
 
-          // FIND RELEVANT REDDIT POSTS (WITH FILTERING BY CATEGORY)
+          // FIND RELEVANT REDDIT POSTS (WITH FILTERING BY CATEGORY AND EXCLUDING USER'S OWN POSTS)
           let filteredPosts;
           try {
             filteredPosts = await findRelevantPosts(
               supabase,
               website.id,
               postsPerHour,
-              postCategoriesActive
+              postCategoriesActive,
+              redditUsername
             );
           } catch (rpcError) {
             console.error(

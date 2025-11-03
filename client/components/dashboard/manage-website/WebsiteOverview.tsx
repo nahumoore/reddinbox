@@ -15,6 +15,7 @@ export default function WebsiteOverview() {
   const [isSaving, setIsSaving] = useState(false);
 
   // Form state
+  const [editedDescription, setEditedDescription] = useState("");
   const [editedTargetAudience, setEditedTargetAudience] = useState("");
   const [editedKeywords, setEditedKeywords] = useState<string[]>([]);
   const [editedExpertise, setEditedExpertise] = useState<string[]>([]);
@@ -23,6 +24,7 @@ export default function WebsiteOverview() {
 
   const handleEditClick = () => {
     if (userActiveWebsite) {
+      setEditedDescription(userActiveWebsite.description || "");
       setEditedTargetAudience(userActiveWebsite.target_audience || "");
       setEditedKeywords(userActiveWebsite.keywords || []);
       setEditedExpertise(userActiveWebsite.expertise || []);
@@ -51,6 +53,7 @@ export default function WebsiteOverview() {
         },
         body: JSON.stringify({
           website_id: userActiveWebsite.id,
+          description: editedDescription,
           target_audience: editedTargetAudience,
           keywords: editedKeywords,
           expertise: editedExpertise,
@@ -157,6 +160,30 @@ export default function WebsiteOverview() {
                   {isSaving ? "Saving..." : "Save"}
                 </Button>
               </div>
+            )}
+          </div>
+
+          {/* Website Description */}
+          <div className="space-y-2">
+            <h3 className="text-sm font-medium text-muted-foreground">
+              Website Description
+            </h3>
+            {!isEditMode ? (
+              userActiveWebsite.description ? (
+                <p className="text-sm">{userActiveWebsite.description}</p>
+              ) : (
+                <p className="text-sm text-muted-foreground italic">
+                  No website description specified
+                </p>
+              )
+            ) : (
+              <Textarea
+                value={editedDescription}
+                onChange={(e) => setEditedDescription(e.target.value)}
+                placeholder="Describe what your website is about..."
+                rows={3}
+                className="resize-none"
+              />
             )}
           </div>
 

@@ -12,7 +12,10 @@
       "Bash(tree /F)",
       "Skill(seo)",
       "Bash(cat \"app/api/relationship-pipeline/fetch-interactions/route.ts\")",
-      "Skill(design)"
+      "Skill(design)",
+      "mcp__ide__getDiagnostics",
+      "Bash(git mv:*)",
+      "Bash(move StepOne.tsx PostConfigurationStep.tsx)"
     ],
     "deny": [],
     "ask": []

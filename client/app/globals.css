@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "@uiw/react-md-editor/markdown-editor.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -166,4 +167,39 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Markdown Editor Styling */
+.markdown-editor {
+  @apply rounded-md overflow-hidden border border-border;
+}
+
+.markdown-editor .w-md-editor {
+  @apply shadow-none;
+}
+
+.markdown-editor .w-md-editor-toolbar {
+  @apply bg-muted border-b border-border;
+}
+
+.markdown-editor .w-md-editor-toolbar ul > li > button {
+  @apply text-foreground hover:bg-accent/50 transition-colors;
+}
+
+.markdown-editor .w-md-editor-toolbar ul > li > button:hover {
+  @apply bg-secondary;
+}
+
+.markdown-editor .w-md-editor-text-pre,
+.markdown-editor .w-md-editor-text-input {
+  @apply text-sm font-sans leading-relaxed;
+}
+
+.markdown-editor .w-md-editor-text {
+  @apply bg-white;
+}
+
+.markdown-editor .w-md-editor-text-pre > code,
+.markdown-editor .w-md-editor-text-input {
+  @apply font-sans;
 }

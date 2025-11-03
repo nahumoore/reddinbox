@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/sidebar";
 import {
   IconHeartHandshake,
-  IconNews,
   IconUser,
   IconUsersGroup,
   IconUserUp,
@@ -39,11 +38,11 @@ const data = {
           icon: IconHeartHandshake,
           url: "/dashboard/relationship-pipeline",
         },
-        {
-          title: "Posts Builder",
-          icon: IconNews,
-          url: "/dashboard/posts-builder",
-        },
+        // {
+        //   title: "Posts Builder",
+        //   icon: IconNews,
+        //   url: "/dashboard/posts-builder",
+        // },
       ],
     },
   ],

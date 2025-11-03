@@ -6,12 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabaseClient } from "@/lib/supabase/client";
-import { IconLoader2, IconMail, IconCircleCheck } from "@tabler/icons-react";
+import { IconCircleCheck, IconLoader2, IconMail } from "@tabler/icons-react";
+import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import { useState, FormEvent } from "react";
+import { FormEvent, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { motion, AnimatePresence } from "framer-motion";
 
 // EMAIL VALIDATION SCHEMA
 const emailSchema = z.string().email("Please enter a valid email");
@@ -77,7 +77,9 @@ export default function RegisterPage() {
           {/* Header Section */}
           <div className="flex flex-col items-center gap-4">
             <div className="flex flex-col items-center gap-2">
-              <h2 className="font-body text-lg text-muted-foreground">Welcome to</h2>
+              <h2 className="font-body text-lg text-muted-foreground">
+                Welcome to
+              </h2>
               <Link
                 href="/"
                 className="flex items-center gap-2 font-heading hover:scale-105 transition-transform"
@@ -87,7 +89,8 @@ export default function RegisterPage() {
                 <span className="sr-only">Reddinbox</span>
               </Link>
               <p className="font-body text-center text-sm text-muted-foreground mt-1 max-w-md">
-                Build authority on Reddit and generate leads through authentic community engagement
+                Build authority on Reddit and generate leads through authentic
+                community engagement
               </p>
             </div>
             <div className="text-center text-sm font-body">
@@ -112,9 +115,15 @@ export default function RegisterPage() {
                 className="flex flex-col gap-6"
               >
                 {/* Email Form */}
-                <form onSubmit={handleEmailSubmit} className="flex flex-col gap-4">
+                <form
+                  onSubmit={handleEmailSubmit}
+                  className="flex flex-col gap-4"
+                >
                   <div className="grid gap-2">
-                    <Label htmlFor="email" className="font-body text-sm font-medium">
+                    <Label
+                      htmlFor="email"
+                      className="font-body text-sm font-medium"
+                    >
                       Email address
                     </Label>
                     <Input
@@ -189,21 +198,17 @@ export default function RegisterPage() {
                   <IconCircleCheck className="size-12 text-primary" />
                 </div>
                 <div className="text-center space-y-2">
-                  <h3 className="font-heading text-xl font-semibold">Check your email</h3>
+                  <h3 className="font-heading text-xl font-semibold">
+                    Check your email
+                  </h3>
                   <p className="font-body text-sm text-muted-foreground max-w-sm">
-                    We&apos;ve sent a magic link to <span className="font-medium text-foreground">{email}</span>
+                    We&apos;ve sent a magic link to{" "}
+                    <span className="font-medium text-foreground">{email}</span>
                   </p>
                   <p className="font-body text-xs text-muted-foreground pt-2">
                     Click the link in the email to complete your registration
                   </p>
                 </div>
-                <Button
-                  variant="outline"
-                  onClick={() => setOtpSent(false)}
-                  className="font-body mt-4"
-                >
-                  Use a different email
-                </Button>
               </motion.div>
             )}
           </AnimatePresence>

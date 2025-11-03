@@ -1,7 +1,7 @@
 import { redditGenerateCommentPrompt } from "@/defs/comments/generate-comment";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { supabaseServer } from "@/lib/supabase/server";
-import { cleanUpGeneratedComment } from "@/utils/llm/clean-up-generated-comment";
+import { cleanUpGeneratedContent } from "@/utils/llm/clean-up-generated-content";
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
@@ -199,7 +199,7 @@ export const POST = async (req: NextRequest) => {
     );
   }
 
-  const cleanedComment = cleanUpGeneratedComment(
+  const cleanedComment = cleanUpGeneratedContent(
     response.choices[0].message.content || ""
   );
 

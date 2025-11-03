@@ -14,7 +14,8 @@ export async function findRelevantPosts(
   supabase: SupabaseClient,
   websiteId: string,
   postsPerHour: number,
-  postCategoriesActive: string[]
+  postCategoriesActive: string[],
+  redditUsername?: string | null
 ): Promise<RelevantPost[]> {
   // USE RPC FUNCTION TO FIND RELEVANT REDDIT CONTENT WITH SIMILARITY THRESHOLD 4.5
   const { data: relevantPosts, error: rpcError } = await supabase.rpc(
@@ -33,6 +34,15 @@ export async function findRelevantPosts(
     return [];
   }
 
+  // FILTER OUT POSTS AUTHORED BY THE USER'S OWN REDDIT ACCOUNT
+  let filteredPosts = relevantPosts;
+  if (redditUsername) {
+    filteredPosts = relevantPosts.filter(
+      (p: { author: string }) =>
+        p.author.toLowerCase() !== redditUsername.toLowerCase()
+    );
+  }
+
   // FILTER POSTS BY CONTENT CATEGORY IF CATEGORIES ARE SPECIFIED
   if (postCategoriesActive.length > 0) {
     // FETCH FULL CONTENT DETAILS TO GET CONTENT_CATEGORY
@@ -41,7 +51,7 @@ export async function findRelevantPosts(
       .select("id, content_category")
       .in(
         "id",
-        relevantPosts.map((p: { id: string }) => p.id)
+        filteredPosts.map((p: { id: string }) => p.id)
       );
 
     if (contentError) {
@@ -57,11 +67,11 @@ export async function findRelevantPosts(
         )
         .map((c) => c.id);
 
-      return relevantPosts.filter((p: { id: string }) =>
+      return filteredPosts.filter((p: { id: string }) =>
         allowedPostIds.includes(p.id)
       );
     }
   }
 
-  return relevantPosts;
+  return filteredPosts;
 }
