@@ -7,7 +7,6 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useUserWebsites } from "@/stores/user-wesbites";
 import {
-  IconCheck,
   IconMessage,
   IconMessagePlus,
   IconSettings,
@@ -35,11 +34,11 @@ const TABS: Tab[] = [
     label: "Comment Replies",
     icon: IconMessage,
   },
-  {
-    value: "scheduled-comments",
-    label: "Scheduled Comments",
-    icon: IconCheck,
-  },
+  // {
+  //   value: "scheduled-comments",
+  //   label: "Scheduled Comments",
+  //   icon: IconCheck,
+  // },
 ];
 
 export default function LeadsPage() {

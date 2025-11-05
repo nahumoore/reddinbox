@@ -230,6 +230,75 @@ export type Database = {
           },
         ]
       }
+      reddit_leads: {
+        Row: {
+          buying_signals: string[] | null
+          conversation_summary: string | null
+          created_at: string | null
+          first_interaction_at: string | null
+          id: string
+          last_analyzed_at: string | null
+          last_interaction_at: string | null
+          lead_score: number
+          lead_status: Database["public"]["Enums"]["reddit_lead_status"]
+          marked_ready_at: string | null
+          pain_points: string[] | null
+          reddit_username: string
+          total_interactions_count: number | null
+          user_id: string
+          website_id: string
+        }
+        Insert: {
+          buying_signals?: string[] | null
+          conversation_summary?: string | null
+          created_at?: string | null
+          first_interaction_at?: string | null
+          id?: string
+          last_analyzed_at?: string | null
+          last_interaction_at?: string | null
+          lead_score?: number
+          lead_status?: Database["public"]["Enums"]["reddit_lead_status"]
+          marked_ready_at?: string | null
+          pain_points?: string[] | null
+          reddit_username: string
+          total_interactions_count?: number | null
+          user_id: string
+          website_id: string
+        }
+        Update: {
+          buying_signals?: string[] | null
+          conversation_summary?: string | null
+          created_at?: string | null
+          first_interaction_at?: string | null
+          id?: string
+          last_analyzed_at?: string | null
+          last_interaction_at?: string | null
+          lead_score?: number
+          lead_status?: Database["public"]["Enums"]["reddit_lead_status"]
+          marked_ready_at?: string | null
+          pain_points?: string[] | null
+          reddit_username?: string
+          total_interactions_count?: number | null
+          user_id?: string
+          website_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reddit_leads_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_info"
+            referencedColumns: ["auth_user_id"]
+          },
+          {
+            foreignKeyName: "reddit_leads_website_id_fkey"
+            columns: ["website_id"]
+            isOneToOne: false
+            referencedRelation: "websites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reddit_subreddits: {
         Row: {
           banner_background_image: string | null
@@ -297,6 +366,7 @@ export type Database = {
           our_interaction_reddit_id: string | null
           reddit_account_id: string | null
           reddit_content_discovered_id: string | null
+          reddit_lead: string | null
           retry_count: number | null
           scheduled_at: string | null
           similarity_score: number | null
@@ -318,6 +388,7 @@ export type Database = {
           our_interaction_reddit_id?: string | null
           reddit_account_id?: string | null
           reddit_content_discovered_id?: string | null
+          reddit_lead?: string | null
           retry_count?: number | null
           scheduled_at?: string | null
           similarity_score?: number | null
@@ -339,6 +410,7 @@ export type Database = {
           our_interaction_reddit_id?: string | null
           reddit_account_id?: string | null
           reddit_content_discovered_id?: string | null
+          reddit_lead?: string | null
           retry_count?: number | null
           scheduled_at?: string | null
           similarity_score?: number | null
@@ -361,6 +433,13 @@ export type Database = {
             columns: ["reddit_content_discovered_id"]
             isOneToOne: false
             referencedRelation: "reddit_content_discovered"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reddit_user_interactions_reddit_lead_fkey"
+            columns: ["reddit_lead"]
+            isOneToOne: false
+            referencedRelation: "reddit_leads"
             referencedColumns: ["id"]
           },
           {
@@ -436,6 +515,7 @@ export type Database = {
           name: string
           subreddit_reddit_ids: string[] | null
           target_audience: string | null
+          type_of_service: Database["public"]["Enums"]["website_type_of_service"]
           updated_at: string
           url: string
           user_id: string
@@ -452,6 +532,7 @@ export type Database = {
           name: string
           subreddit_reddit_ids?: string[] | null
           target_audience?: string | null
+          type_of_service?: Database["public"]["Enums"]["website_type_of_service"]
           updated_at?: string
           url: string
           user_id: string
@@ -468,6 +549,7 @@ export type Database = {
           name?: string
           subreddit_reddit_ids?: string[] | null
           target_audience?: string | null
+          type_of_service?: Database["public"]["Enums"]["website_type_of_service"]
           updated_at?: string
           url?: string
           user_id?: string
@@ -509,10 +591,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      binary_quantize: {
-        Args: { "": string } | { "": unknown }
-        Returns: unknown
-      }
       find_relevant_reddit_content: {
         Args: { p_limit?: number; p_website_id: string }
         Returns: {
@@ -529,93 +607,19 @@ export type Database = {
           ups: number
         }[]
       }
-      halfvec_avg: {
-        Args: { "": number[] }
-        Returns: unknown
-      }
-      halfvec_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      halfvec_send: {
-        Args: { "": unknown }
-        Returns: string
-      }
-      halfvec_typmod_in: {
-        Args: { "": unknown[] }
-        Returns: number
-      }
-      hnsw_bit_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      hnsw_halfvec_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      hnsw_sparsevec_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      hnswhandler: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      ivfflat_bit_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      ivfflat_halfvec_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      ivfflathandler: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      l2_norm: {
-        Args: { "": unknown } | { "": unknown }
-        Returns: number
-      }
-      l2_normalize: {
-        Args: { "": string } | { "": unknown } | { "": unknown }
-        Returns: unknown
-      }
-      sparsevec_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      sparsevec_send: {
-        Args: { "": unknown }
-        Returns: string
-      }
-      sparsevec_typmod_in: {
-        Args: { "": unknown[] }
-        Returns: number
-      }
-      vector_avg: {
-        Args: { "": number[] }
-        Returns: string
-      }
-      vector_dims: {
-        Args: { "": string } | { "": unknown }
-        Returns: number
-      }
-      vector_norm: {
-        Args: { "": string }
-        Returns: number
-      }
-      vector_out: {
-        Args: { "": string }
-        Returns: unknown
-      }
-      vector_send: {
-        Args: { "": string }
-        Returns: string
-      }
-      vector_typmod_in: {
-        Args: { "": unknown[] }
-        Returns: number
+      match_reddit_content: {
+        Args: { match_count?: number; query_embedding: string }
+        Returns: {
+          author: string
+          content: string
+          id: string
+          reddit_created_at: string
+          reddit_url: string
+          similarity: number
+          subreddit_name: string
+          title: string
+          ups: number
+        }[]
       }
     }
     Enums: {
@@ -627,6 +631,13 @@ export type Database = {
       email_notification_status: "pending" | "sent" | "failed"
       interaction_type: "comment_reply" | "post_reply" | "dm"
       reddit_interaction_status: "new" | "ignored" | "posted" | "scheduled"
+      reddit_lead_status:
+        | "new"
+        | "unqualified"
+        | "contacted"
+        | "responded"
+        | "converted"
+        | "not_interested"
       reddit_post_category:
         | "help_request"
         | "advice_seeking"
@@ -641,6 +652,7 @@ export type Database = {
         | "resource_compilation"
         | "other"
       subscription_statuses: "free-trial" | "active" | "stopped"
+      website_type_of_service: "saas" | "agency"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -777,6 +789,14 @@ export const Constants = {
       email_notification_status: ["pending", "sent", "failed"],
       interaction_type: ["comment_reply", "post_reply", "dm"],
       reddit_interaction_status: ["new", "ignored", "posted", "scheduled"],
+      reddit_lead_status: [
+        "new",
+        "unqualified",
+        "contacted",
+        "responded",
+        "converted",
+        "not_interested",
+      ],
       reddit_post_category: [
         "help_request",
         "advice_seeking",
@@ -792,6 +812,7 @@ export const Constants = {
         "other",
       ],
       subscription_statuses: ["free-trial", "active", "stopped"],
+      website_type_of_service: ["saas", "agency"],
     },
   },
 } as const

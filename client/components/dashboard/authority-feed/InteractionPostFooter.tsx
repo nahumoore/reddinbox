@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useRedditAccounts } from "@/stores/reddit-accounts";
 import { useRedditUserInteractions } from "@/stores/reddit-user-interactions";
 import { RedditUserInteraction } from "@/types/db-schema";
-import { IconCheck, IconX } from "@tabler/icons-react";
+import { IconCheck, IconCopy, IconX } from "@tabler/icons-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import LessThan30DaysAccountAgeDialog from "./LessThan30DaysAccountAgeDialog";
@@ -31,6 +31,7 @@ export function InteractionPostFooter({
   const [isPosting, setIsPosting] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [showWarningDialog, setShowWarningDialog] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
   const isDisabled = isPosting || isRegenerating;
   const userAvatar =
@@ -135,6 +136,15 @@ export function InteractionPostFooter({
     }
   };
 
+  const handleCopy = () => {
+    setIsCopied(true);
+    navigator.clipboard.writeText(comment);
+
+    setTimeout(() => {
+      setIsCopied(false);
+    }, 2000);
+  };
+
   const handleMarkAsReplied = async () => {
     setIsPosting(true);
 
@@ -186,11 +196,16 @@ export function InteractionPostFooter({
           </Avatar>
 
           <div className="flex-1 space-y-3">
-            <div className="text-sm text-muted-foreground">
-              Replying as{" "}
-              <span className="font-medium text-foreground">
-                u/{activeRedditAccount?.name || "user"}
-              </span>
+            <div className="flex justify-between items-center">
+              <div className="text-sm text-muted-foreground">
+                Replying as{" "}
+                <span className="font-medium text-foreground">
+                  u/{activeRedditAccount?.name || "user"}
+                </span>
+              </div>
+              <Button size="icon" variant="ghost" onClick={handleCopy}>
+                {isCopied ? <IconCheck /> : <IconCopy />}
+              </Button>
             </div>
 
             <div className="relative flex items-stretch">

@@ -4,36 +4,20 @@ export interface ActiveUser {
   auth_user_id: string;
   name: string | null;
   email: string | null;
-  websites:
-    | {
-        id: string;
-        name: string;
-        description: string | null;
-        keywords: string[] | null;
-        type_of_service: "saas" | "agency";
-        subreddit_reddit_ids: string[];
-        authority_feed_options: unknown;
-      }
-    | {
-        id: string;
-        name: string;
-        description: string | null;
-        keywords: string[] | null;
-        type_of_service: "saas" | "agency";
-        subreddit_reddit_ids: string[];
-        authority_feed_options: unknown;
-      }[];
-  reddit_accounts:
-    | {
-        id: string;
-        name: string;
-        is_active: boolean;
-      }
-    | {
-        id: string;
-        name: string;
-        is_active: boolean;
-      }[];
+  websites: {
+    id: string;
+    name: string;
+    description: string | null;
+    keywords: string[] | null;
+    type_of_service: "saas" | "agency";
+    subreddit_reddit_ids: string[];
+    authority_feed_options: unknown;
+  }[];
+  reddit_accounts: {
+    id: string;
+    name: string;
+    is_active: boolean;
+  }[];
 }
 
 const devEmailTest = "nahuelmoreno2904@gmail.com";

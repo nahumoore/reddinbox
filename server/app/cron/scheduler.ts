@@ -2,6 +2,7 @@ import cron from "node-cron";
 import { supabaseAdmin } from "../lib/supabase/client";
 import { checkNewComments } from "./authority-feedback/check-new-comments";
 import { discoverRedditContentJob } from "./authority-feedback/discover-reddit-content";
+import { generateRedditLeadsJob } from "./authority-feedback/generate-reddit-leads";
 import { checkSubscriptions } from "./check-subscriptions/check-subscriptions";
 import { collectFeedback } from "./collect-feedback/collect-feedback";
 
@@ -11,12 +12,14 @@ const cronJobs = {
   checkNewComments, // Check for new comments
   checkSubscriptions, // Check and update expired subscriptions
   collectFeedback, // Collect user feedback from new users
+  generateRedditLeadsJob, // Generate leads from Reddit
 } as const;
 
 // CRON SCHEDULES
 const cronSchedules = {
   discoverRedditContentJob: "0 0 */1 * * *", // Every hour
   checkNewComments: "0 0 */1 * * *", // Every hour
+  generateRedditLeadsJob: "0 0 */1 * * *", // Every hour
   checkSubscriptions: "0 0 0 * * *", // Every day at midnight UTC
   collectFeedback: "0 0 */6 * * *", // Every 6 hours
 } as const;

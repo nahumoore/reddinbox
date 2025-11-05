@@ -34,9 +34,9 @@ const data = {
           url: "/dashboard/authority-feed",
         },
         {
-          title: "Relationship Pipeline",
+          title: "Reddit Leads",
           icon: IconHeartHandshake,
-          url: "/dashboard/relationship-pipeline",
+          url: "/dashboard/reddit-leads",
         },
         // {
         //   title: "Posts Builder",

@@ -230,6 +230,75 @@ export type Database = {
           },
         ]
       }
+      reddit_leads: {
+        Row: {
+          buying_signals: string[] | null
+          conversation_summary: string | null
+          created_at: string | null
+          first_interaction_at: string | null
+          id: string
+          last_analyzed_at: string | null
+          last_interaction_at: string | null
+          lead_score: number
+          lead_status: Database["public"]["Enums"]["reddit_lead_status"]
+          marked_ready_at: string | null
+          pain_points: string[] | null
+          reddit_username: string
+          total_interactions_count: number | null
+          user_id: string
+          website_id: string
+        }
+        Insert: {
+          buying_signals?: string[] | null
+          conversation_summary?: string | null
+          created_at?: string | null
+          first_interaction_at?: string | null
+          id?: string
+          last_analyzed_at?: string | null
+          last_interaction_at?: string | null
+          lead_score?: number
+          lead_status?: Database["public"]["Enums"]["reddit_lead_status"]
+          marked_ready_at?: string | null
+          pain_points?: string[] | null
+          reddit_username: string
+          total_interactions_count?: number | null
+          user_id: string
+          website_id: string
+        }
+        Update: {
+          buying_signals?: string[] | null
+          conversation_summary?: string | null
+          created_at?: string | null
+          first_interaction_at?: string | null
+          id?: string
+          last_analyzed_at?: string | null
+          last_interaction_at?: string | null
+          lead_score?: number
+          lead_status?: Database["public"]["Enums"]["reddit_lead_status"]
+          marked_ready_at?: string | null
+          pain_points?: string[] | null
+          reddit_username?: string
+          total_interactions_count?: number | null
+          user_id?: string
+          website_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reddit_leads_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_info"
+            referencedColumns: ["auth_user_id"]
+          },
+          {
+            foreignKeyName: "reddit_leads_website_id_fkey"
+            columns: ["website_id"]
+            isOneToOne: false
+            referencedRelation: "websites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reddit_subreddits: {
         Row: {
           banner_background_image: string | null
@@ -297,6 +366,7 @@ export type Database = {
           our_interaction_reddit_id: string | null
           reddit_account_id: string | null
           reddit_content_discovered_id: string | null
+          reddit_lead: string | null
           retry_count: number | null
           scheduled_at: string | null
           similarity_score: number | null
@@ -318,6 +388,7 @@ export type Database = {
           our_interaction_reddit_id?: string | null
           reddit_account_id?: string | null
           reddit_content_discovered_id?: string | null
+          reddit_lead?: string | null
           retry_count?: number | null
           scheduled_at?: string | null
           similarity_score?: number | null
@@ -339,6 +410,7 @@ export type Database = {
           our_interaction_reddit_id?: string | null
           reddit_account_id?: string | null
           reddit_content_discovered_id?: string | null
+          reddit_lead?: string | null
           retry_count?: number | null
           scheduled_at?: string | null
           similarity_score?: number | null
@@ -361,6 +433,13 @@ export type Database = {
             columns: ["reddit_content_discovered_id"]
             isOneToOne: false
             referencedRelation: "reddit_content_discovered"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reddit_user_interactions_reddit_lead_fkey"
+            columns: ["reddit_lead"]
+            isOneToOne: false
+            referencedRelation: "reddit_leads"
             referencedColumns: ["id"]
           },
           {
@@ -552,6 +631,13 @@ export type Database = {
       email_notification_status: "pending" | "sent" | "failed"
       interaction_type: "comment_reply" | "post_reply" | "dm"
       reddit_interaction_status: "new" | "ignored" | "posted" | "scheduled"
+      reddit_lead_status:
+        | "new"
+        | "unqualified"
+        | "contacted"
+        | "responded"
+        | "converted"
+        | "not_interested"
       reddit_post_category:
         | "help_request"
         | "advice_seeking"
@@ -703,6 +789,14 @@ export const Constants = {
       email_notification_status: ["pending", "sent", "failed"],
       interaction_type: ["comment_reply", "post_reply", "dm"],
       reddit_interaction_status: ["new", "ignored", "posted", "scheduled"],
+      reddit_lead_status: [
+        "new",
+        "unqualified",
+        "contacted",
+        "responded",
+        "converted",
+        "not_interested",
+      ],
       reddit_post_category: [
         "help_request",
         "advice_seeking",

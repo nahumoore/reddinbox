@@ -21,3 +21,5 @@ export type RedditUserInteraction =
         })
       | null;
   };
+
+export type RedditLeads = Database["public"]["Tables"]["reddit_leads"]["Row"];
