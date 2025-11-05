@@ -242,9 +242,11 @@ export type Database = {
           lead_score: number
           lead_status: Database["public"]["Enums"]["reddit_lead_status"]
           marked_ready_at: string | null
+          notes: string | null
           pain_points: string[] | null
           reddit_username: string
           total_interactions_count: number | null
+          updated_at: string | null
           user_id: string
           website_id: string
         }
@@ -259,9 +261,11 @@ export type Database = {
           lead_score?: number
           lead_status?: Database["public"]["Enums"]["reddit_lead_status"]
           marked_ready_at?: string | null
+          notes?: string | null
           pain_points?: string[] | null
           reddit_username: string
           total_interactions_count?: number | null
+          updated_at?: string | null
           user_id: string
           website_id: string
         }
@@ -276,9 +280,11 @@ export type Database = {
           lead_score?: number
           lead_status?: Database["public"]["Enums"]["reddit_lead_status"]
           marked_ready_at?: string | null
+          notes?: string | null
           pain_points?: string[] | null
           reddit_username?: string
           total_interactions_count?: number | null
+          updated_at?: string | null
           user_id?: string
           website_id?: string
         }

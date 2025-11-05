@@ -1,10 +1,7 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { refreshRedditToken } from "../../helpers/reddit/refresh-access-token";
 import { Database } from "../../lib/supabase/database.types";
-
-type RedditInteraction =
-  Database["public"]["Tables"]["reddit_user_interactions"]["Row"];
-type RedditAccount = Database["public"]["Tables"]["reddit_accounts"]["Row"];
+import { RedditAccount } from "../../types/database-schema";
 
 export const postComments = async ({
   supabase,

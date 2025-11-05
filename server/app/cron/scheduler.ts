@@ -2,9 +2,9 @@ import cron from "node-cron";
 import { supabaseAdmin } from "../lib/supabase/client";
 import { checkNewComments } from "./authority-feedback/check-new-comments";
 import { discoverRedditContentJob } from "./authority-feedback/discover-reddit-content";
-import { generateRedditLeadsJob } from "./authority-feedback/generate-reddit-leads";
 import { checkSubscriptions } from "./check-subscriptions/check-subscriptions";
 import { collectFeedback } from "./collect-feedback/collect-feedback";
+import { generateRedditLeadsJob } from "./generate-reddit-leads/generate-reddit-leads";
 
 // CRON JOBS REGISTRY
 const cronJobs = {
