@@ -69,9 +69,12 @@ export default function LeadStatusCard({
 
   return (
     <Card
-      className={cn("flex flex-col gap-2", variant === "inline" && "flex-row")}
+      className={cn(
+        "flex flex-col gap-2 p-0",
+        variant === "inline" && "flex-row"
+      )}
     >
-      <CardContent className="flex items-center gap-2 !px-2 !py-2">
+      <CardContent className="flex items-center gap-2 p-4">
         <span className="text-sm font-bold">Status:</span>
         {isEditing ? (
           <div className="flex items-center gap-2">
@@ -94,10 +97,24 @@ export default function LeadStatusCard({
                 <SelectItem value="unqualified">Unqualified</SelectItem>
               </SelectContent>
             </Select>
-            <Button size="sm" variant="default" onClick={handleSave} disabled={isSaving}>
-              {isSaving ? <IconLoader2 className="size-4 animate-spin" /> : <IconCheck className="size-4" />}
+            <Button
+              size="sm"
+              variant="default"
+              onClick={handleSave}
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <IconLoader2 className="size-4 animate-spin" />
+              ) : (
+                <IconCheck className="size-4" />
+              )}
             </Button>
-            <Button size="sm" variant="ghost" onClick={handleCancel} disabled={isSaving}>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleCancel}
+              disabled={isSaving}
+            >
               <IconX className="size-4" />
             </Button>
           </div>
