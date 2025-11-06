@@ -62,7 +62,7 @@ export default function Pricing() {
     {
       name: "Gustavo",
       content:
-        "Tried so many Reddit tools before this one and they all felt off. This actually feels",
+        "Tried so many Reddit tools before this one and they all felt off. This actually feels like the real one",
       image: TestimonialUser7,
     },
   ];
@@ -78,10 +78,10 @@ export default function Pricing() {
           </div>
 
           <h2 className="text-4xl font-bold text-foreground mb-4">
-            Build Reddit Authority on
+            Start Getting Customers from
             <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
               {" "}
-              Auto-Pilot
+              Reddit
             </span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">

@@ -9,7 +9,6 @@ import {
   IconMessageCircle,
 } from "@tabler/icons-react";
 import { format } from "date-fns";
-import { StatusBadge } from "./StatusBadge";
 
 interface InteractionItemProps {
   interaction: RedditUserInteraction;
@@ -52,7 +51,6 @@ export function InteractionItem({
                 <h4 className="font-heading font-semibold text-sm group-hover:text-primary transition-colors">
                   {post?.title || "Interaction"}
                 </h4>
-                <StatusBadge status={interaction.status} />
               </div>
 
               <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
@@ -105,6 +103,8 @@ export function InteractionItem({
                       </a>
                     )}
                   </div>
+
+                  <h2 className="text-md font-semibold">{post.title}</h2>
 
                   <p className="text-sm text-foreground/90 leading-relaxed">
                     {post.content}

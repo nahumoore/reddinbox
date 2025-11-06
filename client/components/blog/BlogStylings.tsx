@@ -173,6 +173,9 @@ export default function BlogStylings(): MDXComponents {
         )}
       />
     ),
+    img: (props) => (
+      <img {...props} className={cn("rounded-lg shadow-lg", props.className)} />
+    ),
     // --- Custom Interactive Components for Articles ---
     RedditPostCard: (props) => <RedditPostCard {...props} />, // Used when a post is shared
     RedditReplyCard: (props) => <RedditReplyCard {...props} />, // Used when a reply is shared

@@ -38,7 +38,7 @@ const steps = [
   {
     step: 3,
     icon: IconMessages,
-    title: "Generate Authentic Responses",
+    title: "Reply with Authentic & Human Comments",
     description:
       "Create authentic, helpful responses with the main purpose of helping users and build your reputation while mentioning your product naturally.",
     benefit: "Never sound like a spam bot",
@@ -148,40 +148,40 @@ export default function HowItWorks() {
             </div>
           ))}
 
-        {/* Video Section */}
-        <div className="mt-32">
-          <div className="text-center mb-12">
-            <div className="flex justify-center mb-6">
-              <Badge className="bg-primary/10 text-primary border-primary/20 uppercase text-sm">
-                See It In Action
-              </Badge>
+          {/* Video Section */}
+          <div className="mt-32">
+            <div className="text-center mb-12">
+              <div className="flex justify-center mb-6">
+                <Badge className="bg-primary/10 text-primary border-primary/20 uppercase text-sm">
+                  See It In Action
+                </Badge>
+              </div>
+              <h3 className="text-2xl md:text-4xl font-bold text-foreground mb-4 font-heading">
+                Watch How Reddinbox Works
+              </h3>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Get a complete walkthrough of how Reddinbox helps you build
+                authority and generate leads on Reddit
+              </p>
             </div>
-            <h3 className="text-2xl md:text-4xl font-bold text-foreground mb-4 font-heading">
-              Watch How Reddinbox Works
-            </h3>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Get a complete walkthrough of how Reddinbox helps you build
-              authority and generate leads on Reddit
-            </p>
-          </div>
 
-          <div className="max-w-5xl mx-auto">
-            <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-primary/50 to-primary/30 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative overflow-hidden rounded-2xl shadow-2xl bg-secondary/50 border border-primary/10 transform transition-all duration-300 group-hover:scale-[1.02]">
-                <div className="aspect-video">
-                  <iframe
-                    src="https://www.youtube.com/embed/zfOFv0NiAkI"
-                    title="Reddinbox Demo Video"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    className="w-full h-full"
-                  />
+            <div className="max-w-5xl mx-auto">
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-primary/50 to-primary/30 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative overflow-hidden rounded-2xl shadow-2xl bg-secondary/50 border border-primary/10 transform transition-all duration-300 group-hover:scale-[1.02]">
+                  <div className="aspect-video">
+                    <iframe
+                      src="https://www.youtube.com/embed/zfOFv0NiAkI"
+                      title="Reddinbox Demo Video"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="w-full h-full"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
         </div>
       </div>
     </section>

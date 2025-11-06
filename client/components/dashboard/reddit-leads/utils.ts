@@ -4,6 +4,7 @@ export const getStatusConfig = (
   variant: "default" | "secondary" | "destructive" | "outline";
   label: string;
   color: string;
+  className?: string;
 } => {
   switch (status) {
     case "new":
@@ -33,6 +34,7 @@ export const getStatusConfig = (
         variant: "destructive",
         label: "Unqualified",
         color: "bg-red-500",
+        className: "text-white",
       };
     default:
       return { variant: "outline", label: status, color: "bg-gray-500" };

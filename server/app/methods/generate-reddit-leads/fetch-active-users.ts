@@ -53,8 +53,7 @@ export async function fetchActiveUsers(
     .eq("websites.is_active", true);
 
   // APPLY DEV EMAIL FILTER ONLY IN DEVELOPMENT
-  // if (process.env.NODE_ENV === "dev") query = query.eq("email", devEmailTest);
-  query = query.eq("email", devEmailTest);
+  if (process.env.NODE_ENV === "dev") query = query.eq("email", devEmailTest);
 
   // APPLY REMAINING FILTERS
   const { data: activeUsers, error: usersError } = await query;

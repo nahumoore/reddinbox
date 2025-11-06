@@ -120,7 +120,10 @@ export default function LeadStatusCard({
           </div>
         ) : (
           <>
-            <Badge variant={statusConfig.variant} className="text-sm px-3 py-1">
+            <Badge
+              variant={statusConfig.variant}
+              className={cn(statusConfig.className, "text-sm px-3 py-1")}
+            >
               {statusConfig.label}
             </Badge>
             <Button

@@ -83,6 +83,9 @@ export function cleanUpGeneratedComment(content: string): string {
   // CLEAN UP 'Tip:'
   cleaned = cleaned.replace(/^tip:\s*/i, "");
 
+  // REMOVE PERIODS BEFORE LINE BREAKS
+  cleaned = cleaned.replace(/\.\n/g, "\n");
+
   // DON'T ADD TRIM TO MAINTAIN SPACE BETWEEN PARAGRAPHS
   return cleaned;
 }

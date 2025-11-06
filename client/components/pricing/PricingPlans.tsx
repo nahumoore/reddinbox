@@ -21,24 +21,23 @@ const avatars = [
 
 const features = [
   {
+    title: "Unlimited Personalized Feed",
+    description:
+      "Receive every hour new posts of people mentioning problems that your product solves",
+  },
+  {
     title: "Unlimited Responses",
-    description: "Unlimited authentic, helpful responses that build authority",
-  },
-  {
-    title: "Profile Optimization",
-    description: "Get personalized Reddit profile improvement suggestions",
-  },
-  {
-    title: "Authority Tracking",
-    description: "Monitor your reputation and influence growth",
+    description:
+      "Unlimited authentic, helpful responses mentioning your product",
   },
   {
     title: "Lead Discovery",
     description: "Identify and track potential customers from interactions",
   },
   {
-    title: "Automated Scheduling",
-    description: "Queue responses and content for optimal timing",
+    title: "Lead Scoring",
+    description:
+      "Classify leads based on what they're looking for and how likely they are to convert",
   },
   {
     title: "24/7 Customer Support",
@@ -103,7 +102,7 @@ export default function PricingPlans({
               <div key={index} className="flex items-start gap-3">
                 <IconCheck className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                 <div>
-                  <span className="font-medium">{feature.title}</span>
+                  <span className="font-bold">{feature.title}</span>
                   <span className="text-gray-600">
                     {" "}
                     - {feature.description}
