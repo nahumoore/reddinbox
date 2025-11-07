@@ -32,15 +32,23 @@ export type LeadPerWebsiteClassified = LeadPerWebsite & {
 // CLASSIFY BATCH OF LEADS WITH RETRY LOGIC
 const classifyLeadsBatch = async (
   leadBatch: LeadPerWebsite["leads"],
-  websiteInfo: Pick<LeadPerWebsite, "website_name" | "website_description" | "website_keywords">,
+  websiteInfo: Pick<
+    LeadPerWebsite,
+    | "website_name"
+    | "website_description"
+    | "website_keywords"
+    | "website_target_audience"
+  >,
   maxRetries = 2
-): Promise<Array<{
-  reddit_username: string;
-  lead_score: number;
-  conversation_summary: string;
-  buying_signals: string[];
-  pain_points: string[];
-}>> => {
+): Promise<
+  Array<{
+    reddit_username: string;
+    lead_score: number;
+    conversation_summary: string;
+    buying_signals: string[];
+    pain_points: string[];
+  }>
+> => {
   let lastError: Error | null = null;
 
   // TRY UP TO maxRetries + 1 TIMES (INITIAL ATTEMPT + RETRIES)
@@ -51,6 +59,7 @@ const classifyLeadsBatch = async (
         productName: websiteInfo.website_name,
         productDescription: websiteInfo.website_description,
         productKeywords: websiteInfo.website_keywords,
+        productTargetAudience: websiteInfo.website_target_audience,
       });
 
       // CALL OPENAI WITH BOTTLENECK RATE LIMITING
@@ -132,6 +141,7 @@ const classifySingleWebsite = async (
     website_name: leadPerWebsite.website_name,
     website_description: leadPerWebsite.website_description,
     website_keywords: leadPerWebsite.website_keywords,
+    website_target_audience: leadPerWebsite.website_target_audience,
   };
 
   // PROCESS EACH BATCH SEQUENTIALLY TO AVOID OVER-STIMULATING THE MODEL

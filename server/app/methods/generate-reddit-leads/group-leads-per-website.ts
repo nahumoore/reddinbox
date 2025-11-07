@@ -13,6 +13,7 @@ export type LeadPerWebsite = {
   website_name: string;
   website_keywords: string[];
   website_description: string;
+  website_target_audience: string;
   user_id: string;
   leads: {
     reddit_username: string;
@@ -55,6 +56,7 @@ export const groupLeadsPerWebsite = ({
         website_name: interaction.websites.name,
         website_keywords: interaction.websites.keywords,
         website_description: interaction.websites.description,
+        website_target_audience: interaction.websites.target_audience,
         user_id: interaction.user_id,
         leads: [],
       });

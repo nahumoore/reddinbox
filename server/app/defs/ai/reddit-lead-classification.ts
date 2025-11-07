@@ -2,15 +2,19 @@ export const redditLeadClassificationPrompt = ({
   productName,
   productDescription,
   productKeywords,
+  productTargetAudience,
 }: {
   productName: string;
   productDescription: string;
   productKeywords: string[];
+  productTargetAudience: string;
 }) => {
   const first3Keywords = productKeywords.slice(0, 3).join(", ");
 
   return `
 You are a Reddit lead scoring and classification expert analyzing potential customers for ${productName} - ${productDescription}.
+
+This product targets ${productTargetAudience}.
 
 Your task is to analyze Reddit conversations to identify high-quality leads based on their interactions with our team.
 

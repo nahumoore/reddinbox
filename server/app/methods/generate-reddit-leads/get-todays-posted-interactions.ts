@@ -34,6 +34,7 @@ export interface Interaction {
     id: string;
     name: string;
     keywords: string[];
+    target_audience: string;
     description: string;
   };
 }
@@ -91,6 +92,7 @@ export const getTodaysPostedInteractions = async ({
         id,
         name,
         keywords,
+        target_audience,
         description
       )
       `
